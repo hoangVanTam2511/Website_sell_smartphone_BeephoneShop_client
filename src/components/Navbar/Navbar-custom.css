@@ -1,0 +1,209 @@
+.navbar-custom{
+    display: flex;
+    align-items: center;
+    width: 30%;
+    margin: 4px auto;
+}
+.menu-item-custom{
+    font-size:16px;
+    width: 36%;
+}
+.header__top > div,
+.header__main > div {
+  width: 100%;
+  max-width: 1220px;
+  margin: auto;
+  padding: 0 10px;
+}
+.header__top {
+  background-color: #ffd400;
+  padding: 10px 0 0;
+}
+.header__top > div {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+.header__main {
+  background-color: #ffd400;
+  padding: 0 0 10px;
+}
+.header__logo {
+  padding-right: 15px;
+}
+.header__address {
+  color: #333;
+  font-size: 11px;
+  line-height: 15px;
+  margin-right: 21px;
+  width: 15%;
+  padding-left: 15px;
+  background: rgba(255, 172, 10, 0.6);
+  padding: 4px 6px 4px 10px;
+  border-radius: 4px;
+  position: relative;
+}
+.header__address span {
+  color: #333;
+  font-weight: bold;
+  width: max-content;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  max-width: 117px;
+  text-transform: capitalize;
+  padding-right: 15px;
+}
+.header__address span::before {
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #000;
+  content: '';
+  position: absolute;
+  top: 43%;
+  right: 7px;
+}
+.header__search {
+  position: relative;
+  width: 34%;
+  border-radius: 4px;
+  background-color: #fff;
+}
+.header__search input {
+  background-color: #fff;
+  border: 0;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 14px;
+  height: 40px;
+  padding: 8px 8px 8px 13px;
+  width: calc(100% - 35px);
+}
+.header__search button {
+  background-color: transparent;
+  border: 0;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+.header__search .dropdownsearch {
+  float: left;
+  overflow: hidden;
+  width: 90px;
+}
+.header__search .dropdownsearch a#type {
+  display: block;
+  overflow: hidden;
+  padding: 6px 4px 6px 6px;
+  box-sizing: border-box;
+  background: #fed700;
+  margin: 5px;
+  border-radius: 4px;
+  color: #333;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+}
+.header__search .dropdownsearch a#type:after {
+  content: '';
+  border-top: 5px solid #333;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 0 0 3px;
+}
+.header__search .dropdownsearch ul {
+  display: none;
+  background: #fff;
+  overflow: hidden;
+  position: absolute;
+  left: 0;
+  width: 90px;
+  top: 36px;
+  -webkit-box-shadow: 3px 6px 23px -6px rgba(0, 0, 0, 0.87);
+  box-shadow: 3px 6px 23px -6px rgba(0, 0, 0, 0.87);
+  z-index: 99999;
+}
+.header__search .dropdownsearch ul li {
+  display: block;
+  overflow: hidden;
+  padding: 5px 7px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.header__search .dropdownsearch ul li.active {
+  font-weight: bold;
+}
+header.header.manusearch .header__search input {
+  width: calc(100% - 90px - 35px);
+  padding: 8px 8px 8px 3px;
+}
+.header__cart {
+  border-radius: 4px;
+  color: #333;
+  font-size: 12px;
+  line-height: 14px;
+  padding: 8px 10px;
+  width: 12%;
+  background: rgba(255, 172, 10, 0.6);
+}
+.header__cart .box-cart {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+.header__cart i,
+.header__cart span {
+  display: inline-block;
+  vertical-align: middle;
+  font-weight: 700;
+}
+.header__cart i {
+  margin-right: 8px;
+}
+.header__history {
+  color: #333;
+  font-size: 12px;
+  line-height: 14px;
+  margin: 0 12px 0 18px;
+  text-align: center;
+  width: 55px;
+}
+.header__hot {
+  color: #333;
+  font-size: 12px;
+  line-height: 14px;
+  padding: 3px 4px 3px 30px;
+  position: relative;
+  width: 16%;
+}
+.header__hot .dot {
+  background-color: #ffe66b;
+  border-radius: 100%;
+  display: block;
+  left: 10px;
+  height: 8px;
+  margin-top: -5px;
+  position: absolute;
+  top: 50%;
+  width: 8px;
+}
+.header__listtop {
+  align-items: center;
+  display: flex;
+  width: 28%;
+}
+.header__listtop .divitem {
+  padding: 0 12px;
+  text-align: center;
+}
+.header__listtop .divitem:last-child {
+  padding-right: 0;
+}
+.header__listtop .divitem a {
+  color: #333;
+  font-size: 14px;
+  line-height: 16px;
+}
