@@ -1,11 +1,10 @@
 import React from 'react';
 import "./HeaderSlider.scss";
 import "./styles.css";
-import { sliderImgs } from "../../utils/images";
-import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Col, Row } from 'antd';
+import Carousel from './carousel';
 
 const HeaderSlider = () => {
   let settings = {
@@ -24,14 +23,15 @@ const HeaderSlider = () => {
       <Row>
        <Col span={16}>
           <div className='slider-content overflow-x-hidden' style={{  padding:`10px`, height:422}}>
-              <Slider {...settings} style={{ height:422}}>
+              {/* <Slider {...settings} style={{ height:422}}>
                 <div className='slider-item' style={{ height:422}}> 
                   <img src = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:690:300/q:80/plain/https://dashboard.cellphones.com.vn/storage/banner-nthu-loa-jbl-v60-sliding.jpg' alt = "" style={{ height:422}} />
                 </div>
                 <div className='slider-item' style={{ height:422}}>
                   <img src = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:690:300/q:80/plain/https://dashboard.cellphones.com.vn/storage/690x300-sliding-ultra-l20.png' alt = "" style={{ height:422}} />
                 </div>
-              </Slider>
+              </Slider> */}
+              <Carousel/>
             </div>
        </Col>
        <Col span={8}>

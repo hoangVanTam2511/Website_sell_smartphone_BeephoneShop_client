@@ -24,7 +24,7 @@ import TableCell, { tableCellClasses } from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
-import Slideshow from './slide.js'
+import Carousel from './carousel'
 
 const ProductSinglePage = () => {
   const { id } = useParams()
@@ -124,8 +124,8 @@ const ProductSinglePage = () => {
           </div>
           <Divider style={{ margin: '4px 0' }} />
           <div className='product-single-content bg-white grid'>
-            <div className='product-single-l'>
-              <div className='product-img'>
+            <div className='product-single-l' >
+              {/* <div className='product-img'>
                 <div className='product-img-zoom'>
                   <img
                     src={
@@ -174,10 +174,9 @@ const ProductSinglePage = () => {
                     />
                   </div>
                 </div>
-              </div>
-
-                {/* <Slideshow /> */}
-
+              </div> */}
+              {/* slide */}
+              <Carousel/>
             </div>
             <div className='product-single-r'>
               <div className='product-details font-manrope'>
