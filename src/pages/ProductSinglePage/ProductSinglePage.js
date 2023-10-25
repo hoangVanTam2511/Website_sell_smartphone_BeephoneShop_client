@@ -87,22 +87,6 @@ const ProductSinglePage = () => {
     return <Loader />
   }
 
-  const increaseQty = () => {
-    setQuantity(prevQty => {
-      let tempQty = prevQty + 1
-      if (tempQty > product?.stock) tempQty = product?.stock
-      return tempQty
-    })
-  }
-
-  const decreaseQty = () => {
-    setQuantity(prevQty => {
-      let tempQty = prevQty - 1
-      if (tempQty < 1) tempQty = 1
-      return tempQty
-    })
-  }
-
   const addToCartHandler = product => {
     let discountedPrice =
       product?.price - product?.price * (product?.discountPercentage / 100)
@@ -116,7 +100,7 @@ const ProductSinglePage = () => {
 
   return (
     <main className='py-5 bg-white'>
-      <div className='product-single'>
+      <div className='product-single' style={{ height:'1129px'}}>
         <div className='container'>
           <div className='title fs-20 fw-7' style={{ marginTop: 20 }}>
             {' '}
@@ -318,7 +302,7 @@ const ProductSinglePage = () => {
 
 
             </div>
-            <div className='product-single-r' style={{transform:`translateY(-67%)`}}>
+            <div className='product-single-r' >
               <div
                 className='title fs-20 fw-7'
                 style={{ marginBottom: 20, textAlign: `center` }}

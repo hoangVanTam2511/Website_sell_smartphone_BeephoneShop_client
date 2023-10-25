@@ -9,6 +9,7 @@
         @media screen and (min-width: 768px){
             grid-template-columns: repeat(2, 1fr);
             column-gap: 4rem;
+            height:480px;
         }
 
         .product-single-l{
@@ -59,11 +60,11 @@
             //         }
             //     }
             // }
-            width: 50%;
+            width: 100%;
         }
 
         .product-single-r{
-            margin-top: 5rem;
+            margin-bottom: 5rem;
             .product-details{
                 .title{
                     padding-bottom: 0.6rem;

@@ -1,0 +1,9 @@
+body {
+  font-family: Lato;
+  margin: 0;
+}
+.slick-slider {
+  overflow: hidden;
+  cursor: pointer;
+  width: 636px;
+}
