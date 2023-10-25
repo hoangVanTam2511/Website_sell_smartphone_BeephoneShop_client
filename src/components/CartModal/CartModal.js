@@ -1,6 +1,5 @@
 import React from 'react';
 import "./CartModal.scss";
-import { shopping_cart } from '../../utils/images';
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { formatPrice } from '../../utils/helpers';
 
@@ -27,11 +26,11 @@ const CartModal = ({carts}) => {
               })
             }
 
-            <div className='text-capitalize view-cart-btn bg-orange fs-15 font-manrope text-center'>Thanh toán</div>
+            <div className='text-capitalize view-cart-btn bg-orange fs-15 font-manrope text-center' style={{ backgroundImage: `linear-gradient(0deg, rgb(0, 102, 204), rgb(0, 153, 204))`, borderRadius:`20px`}}>Thanh toán</div>
           </div>) : (
           <div className = "flex flex-column align-center justify-center cart-modal-empty">
             <ShoppingCartOutlined />
-            <h6 className='text-dark fw-4'>No products yet</h6>
+            <h6 className='text-dark fw-4'>Hiện tại không có sản phẩm nào</h6>
           </div>
         )
       }

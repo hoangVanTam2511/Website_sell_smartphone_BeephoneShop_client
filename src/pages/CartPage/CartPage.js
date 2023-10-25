@@ -16,15 +16,15 @@ const CartPage = () => {
       <div className='container my-5'>
         <div className='empty-cart flex justify-center align-center flex-column font-manrope'>
           <img src = {shopping_cart} alt = "" />
-          <span className='fw-6 fs-15 text-gray'>Your shopping cart is empty.</span>
-          <Link to = "/" className='shopping-btn bg-orange text-white fw-5'>Go shopping Now</Link>
+          <span className='fw-6 fs-15 text-gray'>Giỏ hàng đang trống.</span>
+          <Link to = "/" className='shopping-btn bg-orange text-white fw-5'>Đi tới mua hàng</Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div className='cart bg-white'>
+    <div className='cart bg-white' style={{margin: `20px auto`, width: `50%`, borderRadius:'20px'}}>
       <div className='container'>
         <div className='cart-ctable'>
 
