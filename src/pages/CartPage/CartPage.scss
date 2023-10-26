@@ -41,7 +41,7 @@
         padding: 0;
     }
     .cart-ctable{
-        min-width: 1000px;
+        min-width: 100%;
         .cart-ctr{
             grid-template-columns: 1fr 4fr 2fr 2fr 2fr 2fr;
             min-height: 40px;
@@ -112,3 +112,35 @@
         }
     }
 }
+
+.ant-divider-horizontal{
+    margin: 20px auto; 
+    width: 48%;
+    min-width: 100%;
+}
+
+.css-ahj2mt-MuiTypography-root{
+    font-size: 16px!important;
+}
+
+// .css-14s5rfu-MuiFormLabel-root-MuiInputLabel-root  {
+//     color: rgba(0, 0, 0, 0.6);
+//     font-family: "Roboto","Helvetica","Arial",sans-serif;
+//     font-weight: 400;
+//     font-size: 14px!important;
+//     line-height: 1.4375em;
+//     letter-spacing: 0.00938em;
+//     padding: 0;
+//     position: relative;
+//     display: block;
+//     transform-origin: top left;
+//     white-space: nowrap;
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+//     max-width: calc(100% - 24px);
+//     position: absolute;
+//     left: 0;
+//     top: 0;
+//     z-index: 1;
+//     pointer-events: none;
+// }
