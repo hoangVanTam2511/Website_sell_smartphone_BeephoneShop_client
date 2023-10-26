@@ -2,7 +2,7 @@ import './App.scss';
 // react router v6
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 // pages
-import {Home, CategoryProduct, ProductSingle, Cart, Search} from "./pages/index";
+import {Home, CategoryProduct, ProductSingle, Cart, Search, LoginPage} from "./pages/index";
 // components
 import Header from "./components/Header/Header";
 import Sidebar from "./components/Sidebar/Sidebar";
@@ -29,6 +29,8 @@ function App() {
             <Route path = "/cart" element = {<Cart />} />
             {/* searched products */}
             <Route path = "/search/:searchTerm" element = {<Search />} />
+            {/* login page */}
+            <Route path = "/login" element = {<LoginPage />} />
           </Routes>
 
           <Footer />

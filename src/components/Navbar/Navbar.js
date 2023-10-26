@@ -77,7 +77,7 @@ const Navbar = () => {
         </div>
 
         <div className='navbar-cart flex align-center' style={{border:`1px solid white`, width:59, height:50, paddingLeft:8, borderRadius:`17%` }}>
-          <Link to = "/cart" className='cart-btn'>
+          <Link to = "/login" className='cart-btn'>
            <UserOutlined style={{ marginLeft:`10px`}} />
            <div style={{ fontSize:`8px`, width:`50px`}}>
             Đăng nhập
