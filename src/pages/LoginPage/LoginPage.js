@@ -42,7 +42,7 @@ const HomePage = () => {
                   <i class='fa-brands fa-linkedin-in'></i>
                 </a>
               </div>
-              <span>Hoặc chọn phương thức đăng kí khác</span>
+              <span>Hoặc tạo tài khoản mới</span>
               <input type='text' placeholder='Name' />
               <input type='email' placeholder='Email' />
               <input type='password' placeholder='Password' />
@@ -66,7 +66,7 @@ const HomePage = () => {
                   <i class='fa-brands fa-linkedin-in'></i>
                 </a>
               </div>
-              <span>hoặc chọn phương thức đăng nhập khác</span>
+              <span>hoặc sử dụng tài khoản của bạn</span>
               <input type='email' placeholder='Email' />
               <input type='password' placeholder='Password' />
               <a href='#'>Quên mật khẩu?</a>
