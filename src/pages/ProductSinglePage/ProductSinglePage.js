@@ -419,7 +419,6 @@ const ProductSinglePage = () => {
                           top: 0,
                           left: 0,
                           borderTopLeftRadius: '3px',
-                          borderBottomRightRadius: '7px',
                           fontSize: 11,
                           color: 'white'
                         }}
