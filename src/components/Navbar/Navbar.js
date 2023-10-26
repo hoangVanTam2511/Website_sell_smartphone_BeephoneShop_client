@@ -43,7 +43,7 @@ const Navbar = () => {
         </div>
 
         <div className='navbar-collapse w-100'>
-          <div className='navbar-search bg-white ' style={{ width:`95%`}}>
+          <div className='navbar-search bg-white ' style={{ width:`98%`}}>
             <div className='flex align-center'>
               <input type = "text" className='form-control fs-14' placeholder='Nhập thông tin bạn muốn tìm' onChange={(e) => handleSearchTerm(e)} />
               <Link to = {`search/${searchTerm}`} className='text-white search-btn flex align-center justify-center' style = {{ backgroundImage: `linear-gradient(0deg,#0066cc,#0099cc)`}}>
@@ -65,21 +65,30 @@ const Navbar = () => {
           </ul> */}
         </div>
 
-        <div className='navbar-cart flex align-center' >
+        <div className='navbar-cart flex align-center' style={{border:`0px solid white`, width:63, height:50, paddingTop:3, borderRadius:`17%`}}  >
           <Link to = "/cart" className='cart-btn'>
-            <i className='fa-solid fa-cart-shopping'></i>
-            <div className='cart-items-value'>{itemsCount}</div>
-            {/* <CartModal carts = {carts} /> */}
-            {/* <div style={{ fontSize:`8px`, width:`50px`}}>
-             Giỏ hàng
-           </div> */}
+            <i class="fa fa-shipping-fast" style={{ position:`relative`, right:`-24px`, fontSize:`26px`}}></i>
+              <div style={{ fontSize:`10px`, width:`90px`, fontWeight:'500',wordWrap: `break-word`}}>
+             Tra cứu đơn hàng
+           </div>
           </Link>
         </div>
 
-        <div className='navbar-cart flex align-center' style={{border:`1px solid white`, width:59, height:50, paddingLeft:8, borderRadius:`17%` }}>
+        <div className='navbar-cart flex align-center' style={{border:`0px solid white`, width:36, height:50, paddingLeft:8, borderRadius:`10px`}}  >
+          <Link to = "/cart" className='cart-btn'>
+            <i class="fa-solid fa-bag-shopping" style={{ position:`relative`, right:`-8px`, fontSize:`30px`}}></i>
+            <div className='cart-items-value'>{itemsCount}</div>
+            {/* <CartModal carts = {carts} /> */}
+            <div style={{ fontSize:`10px`, width:`50px`, fontWeight:'500'}}>
+             Giỏ hàng
+           </div>
+          </Link>
+        </div>
+
+        <div className='navbar-cart flex align-center' style={{border:`1px solid white`, width:72, height:50, paddingLeft:8, borderRadius:`10px` }}>
           <Link to = "/login" className='cart-btn'>
-           <UserOutlined style={{ marginLeft:`10px`}} />
-           <div style={{ fontSize:`8px`, width:`50px`}}>
+           <UserOutlined style={{ marginLeft:`16px`}} />
+           <div style={{ fontSize:`10px`, width:`80px`, fontWeight:'500'}}>
             Đăng nhập
            </div>
           </Link>
