@@ -69,7 +69,7 @@ const Navbar = () => {
           <Link to = "/cart" className='cart-btn'>
             <i className='fa-solid fa-cart-shopping'></i>
             <div className='cart-items-value'>{itemsCount}</div>
-            <CartModal carts = {carts} />
+            {/* <CartModal carts = {carts} /> */}
             {/* <div style={{ fontSize:`8px`, width:`50px`}}>
              Giỏ hàng
            </div> */}
