@@ -22,9 +22,9 @@ const Product = ({product}) => {
             <span className='new-price'>
               3.000.000 đ
             </span>
-            <span className='discount fw-6' style={{ color:`#128DE2` }}>
+            {/* <span className='discount fw-6' style={{ color:`#128DE2` }}>
               (40% Off)
-            </span>
+            </span> */}
           </div>
         </div>
       </div>

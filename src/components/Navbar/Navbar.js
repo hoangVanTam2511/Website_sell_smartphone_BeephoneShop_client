@@ -66,7 +66,7 @@ const Navbar = () => {
         </div>
 
         <div className='navbar-cart flex align-center' style={{border:`0px solid white`, width:63, height:50, paddingTop:3, borderRadius:`17%`}}  >
-          <Link to = "/cart" className='cart-btn'>
+          <Link to = "/search-order-page" className='cart-btn'>
             <i class="fa fa-shipping-fast" style={{ position:`relative`, right:`-24px`, fontSize:`26px`}}></i>
               <div style={{ fontSize:`10px`, width:`90px`, fontWeight:'500',wordWrap: `break-word`}}>
              Tra cứu đơn hàng
