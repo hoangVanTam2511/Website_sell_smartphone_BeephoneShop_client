@@ -1,0 +1,15 @@
+.order-bought{
+    background: #e4e7ed;
+    width: 221px;
+    text-align: center;
+    /* line-height: 30px; */
+    height: 44px;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+.button-order-bought{
+    width: 222px;
+    font-size: 15px!important;
+}
