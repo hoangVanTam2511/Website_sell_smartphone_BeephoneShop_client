@@ -8,7 +8,8 @@ const Product = ({ product }) => {
     <Link to={`/product/${product?.id}`} key={product?.id}>
       <div className="product-item bg-white"
             style={{
-              width:'250px'
+              width:'285px',
+              height:'350px',
             }}
       >
         <div
@@ -16,8 +17,8 @@ const Product = ({ product }) => {
           style={{
             backgroundColor: `#128DE2`,
             position: "relative",
-            width: "30%",
-            top: "25px",
+            width: "38%",
+            top: "1px",
             borderTopLeftRadius: `8px`,
             borderTopRightRadius: `20px`,
             borderBottomRightRadius: `20px`,
@@ -29,22 +30,19 @@ const Product = ({ product }) => {
         <div className="product-item-img">
           <img
             style={{ width: "86%", margin:'0px auto', }}
-            src='https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:80/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-12.png'
+            src='https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:80/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-s22-ultra-12gb-256gb.png'
             alt={product.title}
           />
         </div>
         <div className="product-item-info fs-14">
           <div className="brand">
-            <span className="fw-7" style={{ fontSize: "18px" }}>
-              {product?.title}
+            <span className="fw-6" style={{ fontSize: "16px" }}>
+              Iphone 12 6G 128GB
             </span>
           </div>
           <div className="price flex align-center justify-center">
+            <span className="new-price" style={{ color:'red' }}>3.000.000 đ</span>
             <span className="old-price">4.000.000 đ</span>
-            <span className="new-price">3.000.000 đ</span>
-            {/* <span className='discount fw-6' style={{ color:`#128DE2` }}>
-              (40% Off)
-            </span> */}
           </div>
         </div>
       </div>

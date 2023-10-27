@@ -40,8 +40,8 @@ const HomePage = () => {
 
   return (
     <main>
-      <div className='slider-wrapper'>
-        <HeaderSlider />
+      <div className='slider-wrapper' >
+        <HeaderSlider/>
       </div>
       <div className='main-content bg-white'>
         <div className='container'>

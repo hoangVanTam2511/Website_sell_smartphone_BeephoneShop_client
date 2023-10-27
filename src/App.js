@@ -18,6 +18,8 @@ function App() {
           <Header />
           <Sidebar />
 
+          <div style={{ height: '90px'}}></div>
+
           <Routes>
             {/* home page route */}
             <Route path = "/" element = {<Home />} />
