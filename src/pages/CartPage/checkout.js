@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./CartPage.scss";
-import RadioGroup from "@mui/material/RadioGroup";            
+import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
@@ -16,8 +16,8 @@ const CartPage = () => {
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
 
-  const [radioReceive, setRadioReceive] = useState()
-  const [radioVocative, setRadioVocative] = useState()
+  const [radioReceive, setRadioReceive] = useState();
+  const [radioVocative, setRadioVocative] = useState();
 
   useEffect(() => {
     callAPI("https://provinces.open-api.vn/api/?depth=2");
@@ -79,11 +79,11 @@ const CartPage = () => {
 
   const onChangeRadioGroupReceive = (e) => {
     setRadioReceive(e.target.value);
-  }
+  };
 
   const onChangeRadioGroupVocative = (e) => {
     setRadioVocative(e.target.value);
-  }
+  };
 
   return (
     <>
@@ -92,7 +92,10 @@ const CartPage = () => {
 
         <div>
           <div style={{ margin: " 10px 0px" }}>
-            <Radio.Group onChange={onChangeRadioGroupVocative} value={radioVocative}>
+            <Radio.Group
+              onChange={onChangeRadioGroupVocative}
+              value={radioVocative}
+            >
               <Radio value={1}>Anh</Radio>
               <Radio value={2}>Chị</Radio>
             </Radio.Group>
@@ -113,7 +116,10 @@ const CartPage = () => {
 
         <div style={{ margin: "10px 0" }}>CHỌN CÁCH THỨC NHẬN HÀNG</div>
         <div style={{ marginLeft: 0 }}>
-          <Radio.Group onChange={onChangeRadioGroupReceive} value={radioReceive} >
+          <Radio.Group
+            onChange={onChangeRadioGroupReceive}
+            value={radioReceive}
+          >
             <Radio value={3}>Giao tận nơi</Radio>
             <Radio value={4}>Nhận tại cửa hàng</Radio>
           </Radio.Group>
