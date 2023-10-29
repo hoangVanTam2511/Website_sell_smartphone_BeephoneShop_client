@@ -234,7 +234,7 @@ const CartPage = () => {
             </Button>
           </div>
 
-          <Divider />
+          <Divider style={{ marginTop: "40px" }} />
         </div>
       </div>
       <br />
