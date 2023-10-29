@@ -9,7 +9,7 @@ const Product = ({ product }) => {
       <div
         className="product-item bg-white"
         style={{
-          width: "250px",
+          width: "230px",
           height: "350px",
         }}
       >
@@ -18,7 +18,7 @@ const Product = ({ product }) => {
           style={{
             backgroundColor: `#128DE2`,
             position: "relative",
-            width: "31%",
+            width: "40%",
             top: "1px",
             borderTopLeftRadius: `8px`,
             borderTopRightRadius: `20px`,
