@@ -64,7 +64,7 @@ const App = () => {
                 class="fa-solid fa-file-invoice"
                 style={{ color: "#128DE2", margin: `0px 4px` }}
               ></i>{" "}
-              Đơn hàng đã mua
+              Trang chủ
             </button>
 
             <button
