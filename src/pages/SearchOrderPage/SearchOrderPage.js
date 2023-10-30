@@ -3,6 +3,7 @@ import { Col, Row } from "antd";
 import Button from "@mui/material/Button";
 import "./SearchOrderPage.css";
 import Orders from "./Orders";
+import Home from "./Home";
 import InformationUser from "./InformationUser";
 
 const App = () => {
@@ -39,20 +40,7 @@ const App = () => {
 
   return (
     <>
-      <div style={{ width: "80%", margin: `30px auto`, display: "flex" }}>
-        <div style={{ width: "27%", marginTop: "6px" }}>
-          Anh <span className="fw-8">Hoàng Văn Tám</span>
-        </div>
-        <div style={{ width: "80%" }}>
-          <span className="fw-5" style={{ fontSize: 20 }}>
-            {component == 1 ? "Đơn hàng đã mua" : "Thông tin tài khoản"}
-          </span>
-          <span className="fw-3" style={{ marginLeft: 20, fontSize: 14 }}>
-            {component == 1 ? "Từ ngày 26/10/2023 - 26/10/2023" : ""}
-          </span>
-        </div>
-      </div>
-
+      <br/>
       <div style={{ width: "80%", margin: `20px auto` }}>
         <Row>
           <Col span={6}>
@@ -75,7 +63,7 @@ const App = () => {
                 class="fa-solid fa-id-card"
                 style={{ color: "#128DE2", margin: `0px 4px` }}
               ></i>{" "}
-              Thông tin và sổ địa chỉ
+              Lịch sử mua hàng
             </button>
             <Button
               className="button-order-bought"
@@ -86,7 +74,7 @@ const App = () => {
             </Button>
           </Col>
           <Col span={18}>
-            {component == 1 ? <Orders /> : <InformationUser />}
+            {component == 1 ? <Home /> : <Orders />}
           </Col>
         </Row>
       </div>
