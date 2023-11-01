@@ -105,10 +105,10 @@ const Orders = () => {
       </div>
 
       <div class="card">
-        <div class="title">
+        <div class="title" style={{ marginLeft:'42%'}}>
           <h4>
             {" "}
-            <span className="fw-6">Thông tin cá nhân</span>
+            <span className="fw-6" >Thông tin cá nhân</span>
           </h4>
           <h4></h4>
         </div>
@@ -210,10 +210,12 @@ const Orders = () => {
         <div style={{ marginTop: '35px'}}>
           <div className='title'>
             <span>Đổi mật khẩu </span>
+          </div>
           <Divider style={{ margin: '5px auto'}}></Divider>
         </div>
       
       </div>
+
 
       <br />
 

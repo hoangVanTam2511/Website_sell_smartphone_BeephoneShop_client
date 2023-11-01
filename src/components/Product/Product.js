@@ -37,7 +37,7 @@ const Product = ({ product }) => {
         </div>
         <div className="product-item-info fs-14">
           <div className="brand">
-            <span className="fw-6" style={{ fontSize: "14px" }}>
+            <span className="fw-8" style={{ fontSize: "14px" }}>
               Iphone 12 6G 128GB
             </span>
           </div>

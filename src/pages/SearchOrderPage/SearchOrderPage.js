@@ -66,7 +66,7 @@ const App = () => {
               Lịch sử mua hàng
             </button>
 
-            <button 
+            {/* <button 
               style={ component == 3 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
               onClick={() => choiseAnotherComponent(3)}
             >
@@ -75,22 +75,22 @@ const App = () => {
                 style={{ color: "#128DE2", margin: `0px 4px` }}
               ></i>{" "}
               Tra cứu bảo hành
-            </button>
+            </button> */}
 
-            <button 
-              style={ component == 4 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
-              onClick={() => choiseAnotherComponent(4)}
+            {/* <button 
+              style={ component == 3 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
+              onClick={() => choiseAnotherComponent(3)}
             >
               <i
                 class="fa-solid fa-id-card"
                 style={{ color: "#128DE2", margin: `0px 4px` }}
               ></i>{" "}
               Hạng thành viên
-            </button>
+            </button> */}
 
             <button 
-              style={ component == 5 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
-              onClick={() => choiseAnotherComponent(5)}
+              style={ component == 3 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
+              onClick={() => choiseAnotherComponent(3)}
             >
               <i
                 class="fa-solid fa-id-card"
@@ -110,9 +110,7 @@ const App = () => {
           <Col span={18}>
             {component == 1 ? <Home /> : <></>}
             {component == 2 ? <Orders /> : <></>}
-            {component == 1 ? <Home /> : <></>}
-            {component == 1 ? <Home /> : <></>}
-            {component == 5 ? <InformationUser /> : <></>}
+            {component == 3 ? <InformationUser /> : <></>}
 
           </Col>
         </Row>
