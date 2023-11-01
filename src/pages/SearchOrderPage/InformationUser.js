@@ -77,6 +77,33 @@ const Orders = () => {
 
   return (
     <>
+      <div style={{ width: `25%`, margin: `0px auto` }}>
+        <div
+          style={{
+            width: `70px`,
+            display: `block`,
+            border: `1px solid #707070`,
+            borderRadius: `50%`,
+            padding: `10px`,
+            display: "block",
+            marginLeft: "32%",
+            height: "70px",
+            backgroundImage: `url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz0LTGso_7ubZRD1CZoDauy3NWC6RxMqVf_A&usqp=CAU)`,
+            backgroundSize: "cover",
+          }}
+        >
+          {" "}
+        </div>
+        <h4 style={{ textAlign: "center" }}>
+          Xin chào
+          <br />{" "}
+          <span className="fw-7 fs-20" style={{ color: `#128DE2` }}>
+            Hoàng Văn Tám
+          </span>
+        </h4>
+        <h4></h4>
+      </div>
+
       <div class="card">
         <div class="title">
           <h4>
@@ -87,7 +114,7 @@ const Orders = () => {
         </div>
 
         <Divider></Divider>
-
+{/* 
         <div class="title">
           <h4>
             Anh Hoàng Văn Tám - 0326235071
@@ -104,7 +131,88 @@ const Orders = () => {
             </Button>
           </h4>
           <h4 className="fs-12"></h4>
+        </div> */}
+
+        <div style={{ marginTop: '35px'}}>
+          <div className='title'>
+            <span>Họ và tên: Hoàng Văn Tám </span>
+
+            <button
+              style={{
+                // backgroundColor: `#128DE2`,
+                color: `white`,
+                marginLeft: "5px",
+              }}
+              // variant="outlined"
+            > <i class="fa-regular fa-pen-to-square" style={{ fontSize: '22px', color:'#128DE2'}}></i> </button>
+          </div>
+          <Divider style={{ margin: '5px auto'}}></Divider>
         </div>
+
+        <div style={{ marginTop: '35px'}}>
+          <div className='title'>
+            <span>Giới tính: Nam </span>
+
+            <button
+              style={{
+                // backgroundColor: `#128DE2`,
+                color: `white`,
+                marginLeft: "5px",
+              }}
+              // variant="outlined"
+            > <i class="fa-regular fa-pen-to-square" style={{ fontSize: '22px', color:'#128DE2'}}></i> </button>
+          </div>
+          <Divider style={{ margin: '5px auto'}}></Divider>
+        </div>
+
+        <div style={{ marginTop: '35px'}}>
+          <div className='title'>
+            <span>Số điện thoại: 0326235071 </span>
+          </div>
+          <Divider style={{ margin: '5px auto'}}></Divider>
+        </div>
+
+        <div style={{ marginTop: '35px'}}>
+          <div className='title'>
+            <span>Sinh nhật: 0326235071 </span>
+          </div>
+          <Divider style={{ margin: '5px auto'}}></Divider>
+        </div>
+
+        <div style={{ marginTop: '35px'}}>
+          <div className='title'>
+            <span>Ngày tham gia Smember: 15/10/2023 </span>
+          </div>
+          <Divider style={{ margin: '5px auto'}}></Divider>
+        </div>
+
+        <div style={{ marginTop: '35px'}}>
+          <div className='title'>
+            <span>Tổng tiền đã mua sắm: 1.000.000 đ </span>
+          </div>
+          <Divider style={{ margin: '5px auto'}}></Divider>
+        </div>
+
+        <div style={{ marginTop: '35px'}}>
+          <div className='title'>
+            <span>Địa chỉ: hh, Cầu Diễn, Hà Nội </span>
+
+            <button
+              style={{
+                color: `white`,
+                marginLeft: "5px",
+              }}
+            > <i class="fa-regular fa-pen-to-square" style={{ fontSize: '22px', color:'#128DE2'}}></i> </button>
+          </div>
+          <Divider style={{ margin: '5px auto'}}></Divider>
+        </div>
+
+        <div style={{ marginTop: '35px'}}>
+          <div className='title'>
+            <span>Đổi mật khẩu </span>
+          <Divider style={{ margin: '5px auto'}}></Divider>
+        </div>
+      
       </div>
 
       <br />

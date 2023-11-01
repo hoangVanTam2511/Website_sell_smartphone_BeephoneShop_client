@@ -65,6 +65,40 @@ const App = () => {
               ></i>{" "}
               Lịch sử mua hàng
             </button>
+
+            <button 
+              style={ component == 3 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
+              onClick={() => choiseAnotherComponent(3)}
+            >
+              <i
+                class="fa-solid fa-id-card"
+                style={{ color: "#128DE2", margin: `0px 4px` }}
+              ></i>{" "}
+              Tra cứu bảo hành
+            </button>
+
+            <button 
+              style={ component == 4 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
+              onClick={() => choiseAnotherComponent(4)}
+            >
+              <i
+                class="fa-solid fa-id-card"
+                style={{ color: "#128DE2", margin: `0px 4px` }}
+              ></i>{" "}
+              Hạng thành viên
+            </button>
+
+            <button 
+              style={ component == 5 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
+              onClick={() => choiseAnotherComponent(5)}
+            >
+              <i
+                class="fa-solid fa-id-card"
+                style={{ color: "#128DE2", margin: `0px 4px` }}
+              ></i>{" "}
+              Tài khoản của bạn
+            </button>
+            
             <Button
               className="button-order-bought"
               variant="outlined"
@@ -74,7 +108,12 @@ const App = () => {
             </Button>
           </Col>
           <Col span={18}>
-            {component == 1 ? <Home /> : <Orders />}
+            {component == 1 ? <Home /> : <></>}
+            {component == 2 ? <Orders /> : <></>}
+            {component == 1 ? <Home /> : <></>}
+            {component == 1 ? <Home /> : <></>}
+            {component == 5 ? <InformationUser /> : <></>}
+
           </Col>
         </Row>
       </div>

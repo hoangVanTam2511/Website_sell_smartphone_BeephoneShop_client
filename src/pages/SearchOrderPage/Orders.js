@@ -1,8 +1,9 @@
 import React from "react";
 import Button from "@mui/material/Button";
 import "./SearchOrderPage.css";
-import { Divider } from "antd";
+import { Divider, DatePicker,  } from "antd";
 
+const { RangePicker } = DatePicker;
 const Orders = () => {
   return (
     <>
@@ -104,6 +105,8 @@ const Orders = () => {
           
           
       </div>
+
+      <RangePicker style={{ marginBottom: '10px', position: 'relative', right: '-505px', backgroundColor: 'transparentaceholder' }}/>
 
       <div class="card">
         <div class="title">

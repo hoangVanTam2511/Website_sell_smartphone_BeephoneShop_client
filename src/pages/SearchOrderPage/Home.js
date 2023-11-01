@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 import './SearchOrderPage.css'
 import { Divider } from 'antd'
-import { Select, Space, Input, Checkbox } from 'antd'
+import { Select, Space, Input, Checkbox, DatePicker } from 'antd'
 import axios from 'axios'
 
+const { RangePicker } = DatePicker;
 const Orders = () => {
   return (
     <>
