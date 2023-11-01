@@ -110,7 +110,7 @@ const Orders = () => {
           />
           <h4 style={{ textAlign: 'center' }}>
             <br />{' '}
-            <span className='fw-7 fs-20' style={{ color: `#128DE2` }}>
+            <span className='fw-7 fs-18' style={{ color: `#128DE2` }}>
               Ưu đãi của bạn
             </span>
 
@@ -154,7 +154,7 @@ const Orders = () => {
           />
           <h4 style={{ textAlign: 'center' }}>
             <br />{' '}
-            <span className='fw-7 fs-20' style={{ color: `#128DE2` }}>
+            <span className='fw-7 fs-18' style={{ color: `#128DE2` }}>
               Đơn hàng của bạn
             </span>
 
@@ -199,7 +199,7 @@ const Orders = () => {
           />
           <h4 style={{ textAlign: 'center' }}>
             <br />{' '}
-            <span className='fw-7 fs-20' style={{ color: `#128DE2` }}>
+            <span className='fw-7 fs-18' style={{ color: `#128DE2` }}>
               Hạng thành viên
             </span>
 
