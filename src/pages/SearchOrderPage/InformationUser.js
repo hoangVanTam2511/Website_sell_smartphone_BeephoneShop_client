@@ -77,7 +77,7 @@ const Orders = () => {
 
   return (
     <>
-      <div style={{ width: `25%`, margin: `0px auto` }}>
+      <div style={{ width: `25%`, margin: `10px auto` }}>
         <div
           style={{
             width: `70px`,
@@ -105,10 +105,10 @@ const Orders = () => {
       </div>
 
       <div class="card">
-        <div class="title" style={{ marginLeft:'42%'}}>
+        <div class="title" style={{ marginLeft:'36%'}}>
           <h4>
             {" "}
-            <span className="fw-6" >Thông tin cá nhân</span>
+            <span className="fw-6 fs-18" >Thông tin cá nhân</span>
           </h4>
           <h4></h4>
         </div>

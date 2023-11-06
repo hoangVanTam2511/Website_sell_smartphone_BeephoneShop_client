@@ -1,7 +1,19 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import './LoginPage.css'
 
 const HomePage = () => {
+
+  const [userLogin,SetUserLogin] = useState({
+    'email' : '',
+    'password' : ''
+  })
+
+  const [userRegister,SetUserRegister] = useState({
+    'email' : '',
+    'password' : '',
+    'passwordAgain' : ''
+  })
+
 
   useEffect(() => {
     loading()
@@ -20,6 +32,17 @@ const HomePage = () => {
       container.classList.remove('active')
     })
   }
+
+  const login = (e) => {
+    e.preventDefault()
+    console.log(userLogin)
+  }
+
+  const register = (e) => {
+    e.preventDefault()
+    console.log(userRegister)
+  }
+
 
   return (
     <main>
@@ -43,10 +66,10 @@ const HomePage = () => {
                 </a>
               </div>
               <span>Hoặc tạo tài khoản mới</span>
-              <input type='text' placeholder='Name' />
-              <input type='email' placeholder='Email' />
-              <input type='password' placeholder='Password' />
-              <button>Đăng kí</button>
+              <input type='email' placeholder='Email' value={userRegister.email} onChange={(e) => SetUserRegister({...userRegister, 'email' : e.target.value})} />
+              <input type='password' placeholder='Mật khẩu' value={userRegister.password} onChange={(e) => SetUserRegister({...userRegister, 'password' : e.target.value})} />
+              <input type='password' placeholder='Nhập lại mật khẩu' value={userRegister.passwordAgain} onChange={(e) => SetUserRegister({...userRegister, 'passwordAgain' : e.target.value})} />
+              <button onClick={register}>Đăng kí</button>
             </form>
           </div>
           <div class='form-container-login sign-in'>
@@ -67,10 +90,10 @@ const HomePage = () => {
                 </a>
               </div>
               <span>hoặc sử dụng tài khoản của bạn</span>
-              <input type='email' placeholder='Email' />
-              <input type='password' placeholder='Password' />
+              <input type='email' placeholder='Email' value={userLogin.email} onChange={(e) => SetUserLogin({...userLogin,email:e.target.value})} />
+              <input type='password' placeholder='Mật khẩu' value={userLogin.password} onChange={(e) => SetUserLogin({...userLogin,password:e.target.value})} />
               <a href='#'>Quên mật khẩu?</a>
-              <button>Đăng nhập</button>
+              <button onClick={login}>Đăng nhập</button>
             </form>
           </div>
           <div class='toggle-container-login'>
