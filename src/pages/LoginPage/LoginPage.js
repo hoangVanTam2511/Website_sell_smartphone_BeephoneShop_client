@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import './LoginPage.css'
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../store/userSlice";
+import { addToCart } from "../../store/cartSlice"
+import toast, { Toaster } from 'react-hot-toast'
 
 const HomePage = () => {
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
 
   const [userLogin,SetUserLogin] = useState({
     'email' : '',
@@ -33,9 +41,24 @@ const HomePage = () => {
     })
   }
 
-  const login = (e) => {
+  const login = async(e) => {
     e.preventDefault()
-    console.log(userLogin)
+    dispatch(loginUser(userLogin)).then((data) => {
+      console.log(data.payload)
+      if( data.payload.id === null || data.payload.id === ""){
+        toast.error('Đăng nhập không thành công.');
+      }else{
+        SetUserLogin({
+          'email' : '',
+          'password' : ''
+        })
+        dispatch(addToCart())
+        toast.success('Đăng nhập thành công');
+        setTimeout(() => {
+          navigate('/')
+        }, 900)
+      }
+    })
   }
 
   const register = (e) => {
@@ -58,12 +81,6 @@ const HomePage = () => {
                 <a href='#' class='icons'>
                   <i class='fa-brands fa-facebook-f'></i>
                 </a>
-                <a href='#' class='icons'>
-                  <i class='fa-brands fa-github'></i>
-                </a>
-                <a href='#' class='icons'>
-                  <i class='fa-brands fa-linkedin-in'></i>
-                </a>
               </div>
               <span>Hoặc tạo tài khoản mới</span>
               <input type='email' placeholder='Email' value={userRegister.email} onChange={(e) => SetUserRegister({...userRegister, 'email' : e.target.value})} />
@@ -82,17 +99,13 @@ const HomePage = () => {
                 <a href='#' class='icons'>
                   <i class='fa-brands fa-facebook-f'></i>
                 </a>
-                <a href='#' class='icons'>
-                  <i class='fa-brands fa-github'></i>
-                </a>
-                <a href='#' class='icons'>
-                  <i class='fa-brands fa-linkedin-in'></i>
-                </a>
               </div>
               <span>hoặc sử dụng tài khoản của bạn</span>
               <input type='email' placeholder='Email' value={userLogin.email} onChange={(e) => SetUserLogin({...userLogin,email:e.target.value})} />
               <input type='password' placeholder='Mật khẩu' value={userLogin.password} onChange={(e) => SetUserLogin({...userLogin,password:e.target.value})} />
               <a href='#'>Quên mật khẩu?</a>
+              <div class="g-recaptcha"
+               data-sitekey="6Lel4Z4UAAAAAOa8LO1Q9mqKRUiMYl_00o5mXJrR"></div>
               <button onClick={login}>Đăng nhập</button>
             </form>
           </div>
@@ -118,6 +131,57 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+       {/* toaster */}
+       <Toaster
+        position='top-center'
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=''
+        containerStyle={{}}
+        toastOptions={{
+          // Define default options
+          // className: '',
+          // duration: 5000,
+          // style: {
+          //   background: '#4caf50',
+          //   color: 'white'
+          // },
+
+          // Default options for specific types
+          success: {
+            duration: 3000,
+            theme: {
+              primary: 'green',
+              secondary: 'white'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#4caf50',
+            },
+            style: {
+              background: '#4caf50',
+              color: 'white'
+            },
+          },
+
+          error: {
+            duration: 3000,
+            theme: {
+              primary: '#f44336',
+              secondary: 'white'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#f44336',
+            },
+            style: {
+              background: '#f44336',
+              color: 'white'
+            },
+          }
+        }}
+      />
     </main>
   )
 }

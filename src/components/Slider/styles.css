@@ -1,12 +1,26 @@
 .slick-list {
   height: 387px;
-  border-radius: 20px;
+  border-radius: 15px;
 }
 .banner-slider {
-  border-radius: 20px;
+  border-radius: 15px;
   padding: 8px;
 }
 .slider-wrapper {
   margin-top: 15px;
   background-color: white;
+}
+.swiper-button-next,
+.swiper-button-prev {
+    background-color: white;
+    background-color: rgba(255, 255, 255, 0.5);
+    right:10px;
+    padding: 30px;
+    color: #000 !important;
+    fill: black !important;
+    stroke: black !important;
+    opacity: 0;
+}
+.swiper-button-next::after, .swiper-button-prev::after{
+   opacity: 0;
 }

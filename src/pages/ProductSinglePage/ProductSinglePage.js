@@ -1,22 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import './ProductSinglePage.scss'
 import { useParams } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
-import {
-  fetchAsyncProductSingle,
-  getProductSingle,
-  getSingleProductStatus
-} from '../../store/productSlice'
-import { STATUS } from '../../utils/status'
-import Loader from '../../components/Loader/Loader'
-import {
-  addToCart,
-  getCartMessageStatus,
-  setCartMessageOff,
-  setCartMessageOn
-} from '../../store/cartSlice'
-import CartMessage from '../../components/CartMessage/CartMessage'
-import { Button, Dropdown, Space, Divider } from 'antd'
+import axios from 'axios'
+import { useDispatch, useSelector } from 'react-redux'
+import { Button, Divider } from 'antd'
 import { styled } from '@mui/material/styles'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -25,20 +12,39 @@ import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 import Carousel from './carousel'
+import { addToCart } from '../../store/cartSlice'
+import { useNavigate } from 'react-router-dom'
+import toast, { Toaster } from 'react-hot-toast'
 
 const ProductSinglePage = () => {
   const { id } = useParams()
+  const [ramRomConfigs, setRamRomConfigs] = useState([])
+  const [productDetails, setProductDetails] = useState([])
   const dispatch = useDispatch()
-  const product = useSelector(getProductSingle)
-  const productSingleStatus = useSelector(getSingleProductStatus)
-  const [quantity, setQuantity] = useState(1)
-  const cartMessageStatus = useSelector(getCartMessageStatus)
+  const user = useSelector(state => state.user.user)
+  const navigate = useNavigate()
 
   //ram, rom, color
   const [config, setConfig] = useState({
+    id: '',
     ram: '',
     rom: '',
-    color: ''
+    color: '',
+    price: 0,
+    priceDiscount: 0,
+    discount: 0
+  })
+
+  // product
+  const [product, setProduct] = useState({
+    nameProduct: '',
+    typeDisplay: '',
+    sizeDisplay: '',
+    nameBrand: '',
+    nameChip: '',
+    nameProductLine: '',
+    batteryCapacity: '',
+    memoryCardType: ''
   })
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -66,70 +72,131 @@ const ProductSinglePage = () => {
   }
 
   const rows = [
-    createData('Màn hình :', 'OLED, 6.7, 1200 x 2640 Pixels'),
+    createData(
+      'Màn hình :',
+      `${product.typeDisplay}, ${product.sizeDisplay}, 1200 x 2640 Pixels`
+    ),
     createData('Hệ điều hành :', 'IOS 13'),
     createData('Camera sau :', 'Chính 48 MP & Phụ 8 MP, 5 MP'),
     createData('Camera trước :', 'Chính 48 MP & Phụ 8 MP, 5 MP'),
-    createData('Chip', 'Apple A14 Bionic'),
-    createData('Ram', '6 GB'),
-    createData('ROM', '128 GB'),
+    createData('Chip', `${product.nameChip}`),
+    createData('Ram', `${config.ram} GB`),
+    createData('ROM', `${config.rom} GB`),
     createData('SIM', '1 Nano SIM & 1 eSIM'),
-    createData('Pin, sạc:', '4323 mAh, 20 W')
+    createData('Pin, sạc:', `${product.batteryCapacity} mah, 20 W`)
   ]
 
   // getting single product
-  useEffect(
-    () => {
-      dispatch(fetchAsyncProductSingle(id))
+  useEffect(() => {
+    getConfig()
+  }, [])
 
-      if (cartMessageStatus) {
-        setTimeout(() => {
-          dispatch(setCartMessageOff())
-        }, 2000)
+  const checkRomRamDistinct = (listRamRomDistinct, ram, rom) => {
+    if (listRamRomDistinct.length === 0) {
+      return true
+    } else {
+      var flag = 0
+      listRamRomDistinct.forEach(item => {
+        if (item.dungLuongRam === ram && item.dungLuongRom === rom) {
+          flag++
+        }
+      })
+
+      if (flag === 0) {
+        return true
+      } else {
+        return false
       }
-    },
-    [cartMessageStatus],
-    [config]
-  )
-
-  let discountedPrice =
-    product?.price - product?.price * (product?.discountPercentage / 100)
-  if (productSingleStatus === STATUS.LOADING) {
-    return <Loader />
+    }
   }
 
-  const addToCartHandler = product => {
-    let discountedPrice =
-      product?.price - product?.price * (product?.discountPercentage / 100)
-    let totalPrice = quantity * discountedPrice
+  const getConfig = async () => {
+    await axios
+      .get(`http://localhost:8080/client/product-detail/get-config/${id}`)
+      .then(res => {
+        if (res.status === 200) {
+          setProductDetails(res.data)
+          let listRamRomDistinct = []
+          res.data.map(e => {
+            if (
+              checkRomRamDistinct(
+                listRamRomDistinct,
+                e.dungLuongRam,
+                e.dungLuongRom
+              )
+            ) {
+              listRamRomDistinct.push({
+                id: e.id,
+                dungLuongRam: e.dungLuongRam,
+                dungLuongRom: e.dungLuongRom,
+                tenMauSac: e.tenMauSac,
+                donGia: e.donGia,
+                donGiaSauKhuyenMai: e.donGiaSauKhuyenMai
+              })
+            }
+          })
+          setRamRomConfigs(listRamRomDistinct)
+          addConfigs(listRamRomDistinct[0])
+          console.log(listRamRomDistinct[0])
+        }
+      })
+      .catch(error => console.log(error))
 
-    dispatch(
-      addToCart({ ...product, quantity: quantity, totalPrice, discountedPrice })
-    )
-    dispatch(setCartMessageOn(true))
+    await axios
+      .get(`http://localhost:8080/client/product-detail/get-product/${id}`)
+      .then(item => {
+        if (item.status === 200) {
+          var res = item.data
+          setProduct({
+            nameProduct: res.tenSanPham,
+            typeDisplay: res.loaiManHinh,
+            sizeDisplay: res.kichThuocManHinh,
+            nameBrand: res.tenHang,
+            nameChip: res.tenChip,
+            nameProductLine: res.tenDongSanPham,
+            batteryCapacity: res.dungLuongPin,
+            memoryCardType: res.loaiTheNho
+          })
+        }
+      })
+      .catch(error => console.log(error))
+  }
+
+  const addToCartHandler = async product => {
+    // add to cart
+    await axios
+      .post(
+        `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
+      )
+      .then(res => {
+        if (res.status === 200) {
+          dispatch(addToCart())
+            toast.success('Thêm vào giỏ hàng thành công!')
+        }
+      })
+      .catch(res => console.log(res))
   }
 
   const addConfigs = value => {
-    if (value.indexOf('ram') !== -1) {
-      var textRam = value.split('-')[0]
-      var textRom = value.split('-')[1]
+    setConfig({
+      id: value.id,
+      ram: value.dungLuongRam,
+      rom: value.dungLuongRom,
+      color: value.tenMauSac,
+      price: value.donGia,
+      priceDiscount: value.donGiaSauKhuyenMai,
+      discount: (
+        ((value.donGia - value.donGiaSauKhuyenMai) / value.donGia) *
+        100
+      ).toFixed(0)
+    })
+  }
 
-      setConfig({
-        ...config,
-        ram: textRam.slice(textRam.indexOf(':') + 1, textRam.length),
-        rom: textRom.slice(textRom.indexOf(':') + 1, textRom.length)
-      })
-    }
-
-    if (value.indexOf('color') !== -1) {
-      var text = value.split('-')[0]
-      setConfig({
-        ...config,
-        color: text.slice(text.indexOf(':') + 1, text.length)
-      })
-    }
-
-    console.log(config)
+  const formatMoney = number => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(number)
   }
 
   const borderButtonChoise = {
@@ -154,7 +221,7 @@ const ProductSinglePage = () => {
         <div className='container'>
           <div className='title fs-20 fw-7' style={{ marginTop: 20 }}>
             {' '}
-            Điện thoại {product?.title}
+            Điện thoại {product.nameProduct}
           </div>
           <Divider style={{ margin: '4px 0' }} />
           <div className='product-single-content bg-white grid'>
@@ -165,135 +232,76 @@ const ProductSinglePage = () => {
             <div className='product-single-r'>
               <div className='product-details font-manrope'>
                 <div>
-                  <Button
-                    onClick={() => addConfigs('ram:4-rom:60')}
-                    type='primary'
-                    style={
-                      config.ram === '4' && config.rom === '60'
-                        ? borderButtonChoise
-                        : borderButtonNoChoise
-                    }
-                    ghost
-                  >
-                    {config.ram === '4' && config.rom === '60' ? (
-                      <i
-                        class='fa fa-check'
-                        style={{
-                          position: 'absolute',
-                          width: 14,
-                          height: 14,
-                          background: '#128DE2',
-                          top: 0,
-                          left: 0,
-                          borderTopLeftRadius: '3px',
-                          borderBottomRightRadius: '7px',
-                          fontSize: 11,
-                          color: 'white'
-                        }}
-                      ></i>
-                    ) : (
-                      <i
-                        class='fa fa-check'
-                        style={{
-                          position: 'absolute',
-                          width: 14,
-                          height: 14,
-                          background: 'white',
-                          top: 0,
-                          left: 0,
-                          borderTopLeftRadius: '3px',
-                          borderBottomRightRadius: '7px',
-                          fontSize: 11,
-                          color: 'white'
-                        }}
-                      ></i>
-                    )}
+                  {ramRomConfigs.map(e => {
+                    return (
+                      <>
+                        <Button
+                          onClick={() => addConfigs(e)}
+                          type='primary'
+                          style={
+                            config.ram === e.dungLuongRam &&
+                            config.rom === e.dungLuongRom.toString()
+                              ? borderButtonChoise
+                              : borderButtonNoChoise
+                          }
+                          ghost
+                        >
+                          {config.ram === e.dungLuongRam &&
+                          config.rom === e.dungLuongRom ? (
+                            <i
+                              class='fa fa-check'
+                              style={{
+                                position: 'absolute',
+                                width: 14,
+                                height: 14,
+                                background: '#128DE2',
+                                top: 0,
+                                left: 0,
+                                borderTopLeftRadius: '3px',
+                                borderBottomRightRadius: '7px',
+                                fontSize: 11,
+                                color: 'white'
+                              }}
+                            ></i>
+                          ) : (
+                            <i
+                              class='fa fa-check'
+                              style={{
+                                position: 'absolute',
+                                width: 14,
+                                height: 14,
+                                background: 'white',
+                                top: 0,
+                                left: 0,
+                                borderTopLeftRadius: '3px',
+                                borderBottomRightRadius: '7px',
+                                fontSize: 11,
+                                color: 'white'
+                              }}
+                            ></i>
+                          )}
 
-                    <span
-                      className=' fw-6'
-                      style={{ display: 'block', fontSize: 10 }}
-                    >
-                      {' '}
-                      4 GB - 60 GB{' '}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: 12,
-                        color: '#444',
-                        marginLeft: 5,
-                        position: 'relative',
-                        top: '-5px'
-                      }}
-                    >
-                      {' '}
-                      50.000.000 đ{' '}
-                    </span>
-                  </Button>
-
-                  <Button
-                    onClick={() => addConfigs('ram:9-rom:80')}
-                    type='primary'
-                    style={
-                      config.ram === '9' && config.rom === '80'
-                        ? borderButtonChoise
-                        : borderButtonNoChoise
-                    }
-                    ghost
-                  >
-                    {config.ram === '9' && config.rom === '80' ? (
-                      <i
-                        class='fa fa-check'
-                        style={{
-                          position: 'absolute',
-                          width: 14,
-                          height: 14,
-                          background: '#128DE2',
-                          top: 0,
-                          left: 0,
-                          borderTopLeftRadius: '3px',
-                          borderBottomRightRadius: '7px',
-                          fontSize: 11,
-                          color: 'white'
-                        }}
-                      ></i>
-                    ) : (
-                      <i
-                        class='fa fa-check'
-                        style={{
-                          position: 'absolute',
-                          width: 14,
-                          height: 14,
-                          background: 'white',
-                          top: 0,
-                          left: 0,
-                          borderTopLeftRadius: '3px',
-                          borderBottomRightRadius: '7px',
-                          fontSize: 11,
-                          color: 'white'
-                        }}
-                      ></i>
-                    )}
-
-                    <span
-                      className=' fw-6'
-                      style={{ display: 'block', fontSize: 10 }}
-                    >
-                      {' '}
-                      9 GB - 80 GB{' '}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: 12,
-                        color: '#444',
-                        marginLeft: 5,
-                        position: 'relative',
-                        top: '-5px'
-                      }}
-                    >
-                      {' '}
-                      150.000.000 đ{' '}
-                    </span>
-                  </Button>
+                          <span
+                            className=' fw-6'
+                            style={{ display: 'block', fontSize: 10 }}
+                          >
+                            {e.dungLuongRam} GB - {e.dungLuongRom} GB{' '}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: 12,
+                              color: '#444',
+                              marginLeft: 5,
+                              position: 'relative',
+                              top: '-5px'
+                            }}
+                          >
+                            {formatMoney(e.donGia)}
+                          </span>
+                        </Button>
+                      </>
+                    )
+                  })}
                 </div>
 
                 <div className='fw-6' style={{ marginTop: 10, fontSize: 13 }}>
@@ -304,237 +312,97 @@ const ProductSinglePage = () => {
                   className='info flex align-center flex-wrap fs-14'
                   style={{ marginTop: 10 }}
                 >
-                  <Button
-                    type='primary'
-                    onClick={() => addConfigs('color:Đen')}
-                    style={
-                      config.color === 'Đen'
-                        ? borderButtonChoise
-                        : borderButtonNoChoise
+                  {productDetails.map(item => {
+                    if (
+                      config.ram === item.dungLuongRam &&
+                      config.rom === item.dungLuongRom
+                    ) {
+                      return (
+                        <>
+                          <Button
+                            type='primary'
+                            onClick={() => addConfigs(item)}
+                            style={
+                              config.color === item.tenMauSac
+                                ? borderButtonChoise
+                                : borderButtonNoChoise
+                            }
+                            ghost
+                          >
+                            {config.color === item.tenMauSac ? (
+                              <i
+                                class='fa fa-check'
+                                style={{
+                                  position: 'absolute',
+                                  width: 14,
+                                  height: 14,
+                                  background: '#128DE2',
+                                  top: 0,
+                                  left: 0,
+                                  borderTopLeftRadius: '3px',
+                                  borderBottomRightRadius: '7px',
+                                  fontSize: 11,
+                                  color: 'white'
+                                }}
+                              ></i>
+                            ) : (
+                              <i
+                                class='fa fa-check'
+                                style={{
+                                  position: 'absolute',
+                                  width: 14,
+                                  height: 14,
+                                  background: 'white',
+                                  top: 0,
+                                  left: 0,
+                                  borderTopLeftRadius: '3px',
+                                  borderBottomRightRadius: '7px',
+                                  fontSize: 11,
+                                  color: 'white'
+                                }}
+                              ></i>
+                            )}
+
+                            <div style={{ display: 'flex' }}>
+                              <div>
+                                <img
+                                  style={{ width: 38, height: 38 }}
+                                  src='https://cdn2.cellphones.com.vn/insecure/rs:fill:50:50/q:80/plain/https://cellphones.com.vn/media/catalog/product/g/a/galaxy-z-fold-5-xam-1_1__1_2.jpg'
+                                />
+                              </div>
+
+                              <div>
+                                <span
+                                  style={{
+                                    fontSize: 12,
+                                    color: '#444',
+                                    display: 'block',
+                                    textAlign: 'left',
+                                    marginLeft: '5px'
+                                  }}
+                                  className='fw-6'
+                                >
+                                  {item.tenMauSac}
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: 12,
+                                    color: '#444',
+                                    position: 'relative',
+                                    top: '-3px',
+                                    left: '5px'
+                                  }}
+                                >
+                                  {' '}
+                                  {formatMoney(item.donGia)}
+                                </span>
+                              </div>
+                            </div>
+                          </Button>
+                        </>
+                      )
                     }
-                    ghost
-                  >
-                    {config.color === 'Đen' ? (
-                      <i
-                        class='fa fa-check'
-                        style={{
-                          position: 'absolute',
-                          width: 14,
-                          height: 14,
-                          background: '#128DE2',
-                          top: 0,
-                          left: 0,
-                          borderTopLeftRadius: '3px',
-                          borderBottomRightRadius: '7px',
-                          fontSize: 11,
-                          color: 'white'
-                        }}
-                      ></i>
-                    ) : (
-                      <i
-                        class='fa fa-check'
-                        style={{
-                          position: 'absolute',
-                          width: 14,
-                          height: 14,
-                          background: 'white',
-                          top: 0,
-                          left: 0,
-                          borderTopLeftRadius: '3px',
-                          borderBottomRightRadius: '7px',
-                          fontSize: 11,
-                          color: 'white'
-                        }}
-                      ></i>
-                    )}
-
-                    <div style={{ display: 'flex' }}>
-                      <div>
-                        <img src='https://cdn2.cellphones.com.vn/insecure/rs:fill:50:50/q:80/plain/https://cellphones.com.vn/media/catalog/product/g/a/galaxy-z-fold-5-xam-1_1__1_2.jpg' />
-                      </div>
-
-                      <div>
-                        <span
-                          style={{
-                            fontSize: 12,
-                            color: '#444',
-                            display: 'block',
-                            textAlign: 'left',
-                            marginLeft: '5px'
-                          }}
-                          className='fw-6'
-                        >
-                          Đen
-                        </span>
-                        <span
-                          style={{
-                            fontSize: 12,
-                            color: '#444',
-                            position: 'relative',
-                            top: '-3px',
-                            left: '5px'
-                          }}
-                        >
-                          {' '}
-                          50.000.000 đ{' '}
-                        </span>
-                      </div>
-                    </div>
-                  </Button>
-
-                  <Button
-                    type='primary'
-                    onClick={() => addConfigs('color:Kem')}
-                    style={
-                      config.color === 'Kem'
-                        ? borderButtonChoise
-                        : borderButtonNoChoise
-                    }
-                    ghost
-                  >
-                    {config.color === 'Kem' ? (
-                      <i
-                        class='fa fa-check'
-                        style={{
-                          position: 'absolute',
-                          width: 14,
-                          height: 14,
-                          background: '#128DE2',
-                          top: 0,
-                          left: 0,
-                          borderTopLeftRadius: '3px',
-                          borderBottomRightRadius: '7px',
-                          fontSize: 11,
-                          color: 'white'
-                        }}
-                      ></i>
-                    ) : (
-                      <i
-                        class='fa fa-check'
-                        style={{
-                          position: 'absolute',
-                          width: 14,
-                          height: 14,
-                          background: 'white',
-                          top: 0,
-                          left: 0,
-                          borderTopLeftRadius: '3px',
-                          fontSize: 11,
-                          color: 'white'
-                        }}
-                      ></i>
-                    )}
-                    <div style={{ display: 'flex' }}>
-                      <div>
-                        <img src='https://cdn2.cellphones.com.vn/insecure/rs:fill:50:50/q:80/plain/https://cellphones.com.vn/media/catalog/product/g/a/galaxy-z-fold-5-kem-1_3_2.jpg' />
-                      </div>
-
-                      <div>
-                        <span
-                          style={{
-                            fontSize: 12,
-                            color: '#444',
-                            display: 'block',
-                            textAlign: 'left',
-                            marginLeft: '5px'
-                          }}
-                          className='fw-6'
-                        >
-                          Kem
-                        </span>
-                        <span
-                          style={{
-                            fontSize: 12,
-                            color: '#444',
-                            position: 'relative',
-                            top: '-3px',
-                            left: '5px'
-                          }}
-                        >
-                          {' '}
-                          50.000.000 đ{' '}
-                        </span>
-                      </div>
-                    </div>
-                  </Button>
-
-                  <Button
-                    type='primary'
-                    onClick={() => addConfigs('color:Xanh dương')}
-                    style={
-                      config.color === 'Xanh dương'
-                        ? borderButtonChoise
-                        : borderButtonNoChoise
-                    }
-                    ghost
-                  >
-                    {config.color === 'Xanh dương' ? (
-                      <i
-                        class='fa fa-check'
-                        style={{
-                          position: 'absolute',
-                          width: 14,
-                          height: 14,
-                          background: '#128DE2',
-                          top: 0,
-                          left: 0,
-                          borderTopLeftRadius: '3px',
-                          borderBottomRightRadius: '7px',
-                          fontSize: 11,
-                          color: 'white'
-                        }}
-                      ></i>
-                    ) : (
-                      <i
-                        class='fa fa-check'
-                        style={{
-                          position: 'absolute',
-                          width: 14,
-                          height: 14,
-                          background: 'white',
-                          top: 0,
-                          left: 0,
-                          borderTopLeftRadius: '3px',
-                          borderBottomRightRadius: '7px',
-                          fontSize: 11,
-                          color: 'white'
-                        }}
-                      ></i>
-                    )}
-
-                    <div style={{ display: 'flex' }}>
-                      <div>
-                        <img src='https://cdn2.cellphones.com.vn/insecure/rs:fill:50:50/q:80/plain/https://cellphones.com.vn/media/catalog/product/g/a/galaxy-z-fold-5-xanh-1_1_1_1.jpg' />
-                      </div>
-
-                      <div>
-                        <span
-                          style={{
-                            fontSize: 12,
-                            color: '#444',
-                            display: 'block',
-                            textAlign: 'left',
-                            marginLeft: '5px'
-                          }}
-                          className='fw-6'
-                        >
-                          Xanh dương
-                        </span>
-                        <span
-                          style={{
-                            fontSize: 12,
-                            color: '#444',
-                            position: 'relative',
-                            top: '-3px',
-                            left: '5px'
-                          }}
-                        >
-                          {' '}
-                          50.000.000 đ{' '}
-                        </span>
-                      </div>
-                    </div>
-                  </Button>
+                  })}
                 </div>
 
                 <div>
@@ -547,23 +415,33 @@ const ProductSinglePage = () => {
                       className='new-price fw-5 font-poppins fs-24'
                       style={{ display: `flex`, color: `#128DE2` }}
                     >
-                      4.0000.000 đ
+                      {formatMoney(
+                        config.priceDiscount === 0
+                          ? config.price
+                          : config.priceDiscount
+                      )}
                       <div
                         className='old-price text-gray'
                         style={{ marginLeft: 5, fontSize: 17, marginTop: 8 }}
                       >
-                        3.600.000 đ
+                        {config.priceDiscount === 0
+                          ? ''
+                          : formatMoney(config.price)}
                       </div>
                     </div>
-                    <div
-                      className='discount bg-orange fs-13 text-white fw-6 font-poppins'
-                      style={{
-                        backgroundColor: '#128DE2',
-                        border: '  1px solid #128DE2'
-                      }}
-                    >
-                      {product?.discountPercentage}%
-                    </div>
+                    {config.priceDiscount === 0 ? (
+                      ''
+                    ) : (
+                      <div
+                        className='discount bg-orange fs-13 text-white fw-6 font-poppins'
+                        style={{
+                          backgroundColor: '#128DE2',
+                          border: '  1px solid #128DE2'
+                        }}
+                      >
+                        -{config.discount} %
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -583,17 +461,15 @@ const ProductSinglePage = () => {
                       borderRadius: 10,
                       width: `47%`
                     }}
+                    onClick={() => {
+                      addToCartHandler()
+                      navigate('/cart')
+                    }}
                   >
                     <i className='fas fa-shopping-cart'></i>
-                    <span
-                      className='btn-text mx-2'
-                      onClick={() => {
-                        addToCartHandler(product)
-                      }}
-                    >
-                      Mua ngay
-                    </span>
+                    <span className='btn-text mx-2'>Mua ngay</span>
                   </button>
+
                   <button
                     type='button'
                     className='buy-now btn mx-3'
@@ -602,6 +478,9 @@ const ProductSinglePage = () => {
                       border: '  1px solid #128DE2',
                       borderRadius: 10,
                       width: `47%`
+                    }}
+                    onClick={() => {
+                      addToCartHandler()
                     }}
                   >
                     <i className='fas fa-shopping-cart'></i>
@@ -646,12 +525,12 @@ const ProductSinglePage = () => {
                 Xem thêm thông tin
               </Button>
             </div>
-            <div className='product-single-r'>
+            <div className='product-single-r' style={{ marginLeft: 45 }}>
               <div
                 className='title fs-20 fw-7'
                 style={{ marginBottom: 20, textAlign: `center` }}
               >
-                Cấu hình điện thoại {product?.title}
+                Cấu hình điện thoại
               </div>
               <TableContainer component={Paper}>
                 <Table sx={{ maxWidth: `100%` }} aria-label='customized table'>
@@ -687,7 +566,36 @@ const ProductSinglePage = () => {
         </div>
       </div>
 
-      {cartMessageStatus && <CartMessage />}
+      {/* toaster */}
+      <Toaster
+        position='top-center'
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=''
+        containerStyle={{}}
+        toastOptions={{
+          // Define default options
+          className: '',
+          duration: 5000,
+          style: {
+            background: '#4caf50',
+            color: 'white'
+          },
+
+          // Default options for specific types
+          success: {
+            duration: 3000,
+            theme: {
+              primary: 'green',
+              secondary: 'white'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#4caf50',
+            },
+          }
+        }}
+      />
     </main>
   )
 }

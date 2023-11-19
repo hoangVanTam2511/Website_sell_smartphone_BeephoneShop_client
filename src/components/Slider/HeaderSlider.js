@@ -22,7 +22,7 @@ const HeaderSlider = () => {
         <div className='container'>
       <Row>
        <Col span={16}>
-          <div className='slider-content overflow-x-hidden' style={{  padding:`10px`, height:422}}>
+          <div className='slider-content overflow-x-hidden' style={{  padding:`10px`, height: 400}}>
               {/* <Slider {...settings} style={{ height:422}}>
                 <div className='slider-item' style={{ height:422}}> 
                   <img src = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:690:300/q:80/plain/https://dashboard.cellphones.com.vn/storage/banner-nthu-loa-jbl-v60-sliding.jpg' alt = "" style={{ height:422}} />
@@ -36,7 +36,6 @@ const HeaderSlider = () => {
        </Col>
        <Col span={8}>
           <img className='banner-slider' src = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:690:300/q:10/plain/https://dashboard.cellphones.com.vn/storage/ipad-chinh-hang-right-thang10-neww.png'  />
-          <br/>
           <img className='banner-slider' src = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:690:300/q:80/plain/https://dashboard.cellphones.com.vn/storage/690-300-max-Banner-sliding-deal.jpg'  />
 
        </Col>

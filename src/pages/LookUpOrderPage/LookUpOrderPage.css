@@ -1,0 +1,251 @@
+@media (max-width: 600px) {
+    .container_lookup {
+      flex-direction: column;
+    }
+  }
+  
+  .body_lookup {
+    /* font */
+    font-family: "Hanken Grotesk";
+    /* alignment */
+    margin: 0;
+    display: grid;
+    place-content: center;
+    /* sizes */
+    min-height: 86vh;
+    /* color */
+    
+  }
+  
+  p {
+    font-size: 18px;
+  }
+  
+  /*
+  -----------
+  ¦left side¦
+  ----------- 
+  */
+  
+  .container_lookup {
+    /* alignment */
+    display: flex;
+    /* sizes */
+    border-radius: 25px;
+  
+    /* colors */
+    background-color: white;
+    box-shadow: 0px 0px 10px 5px rgb(204, 204, 204);
+  }
+  
+  .container-left {
+    /* alignment */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    text-align: center;
+    /* sizes */
+    border-radius: 25px;
+    width: 380px;
+    /* colors */
+    background-image: linear-gradient(0deg, rgb(0, 102, 204), rgb(0, 153, 204));
+  }
+  
+  .title {
+    /* font */
+    font-size: 16px;
+    font-weight: 700;
+  }
+  
+  .title-left {
+    /* alignment */
+    margin: 37px auto;
+    /* colors */
+    color: white;
+    /* width */
+    width: 83%;
+  }
+  
+  .circle {
+    /* alignment */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: -3px;
+    /* sizes */
+    height: 200px;
+    width: 100%;
+    /* colors */
+    background-image: url(https://cdn.tgdd.vn/2022/10/banner/TGDD-540x270.png);
+    background-size: cover;
+  }
+  
+  .circle-score {
+    /* alignment */
+    margin-bottom: -6px;
+    /* font */
+    font-size: 70px;
+    font-weight: 800;
+    /* colors */
+    color: white;
+  }
+  
+  .circle-out-of {
+    /* font */
+    font-weight: 500;
+    /* colors */
+    color: hsla(0, 0%, 100%, 0.404);
+  }
+  
+  .container-left-bottom {
+    /* alignment */
+    margin: auto 50px;
+  }
+  
+  .container-left-bottom-compliment {
+    /* alignment */
+    margin-bottom: -6px;
+  
+    /* font */
+    font-weight: 700;
+    font-size: 28px;
+  
+    /* colors */
+    color: white;
+  }
+  
+  .container-left-bottom-description {
+    /* colors */
+    color: hsla(0, 0%, 100%, 0.61);
+  }
+  
+  /*
+  ------------
+  ¦right side¦
+  ------------ 
+  */
+  
+  .container-right-box {
+    /* alignment */
+    display: flex;
+    justify-content: center;
+  }
+  
+  .container-right {
+    /* alignment */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    margin: 0 auto;
+    margin-top: 77px;
+    /* sizes */
+    height: 300px;
+  }
+  
+  .title-right {
+    /* alignment */
+    text-align: left;
+    margin-top: -3px;
+    /* sizes */
+    width: 288px;
+    /* colors */
+    color: hsl(224, 30%, 27%);
+  }
+  
+  .stat-box {
+    /* alignment */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    margin-top: -50px;
+  }
+  
+  .stat {
+    /* font */
+    font-size: 18px;
+    font-weight: 500;
+    /* alignment */
+    justify-content: space-around;
+    align-items: center;
+    gap: 70px;
+    margin: 8px 40px;
+    /* sizes */
+    width: 288px;
+    height: 55px;
+    border-radius: 10px;
+  }
+  
+  .stat-part-left {
+    /* alignment */
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  
+  .stat-part-right {
+    /* font */
+    font-weight: 700;
+    /* colors */
+    color: hsla(224, 30%, 27%, 0.514);
+  }
+  
+  .stat-reaction {
+  }
+  
+  .red {
+    color: hsl(0, 100%, 67%);
+  }
+  
+  .blue {
+    color: hsl(224, 30%, 27%);
+  }
+  
+  .yellow {
+    color: hsl(39, 100%, 56%);
+  }
+  
+  .purple {
+    color: hsl(234, 85%, 45%);
+  }
+  
+  .green {
+    color: hsl(166, 100%, 37%);
+  }
+  
+  .btn {
+    /* font */
+    font-size: 18px;
+    font-weight: 500;
+    /* alignment */
+    /* sizes */
+    border: none;
+    width: 288px;
+    height: 55px;
+    border-radius: 10px;
+    /* colors */
+    color: white;
+    background-color: #128de2;
+  }
+  
+  .btn:hover {
+    background-image: linear-gradient(0deg, rgb(0, 102, 204), rgb(0, 153, 204));
+    cursor: pointer;
+  }
+
+  .btn-login{
+    /* font */
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 10px;
+    /* alignment */
+    border: none;
+    width: 288px;
+    height: 55px;
+    border-radius: 10px;
+    /* colors */
+    color: #128de2;
+    background-color: white;
+  }

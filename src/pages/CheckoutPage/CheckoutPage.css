@@ -1,0 +1,10 @@
+.title_checkout {
+    font-size: 20px;
+    font-weight: 500;
+    color: #212529;
+    margin-bottom: 20px;
+    display: flex;
+    width: 46%;
+    margin: 0px auto;
+    justify-content: space-around ;
+}

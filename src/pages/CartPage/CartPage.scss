@@ -20,12 +20,11 @@
 }
 
 .cart{
-    padding-top: 2rem;
-    min-height: 85vh;
+    padding-top: 0.4rem;
+    border-radius: 10px;
 
     &::-webkit-scrollbar{
         height: 5px;
-
     }
     &::-webkit-scrollbar-track{
         box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
@@ -54,14 +53,14 @@
             padding-right: 2rem;
             padding-left: 2rem;
             box-shadow: rgba(60, 64, 67, 0.01) 0px 1px 2px 0px, rgba(60, 64, 67, 0.01) 0px 1px 3px 1px;
-            border-radius: 3px;
+            border-radius: 10px;
             color: rgba(0, 0, 0, 0.6);
         }
         .cart-cbody{
             padding-right: 2rem;
             padding-left: 2rem;
             box-shadow: rgba(60, 64, 67, 0.01) 0px 1px 2px 0px, rgba(60, 64, 67, 0.01) 0px 1px 3px 1px;
-            border-radius: 3px;
+            border-radius: 10px;
             font-size: 14.5px;
             color: rgba(0, 0, 0, 0.6);
         }
@@ -123,24 +122,19 @@
     font-size: 16px!important;
 }
 
-// .css-14s5rfu-MuiFormLabel-root-MuiInputLabel-root  {
-//     color: rgba(0, 0, 0, 0.6);
-//     font-family: "Roboto","Helvetica","Arial",sans-serif;
-//     font-weight: 400;
-//     font-size: 14px!important;
-//     line-height: 1.4375em;
-//     letter-spacing: 0.00938em;
-//     padding: 0;
-//     position: relative;
-//     display: block;
-//     transform-origin: top left;
-//     white-space: nowrap;
-//     overflow: hidden;
-//     text-overflow: ellipsis;
-//     max-width: calc(100% - 24px);
-//     position: absolute;
-//     left: 0;
-//     top: 0;
-//     z-index: 1;
-//     pointer-events: none;
-// }
+.countProductTemp{
+    display: flex;
+    justify-content: space-between;
+    margin: 0px auto;
+    transform: translateY(24px);
+    position: fixed;
+    bottom: 20px;
+    left: 335px;
+    background-color: $clr-white;
+    width: 50%;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    z-index: 999;
+    padding: 9px;
+    border: 1px solid #e3e3e3;
+}

@@ -3,7 +3,7 @@ import "./Sidebar.scss";
 import {Link} from 'react-router-dom';
 import {useSelector, useDispatch} from 'react-redux';
 import { getSidebarStatus, setSidebarOff } from '../../store/sidebarSlice';
-import { fetchAsyncCategories, getAllCategories } from '../../store/categorySlice';
+import {  getAllCategories } from '../../store/categorySlice';
 
 const Sidebar = () => {
 
@@ -12,7 +12,6 @@ const Sidebar = () => {
   const categories = useSelector(getAllCategories);
 
   useEffect(() => {
-    dispatch(fetchAsyncCategories())
   }, [dispatch])
 
   return (

@@ -4,13 +4,15 @@ import Product from "../Product/Product";
 
 const ProductList = ({products}) => {
   return (
-    <div className='product-lists grid bg-white my-3'>
+    <div className='product-lists flex bg-white my-3' style={{ flexWrap: `wrap`, alignItems: `center`, marginLeft: `19px` }}>
       {
         products.map(product => {
-          let discountedPrice = (product.price) - (product.price * (product.discountPercentage / 100));
-
           return (
-            <Product key = {product.id} product = {{...product, discountedPrice}} />
+            <>
+             <Product product = {product} />
+             <Product product = {product} />
+             <Product product = {product} />
+            </>
           )
         })
       }

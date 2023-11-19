@@ -3,6 +3,7 @@
     align-items: center;
     width: 30%;
     margin: 4px auto;
+    background-color: white;
 }
 .menu-item-custom{
     font-size:16px;

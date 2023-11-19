@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 import './SearchOrderPage.css'
-import {  DatePicker } from 'antd'
-import axios from 'axios'
+import { useSelector } from 'react-redux'
 
-const { RangePicker } = DatePicker;
 const Orders = () => {
+
+  const user = useSelector(state => state.user.user)
+
   return (
     <>
       <div class='card' style={{ width: '100%' }}>
@@ -20,15 +21,15 @@ const Orders = () => {
               display: 'block',
               marginLeft: '32%',
               height: '70px',
-              backgroundImage: `url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz0LTGso_7ubZRD1CZoDauy3NWC6RxMqVf_A&usqp=CAU)`,
+              backgroundImage: `url(${user.anhDaiDien})`,
               backgroundSize: 'cover'
             }}
           > </div>
           <h4 style={{ textAlign: 'center' }}>
-            Xin chào
+            Xin chào, 
             <br />{' '}
             <span className='fw-7 fs-20' style={{ color: `#128DE2` }}>
-              Hoàng Văn Tám
+              {user.hoVaTen}
             </span>
           </h4>
           <h4></h4>

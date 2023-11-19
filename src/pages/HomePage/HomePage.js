@@ -1,42 +1,37 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import "./HomePage.scss";
 import "./HomePage.css";
 import HeaderSlider from "../../components/Slider/HeaderSlider";
 import { useSelector, useDispatch } from 'react-redux';
 import { getAllCategories } from '../../store/categorySlice';
 import ProductList from "../../components/ProductList/ProductList";
-import { fetchAsyncProducts, getAllProducts, getAllProductsStatus } from '../../store/productSlice';
+import { getAllProductsStatus } from '../../store/productSlice';
 import Loader from "../../components/Loader/Loader";
 import { STATUS } from '../../utils/status';
+import axios from 'axios';
 
 const HomePage = () => {
   const dispatch = useDispatch();
   const categories = useSelector(getAllCategories);
 
   useEffect(() => {
-    dispatch(fetchAsyncProducts(50));
+    getNewProducts()
   }, []);
 
-  const products = useSelector(getAllProducts);
+  const [products, setProducts] = useState([]);
   const productStatus = useSelector(getAllProductsStatus);
 
-  // randomizing the products in the list
-  const tempProducts = [];
-  if(products.length > 0){
-    for(let i in products){
-      let randomIndex = Math.floor(Math.random() * products.length);
-
-      while(tempProducts.includes(products[randomIndex])){
-        randomIndex = Math.floor(Math.random() * products.length);
+  const getNewProducts = async () => {
+    await axios.get(`http://localhost:8080/client/product-detail/get-list-products`)
+    .then(res => {
+      if(res.status === 200){
+        setProducts(res.data)
       }
-      tempProducts[i] = products[randomIndex];
-    }
+      console.log(res)
+    })
+    .catch(error => console.log(error));
   }
 
-  let catProductsOne = products.filter(product => product.category === categories[0]);
-  let catProductsTwo = products.filter(product => product.category === categories[1]);
-  let catProductsThree = products.filter(product => product.category === categories[2]);
-  let catProductsFour = products.filter(product => product.category === categories[3]);
 
   return (
     <main>
@@ -45,15 +40,35 @@ const HomePage = () => {
       </div>
       <div className='main-content bg-white'>
         <div className='container'>
-          <div className='categories py-5'>
+          <div className='categories'>
             <div className='categories-item'>
-              <div className='title-md title-banner' >
-                <h3 style={{ color: 'white'}}>Sản phẩm mới nhất</h3>
+              <div 
+                style={{
+                  width: '97%',
+                  margin: '0 auto',
+                }}
+              >
+                <h3 style={{ color: '#444', fontWeight: '600', fontSize: '22px'   }}>Sản phẩm mới nhất</h3>
               </div>
-              { productStatus === STATUS.LOADING ? <Loader /> : <ProductList products = {tempProducts} />}
+              { productStatus === STATUS.LOADING ? <Loader /> : <ProductList products = {products} />}
             </div>
-          
-          </div>
+
+            <div className='categories-item'>
+              <div 
+               style={{
+                width: '97%',
+                margin: '0 auto',
+              }}
+              >
+                <h3 style={{
+                  color: '#444', fontWeight: '600', fontSize: '22px'
+                }}
+                >Sản phẩm bán chạy</h3>
+              </div>
+              { productStatus === STATUS.LOADING ? <Loader /> : <ProductList products = {products} />}
+            </div>
+
+            </div>
         </div>
       </div>
     </main>

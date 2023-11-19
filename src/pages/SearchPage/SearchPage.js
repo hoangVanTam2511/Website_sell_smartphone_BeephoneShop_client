@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { STATUS } from '../../utils/status';
 import Loader from '../../components/Loader/Loader';
 import ProductList from '../../components/ProductList/ProductList';
-import { fetchAsyncSearchProduct, getSearchProducts, getSearchProductsStatus, clearSearch } from '../../store/searchSlice';
+import { getSearchProducts, getSearchProductsStatus, clearSearch } from '../../store/searchSlice';
 
 const SearchPage = () => {
   const dispatch = useDispatch();
@@ -15,7 +15,6 @@ const SearchPage = () => {
 
   useEffect(() => {
     dispatch(clearSearch());
-    dispatch(fetchAsyncSearchProduct(searchTerm));
   }, [searchTerm]);
 
   if(searchProducts.length === 0){

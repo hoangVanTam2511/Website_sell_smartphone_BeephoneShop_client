@@ -5,12 +5,18 @@ import "./SearchOrderPage.css";
 import Orders from "./Orders";
 import Home from "./Home";
 import InformationUser from "./InformationUser";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { changeInformationUser } from "../../store/userSlice";
 
 const App = () => {
   const [component, setComponent] = useState(1);
+  const navigate = useNavigate();
+  const dispatch = useDispatch(); 
 
   const choiseAnotherComponent = (value) => {
     setComponent(value);
+    console.log(value)
   };
 
   const backgroundButtonChoise = () => {
@@ -43,9 +49,10 @@ const App = () => {
       <br/>
       <div style={{ width: "80%", margin: `20px auto` }}>
         <Row>
-          <Col span={6}>
+          <Col span={6} style={{ position: 'fixed', zIndex: '666' }}>
+
             <button
-              style={ component == 1 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
+              style={ component === 1 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
               onClick={() => choiseAnotherComponent(1)}
             >
               <i
@@ -56,7 +63,7 @@ const App = () => {
             </button>
 
             <button
-              style={ component == 2 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
+              style={ component === 2 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
               onClick={() => choiseAnotherComponent(2)}
             >
               <i
@@ -89,7 +96,7 @@ const App = () => {
             </button> */}
 
             <button 
-              style={ component == 3 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
+              style={ component === 3 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
               onClick={() => choiseAnotherComponent(3)}
             >
               <i
@@ -103,14 +110,25 @@ const App = () => {
               className="button-order-bought"
               variant="outlined"
               startIcon={<i class="fa-solid fa-arrow-right-to-bracket"></i>}
+              onClick={() => {
+                localStorage.clear();
+                dispatch(changeInformationUser({
+                  id: '',
+                  ma: ''
+                }))
+                navigate("/")
+              }}
             >
               Đăng xuất
             </Button>
           </Col>
+            
+          <Col span={6}></Col>
+
           <Col span={18}>
-            {component == 1 ? <Home /> : <></>}
-            {component == 2 ? <Orders /> : <></>}
-            {component == 3 ? <InformationUser /> : <></>}
+            {component === 1 ? <Home /> : <></>}
+            {component === 2 ? <Orders /> : <></>}
+            {component === 3 ? <InformationUser /> : <></>}
 
           </Col>
         </Row>

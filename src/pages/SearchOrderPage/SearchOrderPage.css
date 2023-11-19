@@ -7,7 +7,7 @@
     position: relative;
     width: 110%;
     padding: 20px;
-    box-shadow: 3px 10px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 1px 2px 8px rgba(0, 0, 0, 0.2);
     border-radius: 3px;
     border: 0;
     .circle {
@@ -64,5 +64,15 @@
   .title{
     display: flex;
     justify-content: space-between;
+    font-size: 20px;
+  }
+
+  .css-1x51dt5-MuiInputBase-input-MuiInput-input{
+    font-size: 20px!important;
   }
   
+
+  .css-1c2i806-MuiFormLabel-root-MuiInputLabel-root{
+    font-size: 16px!important;
+    color: rgb(18, 141, 226)!important;
+  }
