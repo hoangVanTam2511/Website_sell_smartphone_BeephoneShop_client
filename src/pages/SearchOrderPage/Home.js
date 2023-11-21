@@ -2,10 +2,30 @@ import React, { useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 import './SearchOrderPage.css'
 import { useSelector } from 'react-redux'
+import axios from 'axios'
 
 const Orders = () => {
-
   const user = useSelector(state => state.user.user)
+  const [listBill, setListBill] = useState([])
+
+  useEffect(() => {
+    getBillsByIdCustomer()
+  }, [])
+
+  const getBillsByIdCustomer = async () => {
+    if (listBill && listBill.length > 0) return
+    await axios
+      .get(
+        `http://localhost:8080/client/bill/get-list-bills?id_customer=${user.id}`
+      )
+      .then(res => {
+        setListBill(res.data)
+      })
+  }
+
+  const formatDate = date => {
+    return new Date(date).toLocaleDateString('en-US')
+  }
 
   return (
     <>
@@ -24,9 +44,11 @@ const Orders = () => {
               backgroundImage: `url(${user.anhDaiDien})`,
               backgroundSize: 'cover'
             }}
-          > </div>
+          >
+            {' '}
+          </div>
           <h4 style={{ textAlign: 'center' }}>
-            Xin chào, 
+            Xin chào,
             <br />{' '}
             <span className='fw-7 fs-20' style={{ color: `#128DE2` }}>
               {user.hoVaTen}
@@ -50,7 +72,7 @@ const Orders = () => {
               ></i>
             </div>
             <div className='fw-6' style={{ margin: '10px 0px' }}>
-              8/1/2023
+              {formatDate(user.createdAt)}
             </div>
           </h4>
 
@@ -71,7 +93,7 @@ const Orders = () => {
 
           <h4 style={{ width: '20%' }}>
             <div className='fw-6' style={{ margin: '10px 0px' }}>
-              Điểm tích luỹ từ 08/01/2023
+              Điểm tích luỹ từ  {formatDate(user.createdAt)}
             </div>
             <div>
               <i
@@ -80,7 +102,7 @@ const Orders = () => {
               ></i>
             </div>
             <div className='fw-6' style={{ margin: '10px 0px' }}>
-              888888 điểm
+              0 điểm
             </div>
           </h4>
         </div>
@@ -114,26 +136,21 @@ const Orders = () => {
             <span className='fw-7 fs-18' style={{ color: `#128DE2` }}>
               Ưu đãi của bạn
             </span>
-
-            <br/>
-
+            <br />
             <span className='fw-5 fs-16'> 0 ưu đãi </span>
-
-            <br/>
-
+            <br />
             <Button
               style={{
                 backgroundColor: `#128DE2`,
                 color: `white`,
-                marginLeft: "5px",
+                marginLeft: '5px',
                 marginTop: '10px'
               }}
-              variant="outlined"
-              startIcon={<i class="fa-regular fa-eye"></i>}
+              variant='outlined'
+              startIcon={<i class='fa-regular fa-eye'></i>}
             >
               Xem chi tiết
             </Button>
-
           </h4>
           <h4></h4>
         </div>
@@ -158,30 +175,24 @@ const Orders = () => {
             <span className='fw-7 fs-18' style={{ color: `#128DE2` }}>
               Đơn hàng của bạn
             </span>
-
-            <br/>
-
-            <span className='fw-5 fs-16'> 0 đơn hàng </span>
-
-            <br/>
-
+            <br />
+            <span className='fw-5 fs-16'> {listBill.length} đơn hàng </span>
+            <br />
             <Button
               style={{
                 backgroundColor: `#128DE2`,
                 color: `white`,
-                marginLeft: "5px",
+                marginLeft: '5px',
                 marginTop: '10px'
               }}
-              variant="outlined"
-              startIcon={<i class="fa-regular fa-eye"></i>}
+              variant='outlined'
+              startIcon={<i class='fa-regular fa-eye'></i>}
             >
               Xem chi tiết
             </Button>
-
           </h4>
           <h4></h4>
         </div>
-
 
         <div className='card' style={{ width: '30%' }}>
           <img
@@ -203,30 +214,24 @@ const Orders = () => {
             <span className='fw-7 fs-18' style={{ color: `#128DE2` }}>
               Hạng thành viên
             </span>
-
-            <br/>
-
+            <br />
             <span className='fw-5 fs-16'> Vô danh tiểu tốt </span>
-
-            <br/>
-
+            <br />
             <Button
               style={{
                 backgroundColor: `#128DE2`,
                 color: `white`,
-                marginLeft: "5px",
+                marginLeft: '5px',
                 marginTop: '10px'
               }}
-              variant="outlined"
-              startIcon={<i class="fa-regular fa-eye"></i>}
+              variant='outlined'
+              startIcon={<i class='fa-regular fa-eye'></i>}
             >
               Xem chi tiết
             </Button>
-
           </h4>
           <h4></h4>
         </div>
-
       </div>
 
       <br />

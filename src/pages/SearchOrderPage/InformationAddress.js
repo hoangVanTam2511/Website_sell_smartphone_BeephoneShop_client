@@ -26,7 +26,6 @@ const Orders = () => {
         setListOfAddress(res.data)
         console.log(res.data) 
       }
-      console.log(res)
     })
     .catch(error => console.log(error));
   }

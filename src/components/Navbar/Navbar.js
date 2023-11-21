@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../../store/cartSlice'
 import { checkUserAnonymous } from '../../store/userSlice'
 import { UserOutlined } from '@ant-design/icons'
-import TabletMacIcon from '@mui/icons-material/TabletMac';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 
 const Navbar = () => {
@@ -71,34 +70,34 @@ const Navbar = () => {
 
           </div>
 
-          <div
-            className='navbar-cart flex align-center'
-            style={{
-              border: `0px solid white`,
-              width: 29,
-              height: 50,
-              paddingTop: 3,
-              borderRadius: `17%`
-            }}
-          >
-            <Link to='/products' className='cart-btn'>
-              < PhoneAndroidIcon
-                //className="fa fa-mobile" 
-                style={{ position: `relative`, right: `-15px`, fontSize: `26px` }}
-              />
-              <div
-                style={{
-                  fontSize: `10px`,
-                  width: `90px`,
-                  fontWeight: '500',
-                  wordWrap: `break-word`
-                }}
-              >
-                Điện thoại
-              </div>
-            </Link>
-          </div> 
-
+            <div
+              className='navbar-cart flex align-center'
+              style={{
+                border: `0px solid white`,
+                width: 29,
+                height: 50,
+                paddingTop: 3,
+                borderRadius: `17%`
+              }}
+            >
+              <Link to='/products' className='cart-btn'>
+                < PhoneAndroidIcon
+                  //className="fa fa-mobile" 
+                  style={{ position: `relative`, right: `-15px`, fontSize: `26px` }}
+                />
+                <div
+                  style={{
+                    fontSize: `10px`,
+                    width: `90px`,
+                    fontWeight: '500',
+                    wordWrap: `break-word`
+                  }}
+                >
+                  Điện thoại
+                </div>
+              </Link>
+            </div> 
+{/* 
           <div
             className='navbar-cart flex align-center'
             style={{
@@ -125,7 +124,7 @@ const Navbar = () => {
                Máy tính bảng
               </div>
             </Link>
-          </div> 
+          </div>  */}
 
           <div
             className='navbar-cart flex align-center'

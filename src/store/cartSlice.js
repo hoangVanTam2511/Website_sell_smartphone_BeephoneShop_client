@@ -21,15 +21,24 @@ export const addToCart = createAsyncThunk('cart/addToCart', async data => {
   return quantity
 })
 
+export const SetNote = createAsyncThunk('cart/SetNote', async data => {
+  localStorage.setItem('note', data)
+  return data
+})
+
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
-    quantity: 0
+    quantity: 0,
+    note: ""
   },
   reducers: {},
   extraReducers: builder => {
     builder.addCase(addToCart.fulfilled, (state, action) => {
       state.quantity = action.payload
+    })
+    .addCase(SetNote.fulfilled, (state, action) => {
+      state.note = action.payload
     })
   }
 })

@@ -66,7 +66,6 @@ const HomePage = () => {
     console.log(userRegister)
   }
 
-
   return (
     <main>
       <section>

@@ -148,7 +148,7 @@ const Orders = () => {
             <div style={{ marginTop: '35px' }}>
               <div className='title'>
                 <span>
-                  Ngày tham gia Smember: {formatDate(user.createdAt)}{' '}
+                  Ngày tham gia: {formatDate(user.createdAt)}{' '}
                 </span>
               </div>
               <Divider style={{ margin: '5px auto' }}></Divider>

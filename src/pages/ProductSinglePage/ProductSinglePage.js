@@ -74,16 +74,16 @@ const ProductSinglePage = () => {
   const rows = [
     createData(
       'Màn hình :',
-      `${product.typeDisplay}, ${product.sizeDisplay}, 1200 x 2640 Pixels`
+      `6.7 inch, AMOLED, 1200 x 2640 Pixels`
     ),
     createData('Hệ điều hành :', 'IOS 13'),
     createData('Camera sau :', 'Chính 48 MP & Phụ 8 MP, 5 MP'),
     createData('Camera trước :', 'Chính 48 MP & Phụ 8 MP, 5 MP'),
-    createData('Chip', `${product.nameChip}`),
+    createData('Chip', `A13 Bionic`),
     createData('Ram', `${config.ram} GB`),
     createData('ROM', `${config.rom} GB`),
     createData('SIM', '1 Nano SIM & 1 eSIM'),
-    createData('Pin, sạc:', `${product.batteryCapacity} mah, 20 W`)
+    createData('Pin, sạc:', `3400 mah, 20 W`)
   ]
 
   // getting single product
@@ -204,7 +204,8 @@ const ProductSinglePage = () => {
     width: 150,
     height: 46,
     color: 'black',
-    border: '1px solid #128DE2'
+    border: '1px solid #128DE2',
+    marginBottom: 10
   }
 
   const borderButtonNoChoise = {
@@ -212,7 +213,8 @@ const ProductSinglePage = () => {
     width: 150,
     height: 46,
     color: 'black',
-    border: '1px solid #d1d5db'
+    border: '1px solid #d1d5db',
+    marginBottom: 10
   }
 
   return (
@@ -444,11 +446,6 @@ const ProductSinglePage = () => {
                     )}
                   </div>
                 </div>
-
-                <img
-                  src='https://cdn.tgdd.vn/2023/10/banner/920x230-920x230-4.png'
-                  style={{ marginBottom: 10 }}
-                />
 
                 <div className='btns'>
                   <button
