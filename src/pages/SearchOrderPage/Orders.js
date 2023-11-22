@@ -135,7 +135,6 @@ const Orders = () => {
           
       </div>
 
-      <RangePicker style={{ marginBottom: '10px', position: 'relative', right: '-505px', backgroundColor: 'transparentaceholder' }}/>
       {
         listBill.map((bill, index) => (
           <>
@@ -161,11 +160,12 @@ const Orders = () => {
                     style={{ width: `20%` }}
                     src="https://cdn.tgdd.vn/Products/Images/522/281633/Redmi-Pad-Sliver-thumb-org-200x200.jpg"
                   />
-                  <span className="fw-6" style={{ marginLeft: "-120px" }}></span>
+                  <span className="fw-6" style={{ marginLeft: "-120px" }}>
                   {bill.orderItems[0].sanPhamChiTiet.sanPham.tenSanPham +
                   "(" + bill.orderItems[0].sanPhamChiTiet.ram.dungLuong + "GB +" + bill.orderItems[0].sanPhamChiTiet.rom.dungLuong + "GB" + ") "+
                   bill.orderItems[0].sanPhamChiTiet.mauSac.tenMauSac
                   } 
+                  </span>
               
             </h4>
             <h4 className="fs-12">
