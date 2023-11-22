@@ -14,7 +14,8 @@ const Product = ({ product }) => {
         className='product-item bg-white'
         style={{
           width: '230px',
-          height: '330px'
+          height: '330px',
+          margin: '10px auto'
         }}
       >
         {product.donGiaSauKhuyenMai === 0 ? (

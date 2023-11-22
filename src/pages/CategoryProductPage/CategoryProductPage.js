@@ -213,7 +213,7 @@ const CategoryProductPage = () => {
   }
 
   return (
-    <div className='cat-products py-5 bg-white'>
+    <div className='cat-products bg-white'>
       <div className='container'>
         <div className='cat-products-content' style={{ width: '104%'}}>
           <h3 style={{ marginBottom: `0px`, marginTop: 20 }}>
