@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 import './SearchOrderPage.css'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
+import { SetSelectedCart } from '../../store/cartSlice'
 
 const Orders = () => {
   const user = useSelector(state => state.user.user)
   const [listBill, setListBill] = useState([])
+  const dispatch = useDispatch()
 
   useEffect(() => {
     getBillsByIdCustomer()
+    dispatch(SetSelectedCart(1));
   }, [])
 
   const getBillsByIdCustomer = async () => {

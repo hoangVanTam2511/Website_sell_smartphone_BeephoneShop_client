@@ -6,7 +6,6 @@ import { useSelector } from 'react-redux'
 import  OrderDetail from './OrderDetail'
 import axios from 'axios'
 
-const { RangePicker } = DatePicker;
 const Orders = () => {
   const user = useSelector(state => state.user.user)
   const [listBill, setListBill] = useState([])
@@ -36,6 +35,11 @@ const Orders = () => {
   const formatMoney = (number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number)
   }
+
+  const setTab = (data) => {
+    setBillSelected(data === null ? 0 : data)
+  }
+
 
   return (
     <>
@@ -139,7 +143,7 @@ const Orders = () => {
                       style={{ width: `20%` }}
                       src="https://cdn.tgdd.vn/Products/Images/522/281633/Redmi-Pad-Sliver-thumb-org-200x200.jpg"
                     />
-                    <span className="fw-6" style={{ marginLeft: "-120px" }}>
+                    <span className="fw-6" style={{ marginLeft: "-120px", width: '78%',  }}>
                     {bill.orderItems[0].sanPhamChiTiet.sanPham.tenSanPham +
                     "(" + bill.orderItems[0].sanPhamChiTiet.ram.dungLuong + "GB +" + bill.orderItems[0].sanPhamChiTiet.rom.dungLuong + "GB" + ") "+
                     bill.orderItems[0].sanPhamChiTiet.mauSac.tenMauSac
@@ -178,7 +182,7 @@ const Orders = () => {
       ):(
         <>
         <div style={{ width: `110%`, margin: `0px auto` }}>
-        <OrderDetail id_bill={billId} />
+        <OrderDetail id_bill={billId} setTab={setTab} />
         </div>
         </>
 

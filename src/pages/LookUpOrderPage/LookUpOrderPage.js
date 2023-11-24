@@ -31,9 +31,20 @@ const LookUpOrderPage = () => {
       .catch(error => console.log(error))
   }
 
+  const setTab = (data) => {
+    setBill(data)
+    if(data === null){
+      setOrder({
+        phone: '',
+        code: ''
+      })
+    }
+  }
+
   return (
     <>
-      <div className='body_lookup'>
+    {bill === null || bill === undefined ?(
+        <div className='body_lookup'>
         <div className='container_lookup'>
           <div className='container-left'>
             <div className='title title-left'>
@@ -82,14 +93,13 @@ const LookUpOrderPage = () => {
           </div>
         </div>
       </div>
-      {
-        bill && 
+    ):
         <> 
         <div style={{ 
          width: '79%',
-         margin:` 10px auto`,
+         margin:` 40px auto`,
           }}>
-        <OrderDetail id_bill={bill} />
+        <OrderDetail id_bill={bill} setTab={setTab} />
         </div>
         </>
       }
