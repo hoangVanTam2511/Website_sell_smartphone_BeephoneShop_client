@@ -3,14 +3,12 @@ import './HomePage.scss'
 import './HomePage.css'
 import HeaderSlider from '../../components/Slider/HeaderSlider'
 import { useSelector, useDispatch } from 'react-redux'
-import { getAllCategories } from '../../store/categorySlice'
 import ProductList from '../../components/ProductList/ProductList'
 import { getAllProductsStatus } from '../../store/productSlice'
 import Loader from '../../components/Loader/Loader'
 import { STATUS } from '../../utils/status'
 import axios from 'axios'
 import { ResetSelectedCart } from '../../store/cartSlice'
-import Carousel from 'react-multi-carousel'
 import 'react-multi-carousel/lib/styles.css'
 import { over } from 'stompjs'
 import SockJS from 'sockjs-client'
@@ -18,26 +16,7 @@ import SockJS from 'sockjs-client'
 var stompClient = null
 const HomePage = () => {
   const dispatch = useDispatch()
-  const categories = useSelector(getAllCategories)
   const [changeRealTime, setChangeRealTime] = useState('')
-  const responsive = {
-    superLargeDesktop: {
-      breakpoint: { max: 4000, min: 3000 },
-      items: 5
-    },
-    desktop: {
-      breakpoint: { max: 3000, min: 1024 },
-      items: 5
-    },
-    tablet: {
-      breakpoint: { max: 1024, min: 464 },
-      items: 1
-    },
-    mobile: {
-      breakpoint: { max: 464, min: 0 },
-      items: 2
-    }
-  }
 
    // connect websocket
    const connect = () => {
@@ -264,7 +243,9 @@ const HomePage = () => {
 
             {/* <FlashsalePage/> */}
 
-            <div className='categories-item'>
+            {
+              productBestSeller.length === 0 ? <></> :
+              <div className='categories-item'>
               <div className='categories-item'>
                 <div
                   style={{
@@ -384,6 +365,8 @@ const HomePage = () => {
                 )}
               </div>
             </div>
+            }
+       
 
             <div className='categories-item'>
               <div

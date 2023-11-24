@@ -9,6 +9,7 @@ import axios from 'axios'
 const Orders = () => {
   const user = useSelector(state => state.user.user)
   const [listBill, setListBill] = useState([])
+  const [listBillFillter, setListBillFillter] = useState([])
   const [totalAmount, setTotalAmount] = useState(0)
   const [billSelected, setBillSelected] = useState(0)
   const [billId, setBillId] = useState()
@@ -24,6 +25,7 @@ const Orders = () => {
       await axios.get(`http://localhost:8080/client/bill/get-list-bills?id_customer=${user.id}`).then(
         res => {
           setListBill(res.data)
+          setListBillFillter(res.data)
           console.log(res.data)
           res.data.forEach(item => {
             sum += item.tongTienSauKhiGiam
@@ -62,17 +64,15 @@ const Orders = () => {
 
   const loadDataWhenSelectButton = (state)=> {
     if(state === 0) {
-      getBillsByIdCustomer()
+      setListBillFillter(listBill)
     }else{
-      console.log(state)
-      getBillsByIdCustomer()
       var data = []
       listBill.forEach(item => {
-        if(item.trangThai === state){
+        if(item.orderHistories.length === state){
           data.push(item)
         }
       })
-      setListBill(data)
+      setListBillFillter(data)
     }
 
     
@@ -124,7 +124,7 @@ const Orders = () => {
               onClick={() => 
                 {
                   setStateOfOrder(1)
-                  loadDataWhenSelectButton('PENDING_CONFIRM')
+                  loadDataWhenSelectButton(1)
                  }
               }
             >
@@ -137,7 +137,7 @@ const Orders = () => {
               onClick={() => 
                 {
                   setStateOfOrder(2)
-                  loadDataWhenSelectButton('PENDING_CONFIRM')
+                  loadDataWhenSelectButton(2)
                  }}
             >
               Đã xác nhận
@@ -149,7 +149,7 @@ const Orders = () => {
               variant="outlined"
               onClick={() => {
                 setStateOfOrder(3)
-                loadDataWhenSelectButton('DELIVERING')
+                loadDataWhenSelectButton(3)
                }}
             >
               Đang vận chuyển
@@ -175,7 +175,7 @@ const Orders = () => {
               onClick={() => 
                 {
                   setStateOfOrder(5)
-                  loadDataWhenSelectButton('CANCELLED')
+                  loadDataWhenSelectButton(5)
                  }}
             >
               Đã hủy
@@ -185,7 +185,7 @@ const Orders = () => {
         </div>
   
         {
-          listBill.map((bill, index) => (
+          listBillFillter.map((bill, index) => (
             <>
             <div class="card">
             <div class="title">
