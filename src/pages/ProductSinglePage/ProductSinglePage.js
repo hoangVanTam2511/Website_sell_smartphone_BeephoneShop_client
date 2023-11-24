@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom'
 import toast, { Toaster } from 'react-hot-toast'
 import { ResetSelectedCart } from '../../store/cartSlice'
 
+var stompClient = null
 const ProductSinglePage = () => {
   const { id } = useParams()
   const [ramRomConfigs, setRamRomConfigs] = useState([])
@@ -73,10 +74,7 @@ const ProductSinglePage = () => {
   }
 
   const rows = [
-    createData(
-      'Màn hình :',
-      `6.7 inch, AMOLED, 1200 x 2640 Pixels`
-    ),
+    createData('Màn hình :', `6.7 inch, AMOLED, 1200 x 2640 Pixels`),
     createData('Hệ điều hành :', 'IOS 13'),
     createData('Camera sau :', 'Chính 48 MP & Phụ 8 MP, 5 MP'),
     createData('Camera trước :', 'Chính 48 MP & Phụ 8 MP, 5 MP'),
@@ -140,7 +138,6 @@ const ProductSinglePage = () => {
           setRamRomConfigs(listRamRomDistinct)
           addConfigs(listRamRomDistinct[0])
         }
-
       })
       .catch(error => console.log(error))
 
@@ -173,7 +170,7 @@ const ProductSinglePage = () => {
       .then(res => {
         if (res.status === 200) {
           dispatch(addToCart())
-            toast.success('Thêm vào giỏ hàng thành công!')
+          toast.success('Thêm vào giỏ hàng thành công!')
         }
       })
       .catch(res => console.log(res))
@@ -410,11 +407,19 @@ const ProductSinglePage = () => {
                 </div>
 
                 <div>
-                  <span className='fs-14 mx-2 text-dark fw-6' style={{ marginLeft: '0px'}}>Giá bán</span>
+                  <span
+                    className='fs-14 mx-2 text-dark fw-6'
+                    style={{ marginLeft: '0px' }}
+                  >
+                    Giá bán
+                  </span>
                 </div>
 
                 <div className='price' style={{ padding: 0 }}>
-                  <div className='flex align-center my-1' style={{ backgroundColor: 'white'}}>
+                  <div
+                    className='flex align-center my-1'
+                    style={{ backgroundColor: 'white' }}
+                  >
                     <div
                       className='new-price fw-5 font-poppins fs-24'
                       style={{ display: `flex`, color: `#128DE2` }}
@@ -590,8 +595,8 @@ const ProductSinglePage = () => {
             },
             iconTheme: {
               primary: 'white',
-              secondary: '#4caf50',
-            },
+              secondary: '#4caf50'
+            }
           }
         }}
       />

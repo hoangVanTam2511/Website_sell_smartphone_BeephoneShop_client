@@ -12,11 +12,14 @@ import axios from 'axios'
 import { ResetSelectedCart } from '../../store/cartSlice'
 import Carousel from 'react-multi-carousel'
 import 'react-multi-carousel/lib/styles.css'
+import { over } from 'stompjs'
+import SockJS from 'sockjs-client'
 
+var stompClient = null
 const HomePage = () => {
   const dispatch = useDispatch()
   const categories = useSelector(getAllCategories)
-
+  const [changeRealTime, setChangeRealTime] = useState('')
   const responsive = {
     superLargeDesktop: {
       breakpoint: { max: 4000, min: 3000 },
@@ -36,10 +39,33 @@ const HomePage = () => {
     }
   }
 
+   // connect websocket
+   const connect = () => {
+    let Sock = new SockJS('http://localhost:8080/ws')
+    stompClient = over(Sock)
+    stompClient.connect({}, onConnected, onError)
+  }
+
+  const onConnected = () => {
+    stompClient.subscribe('/bill/bills', onMessageReceived)
+  }
+
+  const onMessageReceived = payload => {
+    var data = JSON.parse(payload.body)
+    setChangeRealTime(data.name)
+  }
+
+  const onError = err => {
+    console.log(err)
+  }
+
   useEffect(() => {
     getNewProducts()
     dispatch(ResetSelectedCart())
-  }, [])
+    if (stompClient === null) {
+      connect()
+    }
+  }, [changeRealTime])
 
   const [products, setProducts] = useState([])
   const productStatus = useSelector(getAllProductsStatus)

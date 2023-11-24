@@ -16,7 +16,10 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import LocalAtmOutlinedIcon from '@mui/icons-material/LocalAtmOutlined'
 import { addToCart } from '../../store/cartSlice'
 import toast, { Toaster } from 'react-hot-toast'
+import { over } from 'stompjs'
+import SockJS from 'sockjs-client'
 
+var stompClient = null
 const CartPage = () => {
   // const { itemsCount, totalAmount } = useSelector(state => state.cart)
   const [productDetails, setProductDetails] = useState([])
@@ -32,8 +35,31 @@ const CartPage = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
+  // connect websocket
+  const connect = () => {
+    let Sock = new SockJS('http://localhost:8080/ws')
+    stompClient = over(Sock)
+    stompClient.connect({}, onConnected, onError)
+  }
+
+  const onConnected = () => {
+    stompClient.subscribe('/bill/bills', onMessageReceived)
+  }
+
+  const onMessageReceived = payload => {
+    var data = JSON.parse(payload.body)
+    // console.log(data)
+  }
+
+  const onError = err => {
+    console.log(err)
+  }
+
   useEffect(() => {
     getProductDetails()
+    if(stompClient === null){
+      connect()
+    }
   }, [totalAmount, productDetails])
 
   const getProductDetails = async () => {
@@ -160,8 +186,7 @@ const CartPage = () => {
           setBill(response.data)
           idOrder = response.data.id
         })
-    } catch (error) {
-    }
+    } catch (error) {}
 
     if (idOrder !== '') {
       productDetails.forEach(async e => {
@@ -191,6 +216,14 @@ const CartPage = () => {
           console.log(error)
         }
       })
+    }
+
+    var hello = {
+      name: 'hello server'
+    }
+
+    if (stompClient) {
+      stompClient.send('/app/bills', {}, JSON.stringify(hello))
     }
 
     toast.success('Đặt hàng thành công')
@@ -252,33 +285,31 @@ const CartPage = () => {
         className='text-center fw-5'
         style={{ marginTop: 30, marginBottom: -10 }}
       >
-        {
-          checkoutState === 3 ? 
-          <></>:
+        {checkoutState === 3 ? (
+          <></>
+        ) : (
           <span>
-          <i
-            class='fa fa-arrow-left'
-            style={{ transform: 'translateX(-240px)' }}
-          ></i>
-        </span>
-        }
-   
+            <i
+              class='fa fa-arrow-left'
+              style={{ transform: 'translateX(-240px)' }}
+            ></i>
+          </span>
+        )}
 
         <span style={{ fontWeight: 600 }}>
           {checkoutState === 1 ? 'Thông tin' : ''}
           {checkoutState === 2 ? 'Thanh toán' : ''}
-           {checkoutState === 3 ? 'Hoàn thành' : ''}
+          {checkoutState === 3 ? 'Hoàn thành' : ''}
         </span>
       </h3>
 
       <Divider
         style={{ margin: ' 10px auto', width: '45%', minWidth: '45%' }}
       />
-      {
-        checkoutState === 3 ? 
-          <></>
-        : 
-          <div className='title_checkout'>
+      {checkoutState === 3 ? (
+        <></>
+      ) : (
+        <div className='title_checkout'>
           <div
             style={
               checkoutState === 1
@@ -296,7 +327,7 @@ const CartPage = () => {
               }
             ></Button>
           </div>
-  
+
           <div
             style={
               checkoutState === 2
@@ -315,32 +346,31 @@ const CartPage = () => {
             ></Button>
           </div>
         </div>
-      }
+      )}
 
-{
-        checkoutState === 3 ? 
-          <>
-           <div
-          className='container'
-          style={{ margin: `20px auto`, width: `50%`, borderRadius: '10px' }}
-        >
-          <div className='cart bg-white'
-           style={{
-            textAlign: 'center',
-            fontSize: '20px',
-            fontWeight: '600',
-            padding: `27px`,
-            backgroundColor: 'rgba(255, 193, 7, 0.12)'
-           }} 
+      {checkoutState === 3 ? (
+        <>
+          <div
+            className='container'
+            style={{ margin: `20px auto`, width: `50%`, borderRadius: '10px' }}
           >
-            Đơn hàng đang được xử lí
-             </div>
-
+            <div
+              className='cart bg-white'
+              style={{
+                textAlign: 'center',
+                fontSize: '20px',
+                fontWeight: '600',
+                padding: `27px`,
+                backgroundColor: 'rgba(255, 193, 7, 0.12)'
+              }}
+            >
+              Đơn hàng đang được xử lí
+            </div>
           </div>
-          </>
-        : 
-       <> </>
-      }
+        </>
+      ) : (
+        <> </>
+      )}
 
       {checkoutState === 1 ? (
         <div
@@ -893,7 +923,7 @@ const CartPage = () => {
       )}
 
       {checkoutState === 3 ? (
-       <>
+        <>
           <div
             style={{
               margin: `10px auto`,
@@ -901,10 +931,10 @@ const CartPage = () => {
               borderRadius: '10px'
             }}
           >
-           THÔNG TIN ĐƠN HÀNG
+            THÔNG TIN ĐƠN HÀNG
           </div>
 
-         <div
+          <div
             className='cart bg-white'
             style={{
               padding: 15,
@@ -913,7 +943,6 @@ const CartPage = () => {
               borderRadius: '10px'
             }}
           >
-
             <div
               style={{
                 display: 'flex',
@@ -933,7 +962,7 @@ const CartPage = () => {
             </div>
 
             <Divider />
-            
+
             <div
               style={{
                 display: 'flex',
@@ -977,11 +1006,7 @@ const CartPage = () => {
                 Tổng tiền
               </div>
 
-              <div style={{ style: '#707070' }}>
-                {formatMoney(
-                  totalAmount 
-                )}
-              </div>
+              <div style={{ style: '#707070' }}>{formatMoney(totalAmount)}</div>
             </div>
 
             <div
@@ -1009,7 +1034,11 @@ const CartPage = () => {
                 Hình thức thanh toán
               </div>
 
-              <div style={{ style: '#707070' }}>{paymentMethodCss === 1? "Thanh toán khi nhận hàng" : "Thanh toán online"}</div>
+              <div style={{ style: '#707070' }}>
+                {paymentMethodCss === 1
+                  ? 'Thanh toán khi nhận hàng'
+                  : 'Thanh toán online'}
+              </div>
             </div>
 
             <Divider />
@@ -1103,9 +1132,8 @@ const CartPage = () => {
                 {account?.tinhThanhPho}
               </div>
             </div>
-
           </div>
-                
+
           <div
             style={{
               margin: `10px auto`,
@@ -1113,10 +1141,13 @@ const CartPage = () => {
               borderRadius: '10px'
             }}
           >
-           DANH SÁCH SẢN PHẨM
+            DANH SÁCH SẢN PHẨM
           </div>
 
-          <div className='cart bg-white' style={{ width: '47%', margin: '0 auto'}}>
+          <div
+            className='cart bg-white'
+            style={{ width: '47%', margin: '0 auto' }}
+          >
             <div className='cart-ctable'>
               <div className='cart-cbody bg-white'>
                 {productDetails.map(product => {
@@ -1211,13 +1242,17 @@ const CartPage = () => {
               </div>
             </div>
           </div>
-          <br/>
+          <br />
 
           <div
             className='countProductTemp'
-            style={{ left: 395, width: '47%', display: 'flex', justifyContent: 'space-between' }}
+            style={{
+              left: 395,
+              width: '47%',
+              display: 'flex',
+              justifyContent: 'space-between'
+            }}
           >
-          
             <Button
               variant='outlined'
               style={{
@@ -1226,7 +1261,7 @@ const CartPage = () => {
                 fontSize: 14
               }}
               onClick={() => {
-                navigate("/")
+                navigate('/')
               }}
             >
               Tiếp tục mua hàng
@@ -1240,14 +1275,13 @@ const CartPage = () => {
                 fontSize: 14
               }}
               onClick={() => {
-                navigate("/look-up-order-page")
+                navigate('/look-up-order-page')
               }}
             >
               Kiểm tra đơn hàng
             </Button>
           </div>
-
-       </>
+        </>
       ) : (
         <></>
       )}

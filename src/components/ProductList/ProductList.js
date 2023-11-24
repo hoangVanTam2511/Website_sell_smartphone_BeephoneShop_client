@@ -30,7 +30,7 @@ const ProductList = ({products}) => {
               additionalTransfrom={0}
               showDots={false}
               arrows={true}
-              autoPlaySpeed={3000}
+              autoPlaySpeed={2000}
               autoPlay={true}
               centerMode={false}
               className="slider"
