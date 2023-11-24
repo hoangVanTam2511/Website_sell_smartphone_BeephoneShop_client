@@ -255,7 +255,7 @@ const CartPage = props => {
                     <Space wrap style={{ marginTop: '10px' }}>
                       <Select
                         defaultValue=''
-                        style={{ width: `270px`, height: 40 }}
+                        style={{ width: `313px`, height: 40 }}
                         onChange={e => handleChangeProvinces(e)}
                         optionFilterProp='children'
                         filterOption={(input, option) =>
@@ -272,7 +272,7 @@ const CartPage = props => {
 
                       <Select
                         defaultValue=''
-                        style={{ width: `270px`, height: 40 }}
+                        style={{ width: `313px`, height: 40 }}
                         optionFilterProp='children'
                         filterOption={(input, option) =>
                           (option?.label ?? '').includes(input)
@@ -289,7 +289,7 @@ const CartPage = props => {
 
                       <Select
                         defaultValue=''
-                        style={{ width: `270px`, height: 40 }}
+                        style={{ width: `313px`, height: 40 }}
                         optionFilterProp='children'
                         filterOption={(input, option) =>
                           (option?.label ?? '').includes(input)
@@ -306,7 +306,7 @@ const CartPage = props => {
 
                       <Input
                         placeholder='Số nhà/Tên đường'
-                        style={{ width: `270px`, height: 40, borderRadius: 13 }}
+                        style={{ width: `313px`, height: 40, borderRadius: 13 }}
                         onChange={e => {
                           setAccount({
                             ...account,
@@ -446,14 +446,14 @@ const CartPage = props => {
                   )}
 
                   <TextArea
-                    rows={4}
+                    rows={6}
                     placeholder='Ghi chú'
-                    maxLength={18}
+                    maxLength={20}
                     onChange={e => {
                       dispatch(SetNote(e.target.value))
                       setNote(e.target.value)
                     }}
-                    style={{ width: `550px`, marginTop: 10 }}
+                    style={{ width: `634px`, marginTop: 10 }}
                   />
                 </CardContent>
               </div>
