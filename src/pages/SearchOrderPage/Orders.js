@@ -12,6 +12,7 @@ const Orders = () => {
   const [totalAmount, setTotalAmount] = useState(0)
   const [billSelected, setBillSelected] = useState(0)
   const [billId, setBillId] = useState()
+  const [stateOfOrder, setStateOfOrder] = useState(0)
 
   useEffect(() => {
     getBillsByIdCustomer()
@@ -40,6 +41,42 @@ const Orders = () => {
     setBillSelected(data === null ? 0 : data)
   }
 
+  const cssButtonSelected = () => {
+    return {
+      backgroundColor: `#128DE2`,
+       color: `white`,
+        margin:'20px 10px',
+         fontSize: '10px', 
+         fontWeight: '600' 
+    }
+  }
+
+  const cssButtonNoSelected = () => {
+    return {
+      color: `#128DE2`, 
+      margin:'20px 10px', 
+      fontSize: '10px', 
+      fontWeight: '600' 
+    }
+  }
+
+  const loadDataWhenSelectButton = (state)=> {
+    if(state === 0) {
+      getBillsByIdCustomer()
+    }else{
+      console.log(state)
+      getBillsByIdCustomer()
+      var data = []
+      listBill.forEach(item => {
+        if(item.trangThai === state){
+          data.push(item)
+        }
+      })
+      setListBill(data)
+    }
+
+    
+  }
 
   return (
     <>
@@ -71,46 +108,75 @@ const Orders = () => {
   
         <div style={{ marginLeft: '12%'}}>
             <Button
-              style={{ backgroundColor: `#128DE2`, color: `white`, margin:'20px 0', fontSize: '10 px', fontWeight: '600' }}
+              style={stateOfOrder === 0 ? cssButtonSelected() : cssButtonNoSelected()}
               variant="outlined"
+              onClick={() =>{
+                 setStateOfOrder(0)
+                 loadDataWhenSelectButton(0)
+                }}
             >
               Tất cả
             </Button>
   
             <Button
-              style={{ color: `#128DE2`, margin:'20px 10px', fontSize: '10px', fontWeight: '600' }}
+              style={stateOfOrder === 1 ? cssButtonSelected() : cssButtonNoSelected()}
               variant="outlined"
+              onClick={() => 
+                {
+                  setStateOfOrder(1)
+                  loadDataWhenSelectButton('PENDING_CONFIRM')
+                 }
+              }
             >
               Chờ xác nhận
             </Button>
   
             <Button
-              style={{ color: `#128DE2`, margin:'20px 10px', fontSize: '10px', fontWeight: '600' }}
+               style={stateOfOrder === 2 ? cssButtonSelected() : cssButtonNoSelected()}
               variant="outlined"
+              onClick={() => 
+                {
+                  setStateOfOrder(2)
+                  loadDataWhenSelectButton('PENDING_CONFIRM')
+                 }}
             >
               Đã xác nhận
             </Button>
   
   
             <Button
-              style={{ color: `#128DE2`, margin:'20px 10px', fontSize: '10px', fontWeight: '600' }}
+               style={stateOfOrder === 3 ? cssButtonSelected() : cssButtonNoSelected()}
               variant="outlined"
+              onClick={() => {
+                setStateOfOrder(3)
+                loadDataWhenSelectButton('DELIVERING')
+               }}
             >
               Đang vận chuyển
             </Button>
   
   
             <Button
-              style={{ color: `#128DE2`, margin:'20px 10px', fontSize: '10px', fontWeight: '600' }}
+              style={stateOfOrder === 4 ? cssButtonSelected() : cssButtonNoSelected()}
               variant="outlined"
+              onClick={() => 
+                {
+                  setStateOfOrder(4)
+                  loadDataWhenSelectButton(4)
+                 }}
             >
               Đã giao hàng
             </Button>
   
   
             <Button
-              style={{ color: `#128DE2`, margin:'20px 10px', fontSize: '10px', fontWeight: '600' }}
+               style={stateOfOrder === 5 ? cssButtonSelected() : cssButtonNoSelected()}
               variant="outlined"
+              onClick={() => 
+                {
+                  setStateOfOrder(5)
+                  loadDataWhenSelectButton('CANCELLED')
+                 }}
             >
               Đã hủy
             </Button>
