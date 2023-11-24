@@ -1,46 +1,165 @@
-import React from 'react';
-import "./HeaderSlider.scss";
-import "./styles.css";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { Col, Row } from 'antd';
-import Carousel from './carousel';
+import React from 'react'
+import './HeaderSlider.scss'
+import './styles.css'
+import { Col, Row } from 'antd'
+import Carousel from 'react-multi-carousel'
+import 'react-multi-carousel/lib/styles.css'
 
 const HeaderSlider = () => {
-  let settings = {
-    autoplay: true,
-    autoplaySpeed: 3000,
-    arrows: false,
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1
-  };
+  const responsive = {
+    superLargeDesktop: {
+      breakpoint: { max: 4000, min: 3000 },
+      items: 1
+    },
+    desktop: {
+      breakpoint: { max: 3000, min: 1024 },
+      items: 1
+    },
+    tablet: {
+      breakpoint: { max: 1024, min: 464 },
+      items: 1
+    },
+    mobile: {
+      breakpoint: { max: 464, min: 0 },
+      items: 1
+    }
+  }
 
   return (
-        <div className='container'>
-      <Row>
-       <Col span={16}>
-          <div className='slider-content overflow-x-hidden' style={{  padding:`10px`, height: 400}}>
-              {/* <Slider {...settings} style={{ height:422}}>
-                <div className='slider-item' style={{ height:422}}> 
-                  <img src = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:690:300/q:80/plain/https://dashboard.cellphones.com.vn/storage/banner-nthu-loa-jbl-v60-sliding.jpg' alt = "" style={{ height:422}} />
-                </div>
-                <div className='slider-item' style={{ height:422}}>
-                  <img src = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:690:300/q:80/plain/https://dashboard.cellphones.com.vn/storage/690x300-sliding-ultra-l20.png' alt = "" style={{ height:422}} />
-                </div>
-              </Slider> */}
-              <Carousel/>
-            </div>
-       </Col>
-       <Col span={8}>
-          <img className='banner-slider' src = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:690:300/q:10/plain/https://dashboard.cellphones.com.vn/storage/ipad-chinh-hang-right-thang10-neww.png'  />
-          <img className='banner-slider' src = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:690:300/q:80/plain/https://dashboard.cellphones.com.vn/storage/690-300-max-Banner-sliding-deal.jpg'  />
+    <div className='container'>
+      <Row style={{ width: '103%' }}>
+        <Col span={16}>
+          <div
+            className='slider-content overflow-x-hidden'
+            style={{ height: 355 }}
+          >
+            <Carousel
+              additionalTransfrom={0}
+              showDots={false}
+              arrows={true}
+              autoPlaySpeed={2000}
+              autoPlay={true}
+              centerMode={false}
+              className='slider'
+              containerClass='container-with-dots'
+              dotListClass='dots'
+              draggable
+              focusOnSelect={false}
+              infinite
+              itemClass='carousel-top'
+              keyBoardControl
+              minimumTouchDrag={20}
+              renderButtonGroupOutside={false}
+              renderDotsOutside
+              responsive={responsive}
+              style={{ height: `100%!important` }}
+            >
+                <img
+                  src='https://cdn2.viettelstore.vn/images/Advertises/Main_PC-copy_4651280813112023.jpg'
+                  style={{ height: `100%`, marginLeft: -6 }}
+                />
+        
+                <img
+                  src='https://cdn2.viettelstore.vn/images/Advertises/Manin_31916160916112023.png'
+                  style={{ height: `100%`, marginLeft: -6 }}
+                />
+                <img
+                  src='https://cdn2.viettelstore.vn/images/Advertises/Main-PC-(1155-x-510-px)_75027332221112023.png'
+                  style={{ height: `100%`, marginLeft: -6 }}
+                />
+            </Carousel>
+          </div>
+        </Col>
+        <Col span={8}>
+          <div className='banner-slider'>
+          <Carousel
+              additionalTransfrom={0}
+              showDots={false}
+              arrows={true}
+              autoPlaySpeed={2000}
+              autoPlay={true}
+              centerMode={false}
+              className='slider'
+              containerClass='container-with-dots'
+              dotListClass='dots'
+              draggable
+              focusOnSelect={false}
+              infinite
+              itemClass='carousel-top'
+              keyBoardControl
+              minimumTouchDrag={20}
+              renderButtonGroupOutside={false}
+              renderDotsOutside
+              responsive={responsive}
+              style={{ height: `100%!important` }}
+            >
+              <div>
+                <img
+                  src='https://cdn2.viettelstore.vn/images/Advertises/Tecno-T11-Goc-phai_32244461609112023.jpg'
+                  style={{ height: `100%`, marginLeft: -6 }}
+                />
+              </div>
+              <div>
+                <img
+                  src='https://cdn2.viettelstore.vn/images/Advertises/Goc-phai-(4)_99239571621112023.png'
+                  style={{ height: `100%`, marginLeft: -6 }}
+                />
+              </div>
+              <div>
+                <img
+                  src='https://cdn2.viettelstore.vn/images/Advertises/Main_PC-copy_71749400817112023.jpg'
+                  style={{ height: `100%`, marginLeft: -6 }}
+                />
+              </div>
+            </Carousel>
+          </div>
 
-       </Col>
-     </Row>
-        {/* <div className='slider-content overflow-x-hidden'>
+          <div className='banner-slider'>
+          <Carousel
+              additionalTransfrom={0}
+              showDots={false}
+              arrows={true}
+              autoPlaySpeed={2000}
+              autoPlay={true}
+              centerMode={false}
+              className='slider'
+              containerClass='container-with-dots'
+              dotListClass='dots'
+              draggable
+              focusOnSelect={false}
+              infinite
+              itemClass='carousel-top'
+              keyBoardControl
+              minimumTouchDrag={20}
+              renderButtonGroupOutside={false}
+              renderDotsOutside
+              responsive={responsive}
+              style={{ height: `100%!important` }}
+            >
+              <div>
+                <img
+                  src='https://cdn2.viettelstore.vn/images/Advertises/g%C3%B3c-ph%E1%BA%A3i-3_62447000922112023.png'
+                  style={{ height: `100%`, marginLeft: -6 }}
+                />
+              </div>
+              <div>
+                <img
+                  src='https://cdn2.viettelstore.vn/images/Advertises/Banner-vtsss_86254530922112023.jpg'
+                  style={{ height: `100%`, marginLeft: -6 }}
+                />
+              </div>
+              <div>
+                <img
+                  src='https://cdn2.viettelstore.vn/images/Advertises/Goc-phai-(4)_86535332231102023.png'
+                  style={{ height: `100%`, marginLeft: -6 }}
+                />
+              </div>
+            </Carousel>
+          </div>
+        
+        </Col>
+      </Row>
+      {/* <div className='slider-content overflow-x-hidden'>
           <Slider {...settings}>
             <div className='slider-item'>
               <img src = {sliderImgs[0]} alt = "" />
@@ -50,7 +169,7 @@ const HeaderSlider = () => {
             </div>
           </Slider>
         </div> */}
-      </div>
+    </div>
   )
 }
 

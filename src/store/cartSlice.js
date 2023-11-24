@@ -26,11 +26,23 @@ export const SetNote = createAsyncThunk('cart/SetNote', async data => {
   return data
 })
 
+export const SetSelectedCart = createAsyncThunk('cart/SetSelectedCart', async data => {
+  console.log(data)
+  localStorage.setItem('selectedCart', data)
+  return data
+})
+
+export const ResetSelectedCart = createAsyncThunk('cart/ResetSelectedCart', async () => {
+  localStorage.setItem('selectedCart', 0)
+  return 0
+})
+
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
     quantity: 0,
-    note: ""
+    note: "",
+    selectedCart:0,
   },
   reducers: {},
   extraReducers: builder => {
@@ -39,6 +51,12 @@ const cartSlice = createSlice({
     })
     .addCase(SetNote.fulfilled, (state, action) => {
       state.note = action.payload
+    })
+    .addCase(SetSelectedCart.fulfilled, (state, action) => {
+      state.selectedCart = action.payload
+    })
+    .addCase(ResetSelectedCart.fulfilled, (state, action) => {
+      state.selectedCart = action.payload
     })
   }
 })

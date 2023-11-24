@@ -1,0 +1,92 @@
+
+.steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+   }
+
+   .active::after{
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 0;
+    border-top: 4px solid #2dc258!important;
+    z-index: 2!important;
+    top: 30px;
+    left: 0;
+    z-index: -1;
+   }
+   
+   .steps li:after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 0;
+    border-top: 3px solid #ddd;
+    top: 30px;
+    left: 0;
+    z-index: -1;
+   }
+   
+   .steps li:last-child:after {
+    content: none;
+   }
+   
+   .steps li {
+    width: 20%;
+    position: relative;
+    float: left;
+   }
+   
+   .steps li .img {
+    display: block!important;
+    width: 40px!important;
+    height: 40px!important;
+    line-height: 33px!important;
+    text-align: center!important;
+    border: 4px solid #2dc258!important;
+    border-radius: 50%!important;
+    background-color: white!important;
+    color: #2dc258!important;
+    position: relative!important;
+    bottom: -12px!important;
+    font-size: 17px!important;
+    z-index: 3!important;
+
+   }
+   .steps .active .img{
+    display: block;
+    width: 40px;
+    height: 40px;
+    line-height: 33px;
+    text-align: center;
+    border: 4px solid #2dc258;
+    border-radius: 50%;
+    background-color: white;
+    color: #2dc258;
+    position: relative;
+    bottom: -12px;
+    font-size: 17px;
+   }
+   
+   .steps li .img img {
+    vertical-align: middle;
+   }
+   
+   .steps li .caption {
+    margin-left: 10px;
+    margin-top: 20px;
+   }
+
+   .text-top{
+      margin-left: -35px;
+   }
+
+   .text-bottom{
+    display: block;
+    margin-left: -17px;
+    font-size: 11px;
+    color: #8d8989;
+   }
+   

@@ -4,7 +4,7 @@ import { shopping_cart } from '../../utils/images'
 import { Link } from 'react-router-dom'
 import { Divider } from 'antd'
 import axios from 'axios'
-import { addToCart } from '../../store/cartSlice'
+import { addToCart, SetSelectedCart } from '../../store/cartSlice'
 import Button from '@mui/material/Button'
 import { useDispatch, useSelector } from 'react-redux'
 import { checkUserAnonymous } from '../../store/userSlice'
@@ -56,6 +56,7 @@ const CartPage = () => {
     }
     countTotalAmountAgain()
     dispatch(addToCart());
+    dispatch(SetSelectedCart(1));
   }, [totalAmount])
 
 
@@ -92,7 +93,7 @@ const CartPage = () => {
   const handlePlusCart = async id => {
     await axios
       .post(
-        `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=ab40b0d6-2b90-4b5a-945f-362126edcf91&id_product_detail=${id}&type=plus`
+        `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${id}&type=plus`
       )
       .then(res => {
         if (res.status === 200) {
@@ -111,7 +112,7 @@ const CartPage = () => {
   const handleMinusCart = async id => {
     await axios
       .post(
-        `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=ab40b0d6-2b90-4b5a-945f-362126edcf91&id_product_detail=${id}&type=minus`
+        `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${id}&type=minus`
       )
       .then(res => {
         if (res.status === 200) {

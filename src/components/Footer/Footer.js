@@ -1,9 +1,20 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import './Footer.css'
+import { useDispatch, useSelector } from 'react-redux'
 
 const Footer = () => {
+
+  const selectedCart = useSelector(state => state.cart.selectedCart)
+
+  useEffect(() => {
+      console.log(selectedCart)
+  })
+
   return (
-        <footer class="new_footer_area bg_color" style={{ backgroundColor: 'white', borderTop: '1px solid #e2e2eb', marginTop: 28}}>
+    <>
+    {
+        selectedCart === 0 ? (
+            <footer class="new_footer_area bg_color" style={{ backgroundColor: 'white', borderTop: '1px solid #e2e2eb', marginTop: 28}}>
             <div class="new_footer_top">
                 <div class="container">
                     <div class="row" style={{ display: 'flex', justifyContent: 'space-between'}}>
@@ -77,7 +88,11 @@ const Footer = () => {
                 </div>
             </div>
         </footer>
-
+        ):(
+            <></>
+        )
+    }
+    </>
   )
 }
 

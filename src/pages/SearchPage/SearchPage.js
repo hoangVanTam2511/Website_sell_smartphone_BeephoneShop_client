@@ -6,6 +6,7 @@ import { STATUS } from '../../utils/status';
 import Loader from '../../components/Loader/Loader';
 import ProductList from '../../components/ProductList/ProductList';
 import { getSearchProducts, getSearchProductsStatus, clearSearch } from '../../store/searchSlice';
+import { ResetSelectedCart } from '../../store/cartSlice'
 
 const SearchPage = () => {
   const dispatch = useDispatch();
@@ -15,6 +16,7 @@ const SearchPage = () => {
 
   useEffect(() => {
     dispatch(clearSearch());
+    dispatch(ResetSelectedCart());
   }, [searchTerm]);
 
   if(searchProducts.length === 0){

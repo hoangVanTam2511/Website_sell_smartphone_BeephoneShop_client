@@ -3,15 +3,14 @@ import './CategoryProductPage.scss'
 import './CategoryProduct.css'
 import ProductList from '../../components/ProductList/ProductList'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
 import {
-  getAllProductsByCategory,
   getCategoryProductsStatus
 } from '../../store/categorySlice'
 import Loader from '../../components/Loader/Loader'
 import { STATUS } from '../../utils/status'
 import axios from 'axios'
 import { Button, Slider, Select } from 'antd'
+import { ResetSelectedCart } from '../../store/cartSlice'
 
 const CategoryProductPage = () => {
   const dispatch = useDispatch()
@@ -47,6 +46,7 @@ const CategoryProductPage = () => {
   useEffect(() => {
     loadDataComboBox()
     searchProducts()
+    dispatch(ResetSelectedCart())
   }, [dispatch, chiTietSanPham])
 
   const loadDataComboBox = async () => {

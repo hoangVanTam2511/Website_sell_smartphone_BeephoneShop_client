@@ -15,6 +15,7 @@ import Carousel from './carousel'
 import { addToCart } from '../../store/cartSlice'
 import { useNavigate } from 'react-router-dom'
 import toast, { Toaster } from 'react-hot-toast'
+import { ResetSelectedCart } from '../../store/cartSlice'
 
 const ProductSinglePage = () => {
   const { id } = useParams()
@@ -89,6 +90,7 @@ const ProductSinglePage = () => {
   // getting single product
   useEffect(() => {
     getConfig()
+    dispatch(ResetSelectedCart())
   }, [])
 
   const checkRomRamDistinct = (listRamRomDistinct, ram, rom) => {
@@ -137,8 +139,8 @@ const ProductSinglePage = () => {
           })
           setRamRomConfigs(listRamRomDistinct)
           addConfigs(listRamRomDistinct[0])
-          console.log(listRamRomDistinct[0])
         }
+
       })
       .catch(error => console.log(error))
 
@@ -147,13 +149,13 @@ const ProductSinglePage = () => {
       .then(item => {
         if (item.status === 200) {
           var res = item.data
+          console.log(item)
           setProduct({
             nameProduct: res.tenSanPham,
             typeDisplay: res.loaiManHinh,
             sizeDisplay: res.kichThuocManHinh,
             nameBrand: res.tenHang,
             nameChip: res.tenChip,
-            nameProductLine: res.tenDongSanPham,
             batteryCapacity: res.dungLuongPin,
             memoryCardType: res.loaiTheNho
           })
@@ -408,11 +410,11 @@ const ProductSinglePage = () => {
                 </div>
 
                 <div>
-                  <span className='fs-14 mx-2 text-dark'>Giá bán</span>
+                  <span className='fs-14 mx-2 text-dark fw-6' style={{ marginLeft: '0px'}}>Giá bán</span>
                 </div>
 
-                <div className='price' style={{ padding: 4 }}>
-                  <div className='flex align-center my-1'>
+                <div className='price' style={{ padding: 0 }}>
+                  <div className='flex align-center my-1' style={{ backgroundColor: 'white'}}>
                     <div
                       className='new-price fw-5 font-poppins fs-24'
                       style={{ display: `flex`, color: `#128DE2` }}

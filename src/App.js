@@ -11,7 +11,8 @@ import {
   LoginPage,
   SearchOrderPage,
   CheckoutPage,
-  LookUpOrderPage
+  LookUpOrderPage,
+  OrderDetail
 } from './pages/index'
 // components
 import Header from './components/Header/Header'
@@ -19,7 +20,6 @@ import Sidebar from './components/Sidebar/Sidebar'
 import Footer from './components/Footer/Footer'
 import store from './store/store'
 import { Provider } from 'react-redux'
-import MessengerCustomerChat from 'react-messenger-customer-chat'
 
 function App () {
   return (
@@ -28,11 +28,6 @@ function App () {
         <BrowserRouter>
           <Header />
           <Sidebar />
-          <MessengerCustomerChat
-            pageId='107703527308154'
-            appId="biz_inbox"
-          />
-
           <div style={{ height: '90px' }}></div>
 
           <Routes>
@@ -54,6 +49,8 @@ function App () {
             <Route path='/check-out' element={<CheckoutPage />} />
             {/* look up order page */}
             <Route path='/look-up-order-page' element={<LookUpOrderPage />} />
+             {/* look up order page */}
+             <Route path='/order-detail/:id' element={<OrderDetail />} />
           </Routes>
 
           <Footer />

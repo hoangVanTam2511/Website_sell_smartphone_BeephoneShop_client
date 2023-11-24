@@ -2,8 +2,55 @@ body {
   font-family: Lato;
   margin: 0;
 }
+
 .slick-slider {
   overflow: hidden;
   cursor: pointer;
   width: 636px;
 }
+
+.arrow{
+  align-items: center;
+  background: #fff!important;
+  box-shadow: 0 0 4px 0 rgba(0,0,0,.2);
+  display: flex;
+  font-size: 1.8rem;
+  height: 40px;
+  justify-content: center;
+  opacity: .8!important;
+  outline: none!important;
+  top: 45%;
+  transition: .3s!important;
+  width: 40px;
+  z-index: 1!important;
+  position: relative;
+  border-radius: 50%;
+  font-size: 25px;
+}
+
+.arrow-left{
+   left: 2%;
+   
+}
+
+.arrow-right{
+  left: 92%;
+  top:34%;
+}
+
+.slide-active{
+  animation: fromRight 0.5s ease-out;
+}
+
+/* #toRight {
+	animation: toRight 1s ease-out;
+}
+
+@keyframes toRight {
+  from {
+		transform: translate3d(-100%, 0, 0);
+	}
+	to {
+		transform: translate3d(0%, 0, 0);
+	}
+} */

@@ -8,6 +8,7 @@ import SearchOrderPage from "./SearchOrderPage/SearchOrderPage";
 import CheckoutPage from "./CheckoutPage/CheckoutPage"
 import LookUpOrderPage from "./LookUpOrderPage/LookUpOrderPage"
 import FlashsalePage from "./FlashsalePage/FlashsalePage"
+import OrderDetail from "./SearchOrderPage/OrderDetail"
 
 
-export {Home, CategoryProduct, ProductSingle, Cart, Search, LoginPage, SearchOrderPage, CheckoutPage, LookUpOrderPage, FlashsalePage};
+export {Home, CategoryProduct, ProductSingle, Cart, Search, LoginPage, SearchOrderPage, CheckoutPage, LookUpOrderPage, FlashsalePage, OrderDetail};

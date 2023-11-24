@@ -9,7 +9,7 @@ const Header = () => {
     <header
       className="header text-white"
       style={{
-        backgroundImage: `linear-gradient(0deg,#0066cc,#0099cc)`,
+        backgroundColor: `#128DE2`,
         position: `fixed`,
         zIndex: `999`,
         width: `100%`,

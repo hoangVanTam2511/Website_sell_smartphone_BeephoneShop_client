@@ -48,24 +48,20 @@ const Navbar = () => {
           </div>
 
           <div className='navbar-collapse w-100'>
-            <div className='navbar-search bg-white ' style={{ width: `98%` }}>
-              <div className='flex align-center'>
+            <div className='navbar-search bg-white ' style={{ width: `98%`, display: 'flex' }}>
+               <Link
+                  to={`search/${searchTerm}`}
+                  className='text-white search-btn flex align-center justify-center'
+                >
+                  <i className='fa-solid fa-magnifying-glass' style={{ fontSize: 18}}></i>
+                </Link>
                 <input
                   type='text'
                   className='form-control fs-14'
                   placeholder='Nhập thông tin bạn muốn tìm'
                   onChange={e => handleSearchTerm(e)}
                 />
-                <Link
-                  to={`search/${searchTerm}`}
-                  className='text-white search-btn flex align-center justify-center'
-                  style={{
-                    backgroundImage: `linear-gradient(0deg,#0066cc,#0099cc)`
-                  }}
-                >
-                  <i className='fa-solid fa-magnifying-glass'></i>
-                </Link>
-              </div>
+              
             </div>
 
           </div>
@@ -83,7 +79,7 @@ const Navbar = () => {
               <Link to='/products' className='cart-btn'>
                 < PhoneAndroidIcon
                   //className="fa fa-mobile" 
-                  style={{ position: `relative`, right: `-15px`, fontSize: `26px` }}
+                  style={{ position: `relative`, right: `-15px`, fontSize: `23px` }}
                 />
                 <div
                   style={{
@@ -139,7 +135,7 @@ const Navbar = () => {
             <Link to='/look-up-order-page' className='cart-btn'>
               <i
                 className='fa fa-shipping-fast'
-                style={{ position: `relative`, right: `-24px`, fontSize: `26px` }}
+                style={{ position: `relative`, right: `-24px`, fontSize: `23px` }}
               ></i>
               <div
                 style={{
@@ -167,7 +163,7 @@ const Navbar = () => {
             <Link to='/cart' className='cart-btn'>
               <i
                 className='fa-solid fa-bag-shopping'
-                style={{ position: `relative`, right: `-8px`, fontSize: `30px` }}
+                style={{ position: `relative`, right: `-8px`, fontSize: `29px` }}
               ></i>
               <div className='cart-items-value'>{countOfProductDetail}</div>
               {/* <CartModal carts = {carts} /> */}

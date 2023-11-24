@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../store/userSlice";
 import { addToCart } from "../../store/cartSlice"
 import toast, { Toaster } from 'react-hot-toast'
+import { ResetSelectedCart } from '../../store/cartSlice'
 
 const HomePage = () => {
 
@@ -25,6 +26,7 @@ const HomePage = () => {
 
   useEffect(() => {
     loading()
+    dispatch(ResetSelectedCart())
   })
 
   const loading = () => {

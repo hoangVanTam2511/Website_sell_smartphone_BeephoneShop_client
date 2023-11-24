@@ -9,15 +9,36 @@ import { getAllProductsStatus } from '../../store/productSlice'
 import Loader from '../../components/Loader/Loader'
 import { STATUS } from '../../utils/status'
 import axios from 'axios'
-import Button from '@mui/material/Button'
-import FlashsalePage from '../../pages/FlashsalePage/FlashsalePage'
+import { ResetSelectedCart } from '../../store/cartSlice'
+import Carousel from 'react-multi-carousel'
+import 'react-multi-carousel/lib/styles.css'
 
 const HomePage = () => {
   const dispatch = useDispatch()
   const categories = useSelector(getAllCategories)
 
+  const responsive = {
+    superLargeDesktop: {
+      breakpoint: { max: 4000, min: 3000 },
+      items: 5
+    },
+    desktop: {
+      breakpoint: { max: 3000, min: 1024 },
+      items: 5
+    },
+    tablet: {
+      breakpoint: { max: 1024, min: 464 },
+      items: 1
+    },
+    mobile: {
+      breakpoint: { max: 464, min: 0 },
+      items: 2
+    }
+  }
+
   useEffect(() => {
     getNewProducts()
+    dispatch(ResetSelectedCart())
   }, [])
 
   const [products, setProducts] = useState([])
@@ -37,9 +58,48 @@ const HomePage = () => {
 
   return (
     <main>
+      <div style={{ backgroundColor: 'white', margin: 0}}>
+        <img 
+        style={{
+          maxWidth: `100%`,
+          borderRadius: `0 0 60px 60px`
+        }}
+        src='https://cdn2.viettelstore.vn/images/Advertises/BANNER-BIG_PC-(1)_62146192221112023.jpg' />
+      </div>
+
       <div className='slider-wrapper'>
         <HeaderSlider />
       </div>
+
+      <div>
+        {/* <Carousel
+              additionalTransfrom={0}
+              showDots={false}
+              arrows={true}
+              autoPlaySpeed={3000}
+              autoPlay={true}
+              centerMode={false}
+              className="slider"
+              containerClass="container-with-dots"
+              dotListClass="dots"
+              draggable
+              focusOnSelect={false}
+              infinite
+              itemClass="carousel-top"
+              keyBoardControl
+              minimumTouchDrag={80}
+              renderButtonGroupOutside={false}
+              renderDotsOutside
+              responsive={responsive}
+        style={{  }}
+        >
+
+          <div>
+            <img src='https://cdn2.viettelstore.vn/images/Advertises/BANNER-BIG_PC-(1)_62146192221112023.jpg'/>
+          </div>
+    </ Carousel> */}
+      </div>
+
       <div className='main-content bg-white'>
         <div className='container'>
           <div className='categories'>

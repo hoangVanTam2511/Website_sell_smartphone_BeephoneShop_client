@@ -446,7 +446,7 @@ const CartPage = () => {
           <Checkout account={account} />
           <div
             className='countProductTemp'
-            style={{ left: 355, width: '47%', display: 'block' }}
+            style={{ left: 395, width: '47%', display: 'block' }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ fontWeight: 'bold' }}>Tổng tiền tạm tính</span>
@@ -814,7 +814,7 @@ const CartPage = () => {
           <br />
           <div
             className='countProductTemp'
-            style={{ left: 355, width: '47%', display: 'block' }}
+            style={{ left: 395, width: '47%', display: 'block' }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ fontWeight: 'bold' }}>Tổng tiền</span>
@@ -1215,7 +1215,7 @@ const CartPage = () => {
 
           <div
             className='countProductTemp'
-            style={{ left: 355, width: '47%', display: 'flex', justifyContent: 'space-between' }}
+            style={{ left: 395, width: '47%', display: 'flex', justifyContent: 'space-between' }}
           >
           
             <Button
