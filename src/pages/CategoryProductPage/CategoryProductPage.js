@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import './CategoryProductPage.scss'
 import './CategoryProduct.css'
-import ProductList from '../../components/ProductList/ProductList'
+import ProductListNormal from '../../components/ProductList/ProductListNormal'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   getCategoryProductsStatus
@@ -459,7 +459,7 @@ const CategoryProductPage = () => {
           {categoryProductsStatus === STATUS.LOADING ? (
             <Loader />
           ) : (
-            <ProductList products={products} />
+            <ProductListNormal products={products} />
           )}
         </div>
       </div>

@@ -61,6 +61,8 @@ const HomePage = () => {
 
   useEffect(() => {
     getNewProducts()
+    getListProductBestSeller()
+
     dispatch(ResetSelectedCart())
     if (stompClient === null) {
       connect()
@@ -69,6 +71,7 @@ const HomePage = () => {
   }, [changeRealTime])
 
   const [products, setProducts] = useState([])
+  const [productBestSeller, setProductBestSeller] = useState([])
   const productStatus = useSelector(getAllProductsStatus)
 
   const getNewProducts = async () => {
@@ -77,6 +80,18 @@ const HomePage = () => {
       .then(res => {
         if (res.status === 200) {
           setProducts(res.data)
+        }
+        console.log(res)
+      })
+      .catch(error => console.log(error))
+  }
+
+  const getListProductBestSeller = async () => {
+    await axios
+      .get(`http://localhost:8080/client/product-detail/get-products-best-seller`)
+      .then(res => {
+        if (res.status === 200) {
+          setProductBestSeller(res.data)
         }
         console.log(res)
       })
@@ -365,7 +380,7 @@ const HomePage = () => {
                 {productStatus === STATUS.LOADING ? (
                   <Loader />
                 ) : (
-                  <ProductList products={products} />
+                  <ProductList products={productBestSeller} />
                 )}
               </div>
             </div>
