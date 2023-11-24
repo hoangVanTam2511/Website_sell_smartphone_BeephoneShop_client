@@ -47,6 +47,7 @@ const CategoryProductPage = () => {
     loadDataComboBox()
     searchProducts()
     dispatch(ResetSelectedCart())
+    window.scrollTo(0, 0);
   }, [dispatch, chiTietSanPham])
 
   const loadDataComboBox = async () => {

@@ -89,6 +89,7 @@ const ProductSinglePage = () => {
   useEffect(() => {
     getConfig()
     dispatch(ResetSelectedCart())
+    window.scrollTo(0, 0);
   }, [])
 
   const checkRomRamDistinct = (listRamRomDistinct, ram, rom) => {

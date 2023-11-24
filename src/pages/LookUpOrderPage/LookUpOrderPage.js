@@ -17,6 +17,7 @@ const LookUpOrderPage = () => {
 
   useEffect(() => {
     dispatch(ResetSelectedCart())
+    window.scrollTo(0, 0);
   })
 
   const getOrder = async () => {

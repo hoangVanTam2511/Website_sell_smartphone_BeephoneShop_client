@@ -65,6 +65,7 @@ const HomePage = () => {
     if (stompClient === null) {
       connect()
     }
+    window.scrollTo(0, 0);
   }, [changeRealTime])
 
   const [products, setProducts] = useState([])

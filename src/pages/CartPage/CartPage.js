@@ -57,6 +57,7 @@ const CartPage = () => {
     countTotalAmountAgain()
     dispatch(addToCart());
     dispatch(SetSelectedCart(1));
+    window.scrollTo(0, 0);
   }, [totalAmount])
 
 

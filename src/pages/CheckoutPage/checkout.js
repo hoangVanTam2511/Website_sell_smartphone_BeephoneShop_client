@@ -29,6 +29,7 @@ const CartPage = props => {
     callAPI('https://provinces.open-api.vn/api/?depth=2')
     setAccount(props.account)
     getAllAddress()
+    window.scrollTo(0, 0);
   }, [])
 
   var callAPI = api => {

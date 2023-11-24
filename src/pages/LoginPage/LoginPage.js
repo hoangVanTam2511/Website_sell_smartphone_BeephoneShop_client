@@ -27,6 +27,7 @@ const HomePage = () => {
   useEffect(() => {
     loading()
     dispatch(ResetSelectedCart())
+    window.scrollTo(0, 0);
   })
 
   const loading = () => {

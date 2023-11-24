@@ -60,6 +60,7 @@ const CartPage = () => {
     if(stompClient === null){
       connect()
     }
+    window.scrollTo(0, 0);
   }, [totalAmount, productDetails])
 
   const getProductDetails = async () => {
