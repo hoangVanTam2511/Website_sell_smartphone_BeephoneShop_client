@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 import './SearchOrderPage.css'
 import { Divider } from 'antd'
-import { Select, Space, Input, Checkbox } from 'antd'
 import { useSelector } from 'react-redux'
 import axios from 'axios'
 import TextField from '@mui/material/TextField'
@@ -15,10 +14,24 @@ const Orders = () => {
   const [districts, setDistricts] = useState([])
   const [wards, setWards] = useState([])
   const [changeAddress, setChangeAddress] = useState(1)
+  const [totalAmount, setTotalAmount] = useState(0)
+
+  
+  const getBillsByIdCustomer = async() => {
+    let sum = 0;
+    await axios.get(`http://localhost:8080/client/bill/get-list-bills?id_customer=${user.id}`).then(
+      res => {
+        res.data.forEach(item => {
+          sum += item.tongTienSauKhiGiam
+        })
+        setTotalAmount(sum)
+      }
+    )
+}
 
   useEffect(() => {
     callAPI('https://provinces.open-api.vn/api/?depth=2')
-    console.log(districts)
+    getBillsByIdCustomer()
   }, [])
 
   var callAPI = api => {
@@ -81,6 +94,10 @@ const Orders = () => {
 
   const formatDate = date => {
     return new Date(date).toLocaleDateString('en-US')
+  }
+  
+  const formatMoney = (number) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number)
   }
 
   return (
@@ -156,7 +173,7 @@ const Orders = () => {
 
             <div style={{ marginTop: '35px' }}>
               <div className='title'>
-                <span>Tổng tiền đã mua sắm: 0 đ </span>
+                <span>Tổng tiền đã mua sắm: {formatMoney(totalAmount)} </span>
               </div>
               <Divider style={{ margin: '5px auto' }}></Divider>
             </div>

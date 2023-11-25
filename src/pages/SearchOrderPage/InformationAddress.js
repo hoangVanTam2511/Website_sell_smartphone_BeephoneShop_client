@@ -20,14 +20,17 @@ const Orders = () => {
   }, [])
 
   const getAllAddress = async () => {
-    await axios.get(`http://localhost:8080/client/address/get-all-address?id_account=${user.id}`)
-    .then(res => {
-      if(res.status === 200){
-        setListOfAddress(res.data)
-        console.log(res.data) 
-      }
-    })
-    .catch(error => console.log(error));
+    await axios
+      .get(
+        `http://localhost:8080/client/address/get-all-address?id_account=${user.id}`
+      )
+      .then(res => {
+        if (res.status === 200) {
+          setListOfAddress(res.data)
+          console.log(res.data)
+        }
+      })
+      .catch(error => console.log(error))
   }
 
   var callAPI = api => {
@@ -110,17 +113,14 @@ const Orders = () => {
             <span className='fw-6 fs-20'>Thông tin địa chỉ</span>
           </h4>
         </div>
-        {
-          listOfAddress.map((value, index) => (
-            <div class='card' style={{ width: `100%`, marginBottom: 20 }}>
+        {listOfAddress.map((value, index) => (
+          <div class='card' style={{ width: `100%`, marginBottom: 20 }}>
             <div class='title'>
               <h4>
                 {' '}
                 <span className='fw-6'>Địa chỉ {index + 1}</span>
-
-                {
-                  value.trangThai === 1 ? (
-                    <div
+                {value.trangThai === 1 ? (
+                  <div
                     style={{
                       display: 'inline-block',
                       marginLeft: 10,
@@ -134,28 +134,26 @@ const Orders = () => {
                   >
                     Mặc định
                   </div>
-                  ): (
-                      <></>
-                  )
-                }
-               
-
+                ) : (
+                  <></>
+                )}
+              </h4>
+              <h4>
                 <div
                   style={{
                     display: 'inline-block',
                     marginLeft: 610,
-                    color: 'red',
+                    color: '#128DE2',
                     fontSize: 17,
                     padding: 4
                   }}
                 >
                   <i class='fa-solid fa-trash'></i>
-                </div>
+                </div>{' '}
               </h4>
-              <h4> </h4>
             </div>
-  
-            <Divider style={{ margin: `10px auto` }}/>
+
+            <Divider style={{ margin: `10px auto` }} />
 
             <div>
               <Space wrap style={{ display: 'flex' }}>
@@ -164,38 +162,37 @@ const Orders = () => {
                   {value.tinhThanhPho}{' '}
                   <div
                     style={{
-                      display: 'inline-block',
+                      display: 'inline-block'
                     }}
                     variant='outlined'
-                  > <i
-                  style={{
-                    backgroundColor: `#128DE2`,
-                    color: `white`,
-                    fontSize: '15px',
-                    display: 'inline-block',
-                    padding: '6px',
-                    borderRadius: '5px'
-                  }}
-                  class='fa-regular fa-pen-to-square'></i> </div>
+                  >
+                    {' '}
+                    <i
+                      style={{
+                        backgroundColor: `#128DE2`,
+                        color: `white`,
+                        fontSize: '15px',
+                        display: 'inline-block',
+                        padding: '6px',
+                        borderRadius: '5px'
+                      }}
+                      class='fa-regular fa-pen-to-square'
+                    ></i>{' '}
+                  </div>
                 </div>
               </Space>
-            
             </div>
 
-            {
-              value.trangThai === 1 ? (
-                <></>
-              ):(
-                <Checkbox style={{ marginTop: `10px` }} onChange={onChange}>
+            {value.trangThai === 1 ? (
+              <></>
+            ) : (
+              <Checkbox style={{ marginTop: `10px` }} onChange={onChange}>
                 Đặt làm mặc định
-              </Checkbox> 
-              )
-            }
+              </Checkbox>
+            )}
           </div>
-  
-          ))
-        }
-      
+        ))}
+
         <br />
 
         <Button
@@ -207,7 +204,7 @@ const Orders = () => {
             marginLeft: '225px'
           }}
           variant='outlined'
-          startIcon={<i class="fa-solid fa-plus"></i>}
+          startIcon={<i class='fa-solid fa-plus'></i>}
         >
           Thêm địa chỉ mới
         </Button>
