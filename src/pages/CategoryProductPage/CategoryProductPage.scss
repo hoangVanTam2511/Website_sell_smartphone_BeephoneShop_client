@@ -1,5 +1,66 @@
 @import "../../App.scss";
 
 .cat-products{
-    min-height: 100vh;
+    min-height: 30vh;
+}
+
+.list-filter{
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    box-shadow: 0 2px 20px #000;
+    opacity: 1;
+    padding: 10px 10px 0;
+    position: absolute;
+    transition: .5s;
+    width: 350px;
+    z-index: 2;
+    margin-top: 83px;
+    margin-left: -10px;
+    display: flex;
+    flex-wrap: wrap;
+    top: -38px;
+    animation: mymove .4s infinite;
+    animation-iteration-count: 1;
+}
+
+.list-filter-hidden{
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    box-shadow: 0 2px 20px #000;
+    opacity: 0;
+    padding: 10px 10px 0;
+    position: absolute;
+    transition: .5s;
+    width: 350px;
+    z-index: 2;
+    margin-top: 83px;
+    margin-left: -10px;
+    display: flex;
+    flex-wrap: wrap;
+    top: -38px;
+    animation: mymovehidden 0.4s infinite;
+    animation-iteration-count: 1;
+    overflow: hidden;
+}
+
+.list-filter::after{
+    border-bottom: 10px solid #fff;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    content: "";
+    left: 30px;
+    position: absolute;
+    top: -10px;
+}
+
+@keyframes mymove {
+    from {top: 10px; opacity: 0.5;}
+    to {top: -38px;opacity: 1;}
+  }
+
+@keyframes mymovehidden {
+from {opacity: 1;overflow: visible;height: 100%;box-shadow: 0 2px 20px #000;}
+to {opacity: 0;overflow: hidden;height: 25%;box-shadow: 0 0px 0px #000;}
 }

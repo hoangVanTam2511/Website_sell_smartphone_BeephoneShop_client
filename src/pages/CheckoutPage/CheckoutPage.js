@@ -477,7 +477,7 @@ const CartPage = () => {
           <Checkout account={account} />
           <div
             className='countProductTemp'
-            style={{ left: 395, width: '47%', display: 'block' }}
+            style={{ left: 393, width: 706, display: 'block' }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ fontWeight: 'bold' }}>Tổng tiền tạm tính</span>

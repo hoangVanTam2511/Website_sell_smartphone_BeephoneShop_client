@@ -6,7 +6,7 @@ import { Select, Space, Input } from 'antd'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { changeInformationUser } from '../../store/userSlice'
-import { SetNote } from '../../store/cartSlice'
+import { SetNote, SetSelectedCart } from '../../store/cartSlice'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import { Divider } from 'antd'
 import toast, { Toaster } from 'react-hot-toast'
@@ -29,6 +29,7 @@ const CartPage = props => {
     callAPI('https://provinces.open-api.vn/api/?depth=2')
     setAccount(props.account)
     getAllAddress()
+    dispatch(SetSelectedCart(1))
     window.scrollTo(0, 0);
   }, [])
 
@@ -110,6 +111,7 @@ const CartPage = props => {
 
     }
     setAccount(newAddress)
+    setAddressSelected(3)
     toast.success("Chọn địa chỉ thành công")
     dispatch(changeInformationUser(newAddress))
   }
@@ -125,7 +127,7 @@ const CartPage = props => {
           if(res.data.length === 0){
             setAddressSelected(1)
           }else{
-            setAddressSelected(2)
+            setAddressSelected(1)
           }
         }
       })
@@ -139,7 +141,7 @@ const CartPage = props => {
           THÔNG TIN KHÁCH HÀNG
         </div>
 
-        <div className='cart bg-white' style={{ padding: 15 }}>
+        <div className='cart bg-white' style={{ padding: 30 }}>
           <div
             style={{
               marginLeft: '1%',
@@ -149,15 +151,15 @@ const CartPage = props => {
               display: 'flex'
             }}
           >
-            <span style={{ fontSize: 14, width: '49%' }}>Họ và tên</span>
+            <span style={{ fontSize: 14, width: '48%' }}>Họ và tên</span>
 
-            <span style={{ fontSize: 14, width: '49%' }}>Số điện thoại</span>
+            <span style={{ fontSize: 14, width: '48%' }}>Số điện thoại</span>
           </div>
 
           <div
             style={{
               justifyContent: 'space-evenly',
-              marginTop: 10,
+              marginTop: 15,
               display: 'flex'
             }}
           >
@@ -165,7 +167,7 @@ const CartPage = props => {
               id='outlined-basic'
               placeholder='Họ và tên'
               value={account?.hoVaTen}
-              style={{ width: '49%', height: 40 }}
+              style={{ width: '49%', height: 40, borderRadius: '13px' }}
               onChange={e => {
                 setAccount({
                   ...account,
@@ -177,7 +179,7 @@ const CartPage = props => {
             <Input
               placeholder='Số điện thoại'
               value={account?.soDienThoai}
-              style={{ width: '49%', height: 40 }}
+              style={{ width: '49%', height: 40, borderRadius: '13px' }}
               onChange={e => {
                 setAccount({
                   ...account,
@@ -193,7 +195,7 @@ const CartPage = props => {
               marginLeft: '2%',
               marginBottom: '-9px',
               marginTop: 10,
-              width: '99%'
+              width: '100%'
             }}
           >
             <span style={{ fontSize: 14 }}>Email</span>
@@ -204,7 +206,7 @@ const CartPage = props => {
               id='outlined-basic'
               placeholder='Email của bạn'
               value={account?.email}
-              style={{ height: 40, marginTop: 10, width: '99%' }}
+              style={{ height: 40, marginTop: 10, width: '99%', borderRadius: '13px' }}
               onChange={e => {
                 setAccount({
                   ...account,
@@ -377,10 +379,11 @@ const CartPage = props => {
                                     color: `white`,
                                     fontSize: '15px',
                                     display: 'inline-block',
-                                    padding: '6px',
+                                    padding: '10px',
                                     borderRadius: '5px',
-                                    marginLeft: 184,
-                                    cursor: 'pointer'
+                                    marginLeft: 219,
+                                    cursor: 'pointer',
+                                    height: 40
                                   }}
                                   variant='outlined'
                                   onClick={() => handleChooseAddress(value)}
@@ -395,7 +398,92 @@ const CartPage = props => {
                           </Space>
                         </div>
                       </div>
+                  ))}
+
+                 {listOfAddress &&
+                    addressSelected === 3 &&
+                    listOfAddress.map((value, index) => (
+                      account.diaChi === value.diaChi && account.xaPhuong === value.xaPhuong
+                      && account.quanHuyen === value.quanHuyen && account.tinhThanhPho === value.tinhThanhPho
+                      ? (
+                        <>
+                          <div
+                        className='card'
+                        style={{ width: `100%`, marginTop: 10 }}
+                      >
+                        <div class='title'>
+                          <h4>
+                            {' '}
+                            <span className='fw-6'>Địa chỉ {index + 1}</span>
+                            {
+                                account.diaChi === value.diaChi && account.xaPhuong === value.xaPhuong
+                                && account.quanHuyen === value.quanHuyen && account.tinhThanhPho === value.tinhThanhPho
+                                ? (
+                              <div
+                                style={{
+                                  display: 'inline-block',
+                                  marginLeft: 10,
+                                  color: '#128DE2',
+                                  fontSize: 9,
+                                  padding: 4,
+                                  border: '1px solid #128DE2',
+                                  borderRadius: 5,
+                                  transform: `translateY(-4px)`
+                                }}
+                              >
+                                Mặc định
+                              </div>
+                            ) : (
+                              <></>
+                            )}
+                          </h4>
+                          <h4> </h4>
+                        </div>
+
+                        <Divider style={{ margin: `10px auto` }} />
+
+                        <div>
+                          <Space wrap style={{ display: 'flex' }}>
+                            <div style={{ fontSize: 18 }}>
+                              Địa chỉ: {value.diaChi}, {value.xaPhuong},{' '}
+                              {value.quanHuyen}, {value.tinhThanhPho} <br />
+                              {
+                                account.diaChi === value.diaChi && account.xaPhuong === value.xaPhuong
+                                && account.quanHuyen === value.quanHuyen && account.tinhThanhPho === value.tinhThanhPho
+                                ? (
+                                 <></> 
+                                ):(
+                                  <div
+                                  style={{
+                                    display: 'inline-block',
+                                    backgroundColor: `#128DE2`,
+                                    color: `white`,
+                                    fontSize: '15px',
+                                    display: 'inline-block',
+                                    padding: '10px',
+                                    borderRadius: '5px',
+                                    marginLeft: 219,
+                                    cursor: 'pointer',
+                                  }}
+                                  variant='outlined'
+                                  onClick={() => handleChooseAddress(value)}
+                                >
+                                  {' '}
+                                  Chọn địa chỉ này{' '}
+                                </div>
+                                )
+                              }
+                             
+                            </div>
+                          </Space>
+                        </div>
+                      </div>
+                        </>
+                      ):(
+                       <></>
+                      )
                     ))}
+
 
                   {listOfAddress && listOfAddress.length > 0 && addressSelected === 1 ? (
                     <div
@@ -440,6 +528,53 @@ const CartPage = props => {
                     chọn địa chỉ mới
                     <ArrowForwardIosIcon style={{ fontSize: 11 }} />
                   </div>
+                  ) : (
+                    <>
+                    </>
+                  )}
+
+                  {listOfAddress && listOfAddress.length > 0 && addressSelected === 3 ? (
+                    <>
+                    <span
+                      style={{
+                        textAlign: 'right',
+                        padding: `10px`,
+                        fontSize: 14,
+                        color: '#444',
+                        marginLeft: -8,
+                        width: '75%',
+                        color: 'rgb(18, 141, 226)',
+                        cursor: 'pointer',
+                        display: 'inline-block'
+                      }}
+                      onClick={() => {
+                        setAddressSelected(2)
+                      }}
+                    >
+                      chọn ({listOfAddress.length - 1}) địa chỉ khác
+                    </span>
+                    <span>
+                      Hoặc
+                    </span>
+                    <span
+                    style={{
+                      textAlign: 'right',
+                      padding: `10px`,
+                      fontSize: 14,
+                      color: '#444',
+                      marginLeft: -8,
+                      width: '21%',
+                      color: 'rgb(18, 141, 226)',
+                      cursor: 'pointer',
+                      display: 'inline-block'
+                    }}
+                    onClick={() => {
+                      setAddressSelected(1)
+                    }}
+                  >
+                    nhập địa chỉ mới
+                  </span>
+                  </>
                   ) : (
                     <>
                     </>
