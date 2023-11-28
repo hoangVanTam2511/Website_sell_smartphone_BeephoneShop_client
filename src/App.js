@@ -36,7 +36,7 @@ function App () {
             {/* single product route */}
             <Route path='/product/:id' element={<ProductSingle />} />
             {/* category wise product listing route */}
-            <Route path='/products' element={<CategoryProduct />} />
+            <Route path='/products/:brand' element={<CategoryProduct />} />
             {/* cart */}
             <Route path='/cart' element={<Cart />} />
             {/* searched products */}

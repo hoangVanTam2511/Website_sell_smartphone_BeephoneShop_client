@@ -11,13 +11,14 @@ const ProductList = ({products}) => {
         display: 'flex', 
         alignItems: 'center',
         flexWrap: 'wrap',
-        justifyContent: 'space-between',
+        // justifyContent: 'space-between',
     }}
         >
       {
         products.map(product => {
           return (
             <>
+             <Product product = {product} />
              <Product product = {product} />
              <Product product = {product} />
             </>

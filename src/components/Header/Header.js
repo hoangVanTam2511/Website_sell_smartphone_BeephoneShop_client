@@ -2,8 +2,17 @@ import React from "react";
 import "./Header.scss";
 import Navbar from "../Navbar/Navbar";
 import { Link } from "react-router-dom";
+import {  useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
+import { AddItemNavbar } from "../../store/navbarSlice";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const data = useSelector(state => state.navbar.navbar)
+  const dispatch = useDispatch()
+  const statusOfNavbar = useSelector(state => state.navbar.status)
+  const navigate = useNavigate()
+
   return (
     <>
     <header
@@ -31,46 +40,46 @@ const Header = () => {
         </div>
       </div>
 
-      {/* <div style={{ width: '100%', height: '40px', backgroundColor: 'white'}}>
+      {
+        statusOfNavbar === 0 ?
+        <></>:
+        <div style={{ width: '100%', height: '40px', backgroundColor: 'white'}} className="path-css">
         <div style={{
-          display: 'flex',
           alignItems: 'center',
-          width:' 30%',
+          width:' 82%',
           margin:'0px auto',
           backgroundColor: 'white',
           color: '#000000',
-          justifyContent: 'space-between'
-        }}>
-           <Link to="/" style={{ marginTop: 8}}>
-           <i class="fa fa-mobile"></i>
-           <span style={{ fontSize: 14, marginLeft: 5}}>
-             SamSung
-           </span>
-           </Link>
-
-           <Link to="/" style={{ marginTop: 8}}>
-           <i class="fa fa-mobile"></i>
-           <span style={{ fontSize: 14, marginLeft: 5}}>
-             Apple
-           </span>
-           </Link>
-
-           <Link to="/" style={{ marginTop: 8}}>
-           <i class="fa fa-mobile"></i>
-           <span style={{ fontSize: 14, marginLeft: 5}}>
-             Xiaomi
-           </span>
-           </Link>
-
-
-           <Link to="/" style={{ marginTop: 8}}>
-           <i class="fa fa-mobile"></i>
-           <span style={{ fontSize: 14, marginLeft: 5}}>
-             Điện thoại
-           </span>
-           </Link>
+          }}>
+             <Link to='/' style={{ marginTop: 8,height: `10px`,
+                  marginRight: `10px`,}}>
+                  <i class="fa fa-house icon-css" style={{color: '#128DE2'}}></i>
+                  <span style={{ fontSize: 14, marginLeft: 5, color: '#707070'}}>
+                    Trang chủ
+                  </span>
+                  </Link>
+            {
+              data.map((item, index) => (
+                  <Link to={item.path} 
+                   onClick={() => {
+                    var data = []
+                    data.push(item)
+                     dispatch(AddItemNavbar(data))
+                   }}
+                  style={{ marginTop: 8,height: `10px`,
+                  marginRight: `10px`,}}>
+                  <i class="fa fa-angle-right icon-css" ></i>
+                  <span style={{ fontSize: 14, marginLeft: 5, color: '#707070'}}>
+                    {item.name}
+                  </span>
+                  </Link>
+              ))
+            }
         </div>
-     </div> */}
+     </div>
+      }
+
+    
     </header>
     </>
   );

@@ -40,8 +40,7 @@
     }
 
     &-info{
-        padding: 0 12px 20px 12px;
-        text-align: center;
+        padding: 0 12px 3px 12px;
         font-family: $font-family-manrope;
         opacity: 0.8;
 
@@ -68,7 +67,6 @@
                 color:#707070
             }
             .new-price{
-                margin: 0 1rem;
                 font-weight: 700;
                 font-size: 16px;
             }
@@ -93,4 +91,13 @@
     &:hover{
         box-shadow: rgba(50, 50, 93, 0.1) 0px 2px 5px -1px, rgba(0, 0, 0, 0.1) 0px 1px 20px -1px;
     }
+}
+
+.product-info{
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    color: #3a3a3a;
+    font-size: 11px;
+    margin-right: 10px;
+    padding: 1px 5px;
 }

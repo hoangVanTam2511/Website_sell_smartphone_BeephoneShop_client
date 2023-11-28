@@ -7,6 +7,7 @@ import { addToCart } from '../../store/cartSlice'
 import { checkUserAnonymous } from '../../store/userSlice'
 import { UserOutlined } from '@ant-design/icons'
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
+import { AddItemNavbar } from '../../store/navbarSlice'
 
 const Navbar = () => {
   const dispatch = useDispatch()
@@ -76,9 +77,18 @@ const Navbar = () => {
                 borderRadius: `17%`
               }}
             >
-              <Link to='/products' className='cart-btn'>
+              <Link to='/products/all'
+               onClick={() => {
+                var data = [
+                  {
+                    path: '/products/all',
+                    name: 'Điện thoại'
+                  }
+                ]
+                dispatch(AddItemNavbar(data))
+               }}
+              className='cart-btn'>
                 < PhoneAndroidIcon
-                  //className="fa fa-mobile" 
                   style={{ position: `relative`, right: `-15px`, fontSize: `23px` }}
                 />
                 <div
@@ -93,34 +103,6 @@ const Navbar = () => {
                 </div>
               </Link>
             </div> 
-{/* 
-          <div
-            className='navbar-cart flex align-center'
-            style={{
-              border: `0px solid white`,
-              width: 47,
-              height: 50,
-              paddingTop: 3,
-              borderRadius: `17%`
-            }}
-          >
-            <Link to='/products' className='cart-btn'>
-              < TabletMacIcon
-                // className="fa fa-tablet"
-                style={{ position: `relative`, right: `-21px`, fontSize: `26px` }}
-              />
-              <div
-                style={{
-                  fontSize: `10px`,
-                  width: `90px`,
-                  fontWeight: '500',
-                  wordWrap: `break-word`
-                }}
-              >
-               Máy tính bảng
-              </div>
-            </Link>
-          </div>  */}
 
           <div
             className='navbar-cart flex align-center'
@@ -132,7 +114,17 @@ const Navbar = () => {
               borderRadius: `17%`
             }}
           >
-            <Link to='/look-up-order-page' className='cart-btn'>
+            <Link to='/look-up-order-page'
+            onClick={() => {
+              var data = [
+                {
+                  path: '/look-up-order-pag',
+                  name: 'Tra cứu đơn hàng'
+                }
+              ]
+              dispatch(AddItemNavbar(data))
+             }}
+            className='cart-btn'>
               <i
                 className='fa fa-shipping-fast'
                 style={{ position: `relative`, right: `-24px`, fontSize: `23px` }}
@@ -220,6 +212,8 @@ const Navbar = () => {
               </>
             )}
         </div>
+
+        
       </nav>
     </>
   )

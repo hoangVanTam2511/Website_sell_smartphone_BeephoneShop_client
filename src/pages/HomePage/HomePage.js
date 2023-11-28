@@ -12,14 +12,17 @@ import { ResetSelectedCart } from '../../store/cartSlice'
 import 'react-multi-carousel/lib/styles.css'
 import { over } from 'stompjs'
 import SockJS from 'sockjs-client'
+import { useNavigate } from 'react-router-dom'
+import { AddItemNavbar, ResetItemNavbar } from '../../store/navbarSlice'
 
 var stompClient = null
 const HomePage = () => {
   const dispatch = useDispatch()
   const [changeRealTime, setChangeRealTime] = useState('')
+  const naviage = useNavigate()
 
-   // connect websocket
-   const connect = () => {
+  // connect websocket
+  const connect = () => {
     let Sock = new SockJS('http://localhost:8080/ws')
     stompClient = over(Sock)
     stompClient.connect({}, onConnected, onError)
@@ -46,7 +49,8 @@ const HomePage = () => {
     if (stompClient === null) {
       connect()
     }
-    window.scrollTo(0, 0);
+    dispatch(ResetItemNavbar())
+    window.scrollTo(0, 0)
   }, [changeRealTime])
 
   const [products, setProducts] = useState([])
@@ -67,7 +71,9 @@ const HomePage = () => {
 
   const getListProductBestSeller = async () => {
     await axios
-      .get(`http://localhost:8080/client/product-detail/get-products-best-seller`)
+      .get(
+        `http://localhost:8080/client/product-detail/get-products-best-seller`
+      )
       .then(res => {
         if (res.status === 200) {
           setProductBestSeller(res.data)
@@ -79,13 +85,14 @@ const HomePage = () => {
 
   return (
     <main>
-      <div style={{ backgroundColor: 'white', margin: 0}}>
-        <img 
-        style={{
-          maxWidth: `100%`,
-          borderRadius: `0 0 60px 60px`
-        }}
-        src='https://cdn2.viettelstore.vn/images/Advertises/BANNER-BIG_PC-(1)_62146192221112023.jpg' />
+      <div style={{ backgroundColor: 'white', margin: 0 }}>
+        <img
+          style={{
+            maxWidth: `100%`,
+            borderRadius: `0 0 60px 60px`
+          }}
+          src='https://cdn2.viettelstore.vn/images/Advertises/BANNER-BIG_PC-(1)_62146192221112023.jpg'
+        />
       </div>
 
       <div className='slider-wrapper'>
@@ -243,130 +250,196 @@ const HomePage = () => {
 
             {/* <FlashsalePage/> */}
 
-            {
-              productBestSeller.length === 0 ? <></> :
+            {productBestSeller.length === 0 ? (
+              <></>
+            ) : (
               <div className='categories-item'>
-              <div className='categories-item'>
-                <div
-                  style={{
-                    width: '97%',
-                    margin: '0 auto'
-                  }}
-                >
-                  <h3
+                <div className='categories-item'>
+                  <div
                     style={{
-                      color: '#444',
-                      fontWeight: '600',
-                      fontSize: '22px',
-                      display: 'inline-block'
+                      width: '97%',
+                      margin: '0 auto'
                     }}
                   >
-                    Sản phẩm bán chạy
-                  </h3>
-
-                  <div style={{ display: 'inline-block', float: 'right' }}>
-                    <button
+                    <h3
                       style={{
-                        backgroundColor: '#f3f4f6',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: `10px`,
-                        color: `#444`,
-                        float: `right`,
-                        fontSize: `13px`,
-                        height: `34px`,
-                        padding: ` 5px 10px`,
-                        whiteSpace: 'nowrap'
+                        color: '#444',
+                        fontWeight: '600',
+                        fontSize: '22px',
+                        display: 'inline-block'
                       }}
                     >
-                      Xem tất cả
-                    </button>
-                  </div>
+                      Sản phẩm bán chạy
+                    </h3>
 
-                  <div style={{ display: 'inline-block', float: 'right' }}>
-                    <button
-                      style={{
-                        backgroundColor: '#f3f4f6',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: `10px`,
-                        color: `#444`,
-                        float: `right`,
-                        fontSize: `13px`,
-                        height: `34px`,
-                        padding: ` 5px 10px`,
-                        whiteSpace: 'nowrap',
-                        marginRight: '10px'
-                      }}
-                    >
-                      Sony
-                    </button>
-                  </div>
+                    <div style={{ display: 'inline-block', float: 'right' }}>
+                      <button
+                        style={{
+                          backgroundColor: '#f3f4f6',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: `10px`,
+                          color: `#444`,
+                          float: `right`,
+                          fontSize: `13px`,
+                          height: `34px`,
+                          padding: ` 5px 10px`,
+                          whiteSpace: 'nowrap'
+                        }}
+                        onClick={() => {
+                          var data = [
+                            {
+                              path: '/products/all',
+                              name: 'Điện thoại'
+                            }
+                          ]
+                          dispatch(AddItemNavbar(data))
+                          naviage('/products/all')
+                        }}
+                      >
+                        Xem tất cả
+                      </button>
+                    </div>
 
-                  <div style={{ display: 'inline-block', float: 'right' }}>
-                    <button
-                      style={{
-                        backgroundColor: '#f3f4f6',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: `10px`,
-                        color: `#444`,
-                        float: `right`,
-                        fontSize: `13px`,
-                        height: `34px`,
-                        padding: ` 5px 10px`,
-                        whiteSpace: 'nowrap',
-                        marginRight: '10px'
-                      }}
-                    >
-                      Samsung
-                    </button>
-                  </div>
+                    <div style={{ display: 'inline-block', float: 'right' }}>
+                      <button
+                        style={{
+                          backgroundColor: '#f3f4f6',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: `10px`,
+                          color: `#444`,
+                          float: `right`,
+                          fontSize: `13px`,
+                          height: `34px`,
+                          padding: ` 5px 10px`,
+                          whiteSpace: 'nowrap',
+                          marginRight: '10px'
+                        }}
+                        onClick={() => {
+                          var data = [
+                            {
+                              path: '/products/all',
+                              name: 'Điện thoại'
+                            },
+                            {
+                              path: '/products/sony',
+                              name: 'Sony'
+                            }
+                          ]
+                          dispatch(AddItemNavbar(data))
+                          naviage('/products/sony')
+                        }}
+                      >
+                        Sony
+                      </button>
+                    </div>
 
-                  <div style={{ display: 'inline-block', float: 'right' }}>
-                    <button
-                      style={{
-                        backgroundColor: '#f3f4f6',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: `10px`,
-                        color: `#444`,
-                        float: `right`,
-                        fontSize: `13px`,
-                        height: `34px`,
-                        padding: ` 5px 10px`,
-                        whiteSpace: 'nowrap',
-                        marginRight: '10px'
-                      }}
-                    >
-                      Xiaomi
-                    </button>
-                  </div>
+                    <div style={{ display: 'inline-block', float: 'right' }}>
+                      <button
+                        style={{
+                          backgroundColor: '#f3f4f6',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: `10px`,
+                          color: `#444`,
+                          float: `right`,
+                          fontSize: `13px`,
+                          height: `34px`,
+                          padding: ` 5px 10px`,
+                          whiteSpace: 'nowrap',
+                          marginRight: '10px'
+                        }}
+                        onClick={() => {
+                          var data = [
+                            {
+                              path: '/products/all',
+                              name: 'Điện thoại'
+                            },
+                            {
+                              path: '/products/samsung',
+                              name: 'Samsung'
+                            }
+                          ]
+                          dispatch(AddItemNavbar(data))
+                          naviage('/products/samsung')
+                        }}
+                      >
+                        Samsung
+                      </button>
+                    </div>
 
-                  <div style={{ display: 'inline-block', float: 'right' }}>
-                    <button
-                      style={{
-                        backgroundColor: '#f3f4f6',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: `10px`,
-                        color: `#444`,
-                        float: `right`,
-                        fontSize: `13px`,
-                        height: `34px`,
-                        padding: ` 5px 10px`,
-                        whiteSpace: 'nowrap',
-                        marginRight: '10px'
-                      }}
-                    >
-                      Apple
-                    </button>
+                    <div style={{ display: 'inline-block', float: 'right' }}>
+                      <button
+                        style={{
+                          backgroundColor: '#f3f4f6',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: `10px`,
+                          color: `#444`,
+                          float: `right`,
+                          fontSize: `13px`,
+                          height: `34px`,
+                          padding: ` 5px 10px`,
+                          whiteSpace: 'nowrap',
+                          marginRight: '10px'
+                        }}
+                        onClick={() => {
+                          var data = [
+                            {
+                              path: '/products/all',
+                              name: 'Điện thoại'
+                            },
+                            {
+                              path: '/products/xiaomi',
+                              name: 'Samsung'
+                            }
+                          ]
+                          dispatch(AddItemNavbar(data))
+                          naviage('/products/xiaomi')
+                        }}
+                      >
+                        Xiaomi
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'inline-block', float: 'right' }}>
+                      <button
+                        style={{
+                          backgroundColor: '#f3f4f6',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: `10px`,
+                          color: `#444`,
+                          float: `right`,
+                          fontSize: `13px`,
+                          height: `34px`,
+                          padding: ` 5px 10px`,
+                          whiteSpace: 'nowrap',
+                          marginRight: '10px'
+                        }}
+                        onClick={() => {
+                          var data = [
+                            {
+                              path: '/products/all',
+                              name: 'Điện thoại'
+                            },
+                            {
+                              path: '/products/apple',
+                              name: 'Apple'
+                            }
+                          ]
+                          dispatch(AddItemNavbar(data))
+                          naviage('/products/apple')
+                        }}
+                      >
+                        Apple
+                      </button>
+                    </div>
                   </div>
+                  {productStatus === STATUS.LOADING ? (
+                    <Loader />
+                  ) : (
+                    <ProductList products={productBestSeller} />
+                  )}
                 </div>
-                {productStatus === STATUS.LOADING ? (
-                  <Loader />
-                ) : (
-                  <ProductList products={productBestSeller} />
-                )}
               </div>
-            </div>
-            }
-       
+            )}
 
             <div className='categories-item'>
               <div
@@ -387,98 +460,164 @@ const HomePage = () => {
                 </h3>
 
                 <div style={{ display: 'inline-block', float: 'right' }}>
-                  <button
-                    style={{
-                      backgroundColor: '#f3f4f6',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: `10px`,
-                      color: `#444`,
-                      float: `right`,
-                      fontSize: `13px`,
-                      height: `34px`,
-                      padding: ` 5px 10px`,
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    Xem tất cả
-                  </button>
-                </div>
+                      <button
+                        style={{
+                          backgroundColor: '#f3f4f6',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: `10px`,
+                          color: `#444`,
+                          float: `right`,
+                          fontSize: `13px`,
+                          height: `34px`,
+                          padding: ` 5px 10px`,
+                          whiteSpace: 'nowrap'
+                        }}
+                        onClick={() => {
+                          var data = [
+                            {
+                              path: '/products/all',
+                              name: 'Điện thoại'
+                            }
+                          ]
+                          dispatch(AddItemNavbar(data))
+                          naviage('/products/all')
+                        }}
+                      >
+                        Xem tất cả
+                      </button>
+                    </div>
 
-                <div style={{ display: 'inline-block', float: 'right' }}>
-                  <button
-                    style={{
-                      backgroundColor: '#f3f4f6',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: `10px`,
-                      color: `#444`,
-                      float: `right`,
-                      fontSize: `13px`,
-                      height: `34px`,
-                      padding: ` 5px 10px`,
-                      whiteSpace: 'nowrap',
-                      marginRight: '10px'
-                    }}
-                  >
-                    Sony
-                  </button>
-                </div>
+                    <div style={{ display: 'inline-block', float: 'right' }}>
+                      <button
+                        style={{
+                          backgroundColor: '#f3f4f6',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: `10px`,
+                          color: `#444`,
+                          float: `right`,
+                          fontSize: `13px`,
+                          height: `34px`,
+                          padding: ` 5px 10px`,
+                          whiteSpace: 'nowrap',
+                          marginRight: '10px'
+                        }}
+                        onClick={() => {
+                          var data = [
+                            {
+                              path: '/products/all',
+                              name: 'Điện thoại'
+                            },
+                            {
+                              path: '/products/sony',
+                              name: 'Sony'
+                            }
+                          ]
+                          dispatch(AddItemNavbar(data))
+                          naviage('/products/sony')
+                        }}
+                      >
+                        Sony
+                      </button>
+                    </div>
 
-                <div style={{ display: 'inline-block', float: 'right' }}>
-                  <button
-                    style={{
-                      backgroundColor: '#f3f4f6',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: `10px`,
-                      color: `#444`,
-                      float: `right`,
-                      fontSize: `13px`,
-                      height: `34px`,
-                      padding: ` 5px 10px`,
-                      whiteSpace: 'nowrap',
-                      marginRight: '10px'
-                    }}
-                  >
-                    Samsung
-                  </button>
-                </div>
+                    <div style={{ display: 'inline-block', float: 'right' }}>
+                      <button
+                        style={{
+                          backgroundColor: '#f3f4f6',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: `10px`,
+                          color: `#444`,
+                          float: `right`,
+                          fontSize: `13px`,
+                          height: `34px`,
+                          padding: ` 5px 10px`,
+                          whiteSpace: 'nowrap',
+                          marginRight: '10px'
+                        }}
+                        onClick={() => {
+                          var data = [
+                            {
+                              path: '/products/all',
+                              name: 'Điện thoại'
+                            },
+                            {
+                              path: '/products/samsung',
+                              name: 'Samsung'
+                            }
+                          ]
+                          dispatch(AddItemNavbar(data))
+                          naviage('/products/samsung')
+                        }}
+                      >
+                        Samsung
+                      </button>
+                    </div>
 
-                <div style={{ display: 'inline-block', float: 'right' }}>
-                  <button
-                    style={{
-                      backgroundColor: '#f3f4f6',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: `10px`,
-                      color: `#444`,
-                      float: `right`,
-                      fontSize: `13px`,
-                      height: `34px`,
-                      padding: ` 5px 10px`,
-                      whiteSpace: 'nowrap',
-                      marginRight: '10px'
-                    }}
-                  >
-                    Xiaomi
-                  </button>
-                </div>
+                    <div style={{ display: 'inline-block', float: 'right' }}>
+                      <button
+                        style={{
+                          backgroundColor: '#f3f4f6',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: `10px`,
+                          color: `#444`,
+                          float: `right`,
+                          fontSize: `13px`,
+                          height: `34px`,
+                          padding: ` 5px 10px`,
+                          whiteSpace: 'nowrap',
+                          marginRight: '10px'
+                        }}
+                        onClick={() => {
+                          var data = [
+                            {
+                              path: '/products/all',
+                              name: 'Điện thoại'
+                            },
+                            {
+                              path: '/products/xiaomi',
+                              name: 'Xiaomi'
+                            }
+                          ]
+                          dispatch(AddItemNavbar(data))
+                          naviage('/products/xiaomi')
+                        }}
+                      >
+                        Xiaomi
+                      </button>
+                    </div>
 
-                <div style={{ display: 'inline-block', float: 'right' }}>
-                  <button
-                    style={{
-                      backgroundColor: '#f3f4f6',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: `10px`,
-                      color: `#444`,
-                      float: `right`,
-                      fontSize: `13px`,
-                      height: `34px`,
-                      padding: ` 5px 10px`,
-                      whiteSpace: 'nowrap',
-                      marginRight: '10px'
-                    }}
-                  >
-                    Apple
-                  </button>
-                </div>
+                    <div style={{ display: 'inline-block', float: 'right' }}>
+                      <button
+                        style={{
+                          backgroundColor: '#f3f4f6',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: `10px`,
+                          color: `#444`,
+                          float: `right`,
+                          fontSize: `13px`,
+                          height: `34px`,
+                          padding: ` 5px 10px`,
+                          whiteSpace: 'nowrap',
+                          marginRight: '10px'
+                        }}
+                        onClick={() => {
+                          var data = [
+                            {
+                              path: '/products/all',
+                              name: 'Điện thoại'
+                            },
+                            {
+                              path: '/products/apple',
+                              name: 'Apple'
+                            }
+                          ]
+                          dispatch(AddItemNavbar(data))
+                          naviage('/products/apple')
+                        }}
+                      >
+                        Apple
+                      </button>
+                    </div>
               </div>
               {productStatus === STATUS.LOADING ? (
                 <Loader />

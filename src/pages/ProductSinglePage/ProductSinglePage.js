@@ -225,7 +225,7 @@ const ProductSinglePage = () => {
     <main className='py-5 bg-white'>
       <div className='product-single' style={{ height: '1129px' }}>
         <div className='container'>
-          <div className='title fs-20 fw-7' style={{ marginTop: 20 }}>
+          <div className='title fs-20 fw-7' style={{ marginTop: 65 }}>
             {' '}
             Điện thoại {product.nameProduct}
           </div>

@@ -14,6 +14,7 @@ import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
 import { useSelector } from 'react-redux'
+import { ResetItemNavbar } from '../../store/navbarSlice'
 
 const CartPage = props => {
   const host = 'https://provinces.open-api.vn/api/'
@@ -40,6 +41,7 @@ const CartPage = props => {
   const selectedCart = useSelector(state => state.cart.selectedCart)
 
   useEffect(() => {
+    dispatch(ResetItemNavbar())
     if (account === undefined) {
       callAPI('https://provinces.open-api.vn/api/?depth=2')
       setAccount({
@@ -56,7 +58,7 @@ const CartPage = props => {
         dispatch(SetSelectedCart(1))
       }
     }
-    // window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
   })
 
   const formatMoney = number => {

@@ -8,6 +8,7 @@ import { addToCart, SetSelectedCart } from '../../store/cartSlice'
 import Button from '@mui/material/Button'
 import { useDispatch, useSelector } from 'react-redux'
 import { checkUserAnonymous } from '../../store/userSlice'
+import { ResetItemNavbar } from '../../store/navbarSlice'
 
 const CartPage = () => {
   // const { itemsCount, totalAmount } = useSelector(state => state.cart)
@@ -57,6 +58,7 @@ const CartPage = () => {
     countTotalAmountAgain()
     dispatch(addToCart());
     dispatch(SetSelectedCart(1));
+    dispatch(ResetItemNavbar())
     window.scrollTo(0, 0);
   }, [totalAmount])
 
