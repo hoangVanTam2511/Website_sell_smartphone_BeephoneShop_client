@@ -296,8 +296,16 @@ const CartPage = () => {
         ) : (
           <span>
             <i
+              onClick={() => {
+                console.log(checkoutState)
+                if(checkoutState === 1){
+                  navigate('/cart')
+                }else if(checkoutState === 2){
+                  setCheckoutState(1)
+                }
+              }}
               class='fa fa-arrow-left'
-              style={{ transform: 'translateX(-240px)' }}
+              style={{ transform: 'translateX(-271px)' }}
             ></i>
           </span>
         )}

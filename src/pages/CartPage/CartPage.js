@@ -154,7 +154,6 @@ const CartPage = () => {
       <h3 className='text-center fw-5' style={{ marginTop: 20, transform: 'translateY(17px)' }}>
        
        <span>
-        <i class="fa fa-arrow-left" style={{ transform: 'translateX(-255px)'}}></i>
        </span>
        
        <span style={{ fontWeight: 600 }}>

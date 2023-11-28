@@ -251,10 +251,8 @@ const CartPage = props => {
         ...account,
         hoVaTen: nameSelected,
         soDienThoai: phoneSelected,
-        email: emailSelected,
         diaChi: addressInput
       })
-      console.log(account)
       dispatch(changeInformationUser(account))
       dispatch(SetNote(note))
       props.stepCheckOutTwo(2)
@@ -331,6 +329,11 @@ const CartPage = props => {
               <input
                 onChange={e => {
                   setEmailSelected(e.target.value)
+                  setAccount({
+                    ...account,
+                    email: e.target.value
+                  })
+                  console.log(account)
                 }}
                 type='text'
                 name='text'
