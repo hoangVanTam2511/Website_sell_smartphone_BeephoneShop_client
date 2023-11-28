@@ -27,7 +27,6 @@ export const SetNote = createAsyncThunk('cart/SetNote', async data => {
 })
 
 export const SetSelectedCart = createAsyncThunk('cart/SetSelectedCart', async data => {
-  console.log(data)
   localStorage.setItem('selectedCart', data)
   return data
 })

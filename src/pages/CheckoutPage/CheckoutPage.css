@@ -8,3 +8,108 @@
     margin: 0px auto;
     justify-content: space-around ;
 }
+.css-1x51dt5-MuiInputBase-input-MuiInput-input{
+    font-size: 15px!important;
+}
+
+.css-1c2i806-MuiFormLabel-root-MuiInputLabel-root{
+    color: #999!important;
+    font-size: 11px;
+    line-height: 18px;
+    opacity: 1;
+    top: 0;
+}
+
+.brise-input {
+    border-radius: 0;
+    height: 50px;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+.brise-input input {
+	background-color: #fff;
+    border: 0;
+    border-bottom: 1px solid rgba(145,158,171,.2);
+    border-radius: 0;
+    box-sizing: border-box;
+    font-size: 15px;
+    height: 100%;
+    line-height: 24px;
+    padding: 18px 20px 2px 0;
+    width: 100%;
+}
+.brise-input input:focus ~ label, input:valid ~ label  {
+    color: #999;
+    font-size: 11px;
+    line-height: 18px;
+    opacity: 1;
+    top: 0;
+    left: 0;
+}
+.brise-input .line {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 3px;
+	background: rgb(18, 141, 226);
+	left: -999px;
+	transition: .25s;
+	opacity: 0;
+	z-index: 6;
+}
+.brise-input input:focus ~ .line {
+	left: 0;
+	opacity: 1;
+}
+.brise-input label {
+	position: absolute;
+	left: 10px;
+	top: 45%;
+	transition: ease-out .15s;
+	color: #999;
+    font-size: 12px;
+}
+
+/* End Inputs */
+
+
+
+  .css-aqpgxn-MuiFormLabel-root-MuiInputLabel-root{
+    color: #999!important;
+    font-size: 12px!important;
+    left: 0;
+    line-height: 15px!important;
+    margin: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 18px;
+    transition: top .25s ease;
+    width: 100%;
+    font-family:
+      'Roboto','Helvetica','Arial',sans-serif!important;
+  }
+
+  .css-1c2i806-MuiFormLabel-root-MuiInputLabel-root{
+    color: #999;
+    font-size: 15px!important;
+    line-height: 18px!important;
+    font-family:
+      'Roboto','Helvetica','Arial',sans-serif!important;
+  }
+
+  .css-1k1z705-MuiInputBase-root-MuiInput-root-MuiSelect-root:before {
+    border-bottom: 1px solid rgba(145,158,171,.2)!important;
+  }
+
+  .css-1rxz5jq-MuiSelect-select-MuiInputBase-input-MuiInput-input.css-1rxz5jq-MuiSelect-select-MuiInputBase-input-MuiInput-input.css-1rxz5jq-MuiSelect-select-MuiInputBase-input-MuiInput-input{
+    font-size: 15px!important;
+  }
+
+  .css-1rxz5jq-MuiSelect-select-MuiInputBase-input-MuiInput-input.css-1rxz5jq-MuiSelect-select-MuiInputBase-input-MuiInput-input.css-1rxz5jq-MuiSelect-select-MuiInputBase-input-MuiInput-input{
+    line-height: 19px!important;
+  }
+  .css-1om905o-MuiFormControl-root{
+    margin: 0px!important;
+  }

@@ -84,7 +84,7 @@ const Orders = () => {
       billSelected === 0 ?(
         <>
         <div
-          class="card title"
+          class="card title bg-white"
           style={{ justifyContent: "space-around", marginTop: "10px" }}
         >
           <div style={{ textAlign: "center", width: "45%", color: "#128DE2" }}>

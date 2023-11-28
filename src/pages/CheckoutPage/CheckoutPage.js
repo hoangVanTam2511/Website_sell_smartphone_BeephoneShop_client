@@ -230,6 +230,7 @@ const CartPage = () => {
     toast.success('Đặt hàng thành công')
     dispatch(addToCart(0))
     setCheckoutState(3)
+    window.scrollTo(0, 0)
   }
 
   const checkVoucher = async () => {
@@ -278,6 +279,10 @@ const CartPage = () => {
       borderRadius: `10px`,
       textAlign: 'center'
     }
+  }
+
+  const stepCheckOutTwo = (data) => {
+    setCheckoutState(2)
   }
 
   return (
@@ -474,31 +479,10 @@ const CartPage = () => {
             </div>
           </div>
 
-          <Checkout account={account} />
-          <div
-            className='countProductTemp'
-            style={{ left: 393, width: 706, display: 'block' }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontWeight: 'bold' }}>Tổng tiền tạm tính</span>
-              <span style={{ fontWeight: 'bold', color: '#128DE2' }}>
-                {formatMoney(totalAmount)}
-              </span>
-            </div>
-            <Button
-              variant='contained'
-              style={{
-                width: '100%',
-                marginTop: 5,
-                fontSize: 14
-              }}
-              onClick={() => {
-                setCheckoutState(2)
-              }}
-            >
-              Tiếp tục
-            </Button>
-          </div>
+          <Checkout account={account}  stepCheckOutTwo={stepCheckOutTwo} totalAmount={totalAmount}/>
+          <br/>
+          <br/> 
+       
           <br />
         </div>
       ) : (
@@ -750,9 +734,15 @@ const CartPage = () => {
 
           <div
             style={{
+              color: `#212b36`,
+              fontSize: `16px`,
+              fontWeight: `500`,
+              lineHeight: `18px`,
+              marginBottom: `10px`,
+              marginTop: `15px`,
+              textTransform: `uppercase`,
               margin: `10px auto`,
               width: `47%`,
-              borderRadius: '10px'
             }}
           >
             THÔNG TIN NHẬN HÀNG
@@ -795,6 +785,27 @@ const CartPage = () => {
               <div style={{ style: '#707070' }}>{account?.soDienThoai}</div>
             </div>
 
+              {
+                account.email === null || account.email === '' ? (
+                  <>  </>
+                ):(
+                  <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
+                    Email
+                  </div>
+    
+                  <div style={{ style: '#707070' }}>{account?.email}</div>
+                </div>
+                )
+              }
+           
+
             <div
               style={{
                 display: 'flex',
@@ -819,28 +830,25 @@ const CartPage = () => {
               </div>
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                Ghi chú
-              </div>
-
-              <div
-                style={{
-                  style: '#707070',
-                  wordWrap: 'wrap',
-                  width: '300px',
-                  textAlign: 'right'
-                }}
-              >
-                {note}
-              </div>
-            </div>
+            {
+                note === null || note === '' ? (
+                  <>  </>
+                ):(
+                  <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
+                    Ghi chú
+                  </div>
+    
+                  <div style={{ style: '#707070' }}>{note}</div>
+                </div>
+                )
+              }
           </div>
           <br />
           <div
@@ -867,57 +875,10 @@ const CartPage = () => {
               </Button>
             </div>
           </div>
-
-          {/* toaster */}
-          <Toaster
-            position='top-center'
-            reverseOrder={false}
-            gutter={8}
-            containerClassName=''
-            containerStyle={{}}
-            toastOptions={{
-              // Define default options
-              // className: '',
-              // duration: 5000,
-              // style: {
-              //   background: '#4caf50',
-              //   color: 'white'
-              // },
-
-              // Default options for specific types
-              success: {
-                duration: 3000,
-                theme: {
-                  primary: 'green',
-                  secondary: 'white'
-                },
-                iconTheme: {
-                  primary: 'white',
-                  secondary: '#4caf50'
-                },
-                style: {
-                  background: '#4caf50',
-                  color: 'white'
-                }
-              },
-
-              error: {
-                duration: 3000,
-                theme: {
-                  primary: '#f44336',
-                  secondary: 'white'
-                },
-                iconTheme: {
-                  primary: 'white',
-                  secondary: '#f44336'
-                },
-                style: {
-                  background: '#f44336',
-                  color: 'white'
-                }
-              }
-            }}
-          />
+    <br/>
+    <br/>
+    <br/>
+        
         </>
       ) : (
         <></>
@@ -927,9 +888,13 @@ const CartPage = () => {
         <>
           <div
             style={{
-              margin: `10px auto`,
-              width: `47%`,
-              borderRadius: '10px'
+              color: `#212b36`,
+              fontSize: `16px`,
+              fontWeight: `500`,
+              lineHeight: `18px`,
+              marginBottom: `10px`,
+              marginTop: `15px`,
+              textTransform: `uppercase`
             }}
           >
             THÔNG TIN ĐƠN HÀNG
@@ -1065,9 +1030,13 @@ const CartPage = () => {
 
           <div
             style={{
-              margin: `10px auto`,
-              width: `47%`,
-              borderRadius: '10px'
+              color: `#212b36`,
+              fontSize: `16px`,
+              fontWeight: `500`,
+              lineHeight: `18px`,
+              marginBottom: `10px`,
+              marginTop: `15px`,
+              textTransform: `uppercase`
             }}
           >
             THÔNG TIN NHẬN HÀNG
@@ -1282,61 +1251,69 @@ const CartPage = () => {
               Kiểm tra đơn hàng
             </Button>
           </div>
+          <br />
+          <br />
+
         </>
       ) : (
         <></>
       )}
 
       {/* toaster */}
-      <Toaster
-        position='top-center'
-        reverseOrder={false}
-        gutter={8}
-        containerClassName=''
-        containerStyle={{}}
-        toastOptions={{
-          // Define default options
-          // className: '',
-          // duration: 5000,
-          // style: {
-          //   background: '#4caf50',
-          //   color: 'white'
-          // },
-
-          // Default options for specific types
-          success: {
-            duration: 3000,
-            theme: {
-              primary: 'green',
-              secondary: 'white'
-            },
-            iconTheme: {
-              primary: 'white',
-              secondary: '#4caf50'
-            },
-            style: {
-              background: '#4caf50',
-              color: 'white'
-            }
-          },
-
-          error: {
-            duration: 3000,
-            theme: {
-              primary: '#f44336',
-              secondary: 'white'
-            },
-            iconTheme: {
-              primary: 'white',
-              secondary: '#f44336'
-            },
-            style: {
-              background: '#f44336',
-              color: 'white'
-            }
-          }
-        }}
-      />
+      {
+        checkoutState === 2 || checkoutState === 3 ? (
+          <Toaster
+          style={{ zIndex: -1, overflow: 'hidden', opacity: 0 }}
+           position='top-center'
+           reverseOrder={false}
+           gutter={8}
+           containerClassName='hhe'
+           toastOptions={{
+             // Define default options
+             // className: '',
+             // duration: 5000,
+             // style: {
+             //   background: '#4caf50',
+             //   color: 'white'
+             // },
+   
+             // Default options for specific types
+             success: {
+               duration: 3000,
+               theme: {
+                 primary: 'green',
+                 secondary: 'white'
+               },
+               iconTheme: {
+                 primary: 'white',
+                 secondary: '#4caf50'
+               },
+               style: {
+                 background: '#4caf50',
+                 color: 'white'
+               }
+             },
+   
+             error: {
+               duration: 3000,
+               theme: {
+                 primary: '#f44336',
+                 secondary: 'white'
+               },
+               iconTheme: {
+                 primary: 'white',
+                 secondary: '#f44336'
+               },
+               style: {
+                 background: '#f44336',
+                 color: 'white'
+               }
+             }
+           }}
+         />
+        ):(<></>)
+      }
+    
     </>
   )
 }

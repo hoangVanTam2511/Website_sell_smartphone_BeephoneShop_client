@@ -24,6 +24,7 @@ const ProductSinglePage = () => {
   const [productDetails, setProductDetails] = useState([])
   const dispatch = useDispatch()
   const user = useSelector(state => state.user.user)
+  const selectedCart = useSelector(state => state.cart.selectedCart)
   const navigate = useNavigate()
 
   //ram, rom, color
@@ -163,7 +164,9 @@ const ProductSinglePage = () => {
   }
 
   const addToCartHandler = async product => {
+    console.log("hehe")
     // add to cart
+    if(selectedCart === 0){
     await axios
       .post(
         `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
@@ -175,6 +178,7 @@ const ProductSinglePage = () => {
         }
       })
       .catch(res => console.log(res))
+    }
   }
 
   const addConfigs = value => {
@@ -576,7 +580,7 @@ const ProductSinglePage = () => {
         position='top-center'
         reverseOrder={false}
         gutter={8}
-        containerClassName=''
+        containerClassName='hehe'
         containerStyle={{}}
         toastOptions={{
           // Define default options
@@ -589,7 +593,8 @@ const ProductSinglePage = () => {
 
           // Default options for specific types
           success: {
-            duration: 3000,
+            className: 'hhehehe',
+            duration: 1000,
             theme: {
               primary: 'green',
               secondary: 'white'

@@ -33,7 +33,7 @@ const Orders = () => {
 
   return (
     <>
-      <div class='card' style={{ width: '100%' }}>
+      <div class='card bg-white' style={{ width: '100%' }}>
         <div style={{ width: `25%`, margin: `0px auto` }}>
           <div
             style={{
@@ -120,7 +120,7 @@ const Orders = () => {
           marginTop: '20px'
         }}
       >
-        <div className='card' style={{ width: '30%' }}>
+        <div className='card bg-white' style={{ width: '30%' }}>
           <img
             style={{
               width: `70px`,
@@ -159,7 +159,7 @@ const Orders = () => {
           <h4></h4>
         </div>
 
-        <div className='card' style={{ width: '30%' }}>
+        <div className='card bg-white' style={{ width: '30%' }}>
           <img
             style={{
               width: `70px`,
@@ -198,7 +198,7 @@ const Orders = () => {
           <h4></h4>
         </div>
 
-        <div className='card' style={{ width: '30%' }}>
+        <div className='card bg-white' style={{ width: '30%' }}>
           <img
             style={{
               width: `70px`,

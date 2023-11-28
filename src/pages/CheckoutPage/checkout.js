@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import '../CartPage/CartPage.scss'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
-import { Select, Space, Input } from 'antd'
+import Button from '@mui/material/Button'
+import { Space, Input } from 'antd'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { changeInformationUser } from '../../store/userSlice'
@@ -10,8 +9,11 @@ import { SetNote, SetSelectedCart } from '../../store/cartSlice'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import { Divider } from 'antd'
 import toast, { Toaster } from 'react-hot-toast'
-
-const { TextArea } = Input
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import FormControl from '@mui/material/FormControl'
+import Select from '@mui/material/Select'
+import { useSelector } from 'react-redux'
 
 const CartPage = props => {
   const host = 'https://provinces.open-api.vn/api/'
@@ -25,13 +27,44 @@ const CartPage = props => {
   const [listOfAddress, setListOfAddress] = useState([])
   const [addressSelected, setAddressSelected] = useState(1)
 
+  // selected
+  const [provinceSelected, setProvinceSelected] = useState('')
+  const [districtSelected, setDistrictSelected] = useState('')
+  const [wardSelected, setWardSelected] = useState('')
+  const [nameSelected, setNameSelected] = useState('')
+  const [phoneSelected, setPhoneSelected] = useState('')
+  const [emailSelected, setEmailSelected] = useState('')
+  const [addressInput, setAddressInput] = useState('')
+
+  // redux
+  const selectedCart = useSelector(state => state.cart.selectedCart)
+
   useEffect(() => {
-    callAPI('https://provinces.open-api.vn/api/?depth=2')
-    setAccount(props.account)
-    getAllAddress()
-    dispatch(SetSelectedCart(1))
-    window.scrollTo(0, 0);
-  }, [])
+    if (account === undefined) {
+      callAPI('https://provinces.open-api.vn/api/?depth=2')
+      setAccount({
+        ...props.account,
+        tinhThanhPho: '',
+        quanHuyen: '',
+        xaPhuong: ''
+      })
+      setNameSelected(props.account.hoVaTen)
+      setPhoneSelected(props.account.soDienThoai)
+      setEmailSelected(props.account.email)
+      getAllAddress()
+      if (selectedCart === 0) {
+        dispatch(SetSelectedCart(1))
+      }
+    }
+    // window.scrollTo(0, 0);
+  })
+
+  const formatMoney = number => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(number)
+  }
 
   var callAPI = api => {
     axios
@@ -75,44 +108,52 @@ const CartPage = props => {
       .catch(error => console.log(error))
   }
 
-  const handleChangeProvinces = value => {
-    callApiDistrict(host + 'p/' + value + '?depth=2')
+  const handleChangeProvinces = event => {
+    if (event === undefined) return
+
+    callApiDistrict(host + 'p/' + event.target.value + '?depth=2')
     setAccount({
       ...account,
-      tinhThanhPho: provinces.find(item => item.value === value).label
+      tinhThanhPho: provinces.find(item => item.value === event.target.value)
+        .label
     })
-    dispatch(changeInformationUser(account))
+    setProvinceSelected(event.target.value)
   }
 
-  const handleChangeDistricts = value => {
-    callApiWard(host + 'd/' + value + '?depth=2')
+  const handleChangeDistricts = event => {
+    if (event === undefined) return
+
+    callApiWard(host + 'd/' + event.target.value + '?depth=2')
     setAccount({
       ...account,
-      quanHuyen: districts.find(item => item.value === value).label
+      quanHuyen: districts.find(item => item.value === event.target.value).label
     })
-    dispatch(changeInformationUser(account))
+    setDistrictSelected(event.target.value)
   }
 
-  const handleChangeWards = value => {
+  const handleChangeWards = event => {
+    if (event === undefined) return
+
     setAccount({
       ...account,
-      xaPhuong: wards.find(item => item.value === value).label
+      xaPhuong: wards.find(item => item.value === event.target.value).label
     })
-    dispatch(changeInformationUser(account))
+    setWardSelected(event.target.value)
   }
 
   const handleChooseAddress = value => {
-    let newAddress ={
-      ...account,
+    console.log(account)
+    let newAddress = {
+      ...props.account,
+      diaChiList: value,
       diaChi: value.diaChi,
       tinhThanhPho: value.tinhThanhPho,
       quanHuyen: value.quanHuyen,
       xaPhuong: value.xaPhuong
-
     }
     setAccount(newAddress)
     setAddressSelected(3)
-    toast.success("Chọn địa chỉ thành công")
+    toast.success('Chọn địa chỉ thành công')
     dispatch(changeInformationUser(newAddress))
   }
 
@@ -124,9 +165,13 @@ const CartPage = props => {
       .then(res => {
         if (res.status === 200) {
           setListOfAddress(res.data)
-          if(res.data.length === 0){
+          setAccount({
+            ...props.account,
+            diaChiList: []
+          })
+          if (res.data.length === 0) {
             setAddressSelected(1)
-          }else{
+          } else {
             setAddressSelected(1)
           }
         }
@@ -134,95 +179,199 @@ const CartPage = props => {
       .catch(error => console.log(error))
   }
 
+  const checkValidate = data => {
+    var flag = 0
+    var vnf_regex = /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/
+    var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    if (nameSelected === '' ? 'fail' : 'pass' === 'fail') {
+      flag++
+      toast.error('Quý khách vui lòng không được bỏ trống họ và tên')
+    } else if (nameSelected.trim() === '') {
+      if (flag === 0) {
+        toast.error('Quý khách vui lòng không được bỏ trống họ và tên')
+      }
+
+      flag++
+    }
+
+    if (phoneSelected === null) {
+      if (flag === 0) {
+        toast.error('Quý khách vui này điền đầy đủ số điện thoại')
+      }
+
+      flag++
+    } else if (phoneSelected.trim() === '') {
+      if (flag === 0) {
+        toast.error('Quý khách vui này điền đầy đủ số điện thoại')
+      }
+
+      flag++
+    }
+
+    if (!vnf_regex.test(phoneSelected)) {
+      if (flag === 0) {
+        toast.error('Quý khách phải nhập đúng định dạng số điện thoại')
+      }
+
+      flag++
+    }
+
+    if (emailSelected.trim() !== '' && emailSelected !== null) {
+      if (!re.test(emailSelected)) {
+        if (flag === 0) {
+          toast.error(
+            'Quý khách vui lòng nhập đúng định dạng email(abc@gmail.com)'
+          )
+        }
+
+        flag++
+      }
+    }
+
+    if (account.diaChiList.length === 0) {
+      if (
+        provinceSelected === '' ||
+        districtSelected === '' ||
+        wardSelected === '' ||
+        addressInput === ''
+      ) {
+        if (flag === 0) {
+          toast.error(
+            'Quý khách vui lòng này chọn thành phố, quận huyện, địa chỉ'
+          )
+        }
+
+        flag++
+      }
+    }
+
+    if (flag === 0) {
+      setAccount({
+        ...account,
+        hoVaTen: nameSelected,
+        soDienThoai: phoneSelected,
+        email: emailSelected,
+        diaChi: addressInput
+      })
+      console.log(account)
+      dispatch(changeInformationUser(account))
+      dispatch(SetNote(note))
+      props.stepCheckOutTwo(2)
+    }
+  }
+
   return (
     <>
       <div>
-        <div style={{ margin: `10px 10px`, fontWeight: 600 }}>
+        <div
+          style={{
+            color: `#212b36`,
+            fontSize: `16px`,
+            fontWeight: `500`,
+            lineHeight: `18px`,
+            marginBottom: `10px`,
+            marginTop: `15px`,
+            textTransform: `uppercase`
+          }}
+        >
           THÔNG TIN KHÁCH HÀNG
         </div>
 
-        <div className='cart bg-white' style={{ padding: 30 }}>
-          <div
-            style={{
-              marginLeft: '1%',
-              marginBottom: '-9px',
-              marginTop: '-7px',
-              justifyContent: 'space-evenly',
-              display: 'flex'
-            }}
-          >
-            <span style={{ fontSize: 14, width: '48%' }}>Họ và tên</span>
+        <div
+          className='cart bg-white'
+          style={{
+            padding: 20,
+            backgroundcolor: `#fff!important`,
+            border: `1px solid rgba(145,158,171,.239)`,
+            borderRadius: `10px`,
+            height: '185px'
+          }}
+        >
+          <div style={{ display: `flex`, gap: `20px` }}>
+            <div class='brise-input'>
+              <input
+                onChange={e => {
+                  setNameSelected(e.target.value)
+                }}
+                type='text'
+                name='text'
+                value={nameSelected}
+                required
+              />
+              <label>HỌ VÀ TÊN</label>
+              <span class='line'></span>
+            </div>
 
-            <span style={{ fontSize: 14, width: '48%' }}>Số điện thoại</span>
+            <div class='brise-input'>
+              <input
+                onChange={e => {
+                  setPhoneSelected(e.target.value)
+                }}
+                type='text'
+                name='text'
+                value={phoneSelected}
+                required
+              />
+              <label>SỐ ĐIỆN THOẠI</label>
+              <span class='line'></span>
+            </div>
           </div>
 
           <div
             style={{
-              justifyContent: 'space-evenly',
-              marginTop: 15,
-              display: 'flex'
+              borderRadius: `0`,
+              height: `50px`,
+              position: `relative`,
+              width: `100%`,
+              marginTop: '10px'
             }}
           >
-            <Input
-              id='outlined-basic'
-              placeholder='Họ và tên'
-              value={account?.hoVaTen}
-              style={{ width: '49%', height: 40, borderRadius: '13px' }}
-              onChange={e => {
-                setAccount({
-                  ...account,
-                  hoVaTen: e.target.value
-                })
-                dispatch(changeInformationUser(account))
-              }}
-            />
-            <Input
-              placeholder='Số điện thoại'
-              value={account?.soDienThoai}
-              style={{ width: '49%', height: 40, borderRadius: '13px' }}
-              onChange={e => {
-                setAccount({
-                  ...account,
-                  soDienThoai: e.target.value
-                })
-                dispatch(changeInformationUser(account))
-              }}
-            />
-          </div>
+            <div class='brise-input'>
+              <input
+                onChange={e => {
+                  setEmailSelected(e.target.value)
+                }}
+                type='text'
+                name='text'
+                value={emailSelected}
+                required
+              />
+              <label>EMAIL</label>
+              <span class='line'></span>
+            </div>
 
-          <div
-            style={{
-              marginLeft: '2%',
-              marginBottom: '-9px',
-              marginTop: 10,
-              width: '100%'
-            }}
-          >
-            <span style={{ fontSize: 14 }}>Email</span>
-          </div>
-
-          <div style={{ marginLeft: '1%' }}>
-            <Input
-              id='outlined-basic'
-              placeholder='Email của bạn'
-              value={account?.email}
-              style={{ height: 40, marginTop: 10, width: '99%', borderRadius: '13px' }}
-              onChange={e => {
-                setAccount({
-                  ...account,
-                  email: e.target.value
-                })
-                dispatch(changeInformationUser(account))
+            <span
+              style={{
+                color: `#919eab`,
+                fontSize: `10.5px`,
+                fontStyle: `italic`,
+                fontWeight: `400`,
+                letterSpacing: `0`,
+                lineHeight: `9px`,
+                textAlign: `left`
               }}
-            />
+            >
+              (*) Hóa đơn VAT sẽ được gửi qua email này
+            </span>
           </div>
         </div>
 
-        <div style={{ margin: `10px 10px`, fontWeight: 600 }}>
+        <div
+          style={{
+            color: `#212b36`,
+            fontSize: `16px`,
+            fontWeight: `500`,
+            lineHeight: `18px`,
+            marginBottom: `10px`,
+            marginTop: `15px`,
+            textTransform: `uppercase`
+          }}
+        >
           CHỌN ĐỊA CHỈ NHẬN HÀNG
         </div>
 
-        <div style={{ marginLeft: 0 }}>
+        <div style={{ marginLeft: 0, marginTop: '5px' }}>
           {/* <Radio.Group
               onChange={onChangeRadioGroupReceive}
               value={radioReceive}
@@ -240,277 +389,303 @@ const CartPage = props => {
           <>
             <div>
               <div
-                class='card'
+                class='cart bg-white'
                 style={{
-                  width: `100%`,
-                  backgroundColor: 'white',
-                  borderRadius: 10
+                  borderRadius: 10,
+                  width: '100%',
+                  padding: '20px'
                 }}
               >
-                <CardContent>
-                  <Typography variant='h5' component='div'>
-                    Chọn địa chỉ để biết thời gian nhận hàng và phí vận chuyển
-                    (nếu có)
-                  </Typography>
-                  
-                  {addressSelected === 1 ? (
-                    <Space wrap style={{ marginTop: '10px' }}>
-                      <Select
-                        defaultValue=''
-                        style={{ width: `313px`, height: 40 }}
-                        onChange={e => handleChangeProvinces(e)}
-                        optionFilterProp='children'
-                        filterOption={(input, option) =>
-                          (option?.label ?? '').includes(input)
-                        }
-                        filterSort={(optionA, optionB) =>
-                          (optionA?.label ?? '')
-                            .toLowerCase()
-                            .localeCompare((optionB?.label ?? '').toLowerCase())
-                        }
-                        options={provinces}
-                        showSearch
-                      />
-
-                      <Select
-                        defaultValue=''
-                        style={{ width: `313px`, height: 40 }}
-                        optionFilterProp='children'
-                        filterOption={(input, option) =>
-                          (option?.label ?? '').includes(input)
-                        }
-                        filterSort={(optionA, optionB) =>
-                          (optionA?.label ?? '')
-                            .toLowerCase()
-                            .localeCompare((optionB?.label ?? '').toLowerCase())
-                        }
-                        onChange={handleChangeDistricts}
-                        options={districts}
-                        showSearch
-                      />
-
-                      <Select
-                        defaultValue=''
-                        style={{ width: `313px`, height: 40 }}
-                        optionFilterProp='children'
-                        filterOption={(input, option) =>
-                          (option?.label ?? '').includes(input)
-                        }
-                        filterSort={(optionA, optionB) =>
-                          (optionA?.label ?? '')
-                            .toLowerCase()
-                            .localeCompare((optionB?.label ?? '').toLowerCase())
-                        }
-                        onChange={handleChangeWards}
-                        options={wards}
-                        showSearch
-                      />
-
-                      <Input
-                        placeholder='Số nhà/Tên đường'
-                        style={{ width: `313px`, height: 40, borderRadius: 13 }}
-                        onChange={e => {
-                          setAccount({
-                            ...account,
-                            diaChi: e.target.value
-                          })
-                          dispatch(changeInformationUser(account))
-                        }}
-                        value={account?.diaChi}
-                      />
-                    </Space>
-                  ) : (
-                    <></>
-                  )}
-
-                  {listOfAddress &&
-                    addressSelected === 2 &&
-                    listOfAddress.map((value, index) => (
-                      <div
-                        class='card'
-                        style={{ width: `100%`, marginTop: 10 }}
-                      >
-                        <div class='title'>
-                          <h4>
-                            {' '}
-                            <span className='fw-6'>Địa chỉ {index + 1}</span>
-                            {
-                                account.diaChi === value.diaChi && account.xaPhuong === value.xaPhuong
-                                && account.quanHuyen === value.quanHuyen && account.tinhThanhPho === value.tinhThanhPho
-                                ? (
-                              <div
-                                style={{
-                                  display: 'inline-block',
-                                  marginLeft: 10,
-                                  color: '#128DE2',
-                                  fontSize: 9,
-                                  padding: 4,
-                                  border: '1px solid #128DE2',
-                                  borderRadius: 5,
-                                  transform: `translateY(-4px)`
-                                }}
-                              >
-                                Mặc định
-                              </div>
-                            ) : (
-                              <></>
-                            )}
-                          </h4>
-                          <h4> </h4>
-                        </div>
-
-                        <Divider style={{ margin: `10px auto` }} />
-
-                        <div>
-                          <Space wrap style={{ display: 'flex' }}>
-                            <div style={{ fontSize: 18 }}>
-                              Địa chỉ: {value.diaChi}, {value.xaPhuong},{' '}
-                              {value.quanHuyen}, {value.tinhThanhPho} <br />
-                              {
-                                account.diaChi === value.diaChi && account.xaPhuong === value.xaPhuong
-                                && account.quanHuyen === value.quanHuyen && account.tinhThanhPho === value.tinhThanhPho
-                                ? (
-                                 <></> 
-                                ):(
-                                  <div
-                                  style={{
-                                    display: 'inline-block',
-                                    backgroundColor: `#128DE2`,
-                                    color: `white`,
-                                    fontSize: '15px',
-                                    display: 'inline-block',
-                                    padding: '10px',
-                                    borderRadius: '5px',
-                                    marginLeft: 219,
-                                    cursor: 'pointer',
-                                    height: 40
-                                  }}
-                                  variant='outlined'
-                                  onClick={() => handleChooseAddress(value)}
-                                >
-                                  {' '}
-                                  Chọn địa chỉ này{' '}
-                                </div>
-                                )
-                              }
-                             
-                            </div>
-                          </Space>
-                        </div>
-                      </div>
-                  ))}
-
-                 {listOfAddress &&
-                    addressSelected === 3 &&
-                    listOfAddress.map((value, index) => (
-                      account.diaChi === value.diaChi && account.xaPhuong === value.xaPhuong
-                      && account.quanHuyen === value.quanHuyen && account.tinhThanhPho === value.tinhThanhPho
-                      ? (
-                        <>
-                          <div
-                        className='card'
-                        style={{ width: `100%`, marginTop: 10 }}
-                      >
-                        <div class='title'>
-                          <h4>
-                            {' '}
-                            <span className='fw-6'>Địa chỉ {index + 1}</span>
-                            {
-                                account.diaChi === value.diaChi && account.xaPhuong === value.xaPhuong
-                                && account.quanHuyen === value.quanHuyen && account.tinhThanhPho === value.tinhThanhPho
-                                ? (
-                              <div
-                                style={{
-                                  display: 'inline-block',
-                                  marginLeft: 10,
-                                  color: '#128DE2',
-                                  fontSize: 9,
-                                  padding: 4,
-                                  border: '1px solid #128DE2',
-                                  borderRadius: 5,
-                                  transform: `translateY(-4px)`
-                                }}
-                              >
-                                Mặc định
-                              </div>
-                            ) : (
-                              <></>
-                            )}
-                          </h4>
-                          <h4> </h4>
-                        </div>
-
-                        <Divider style={{ margin: `10px auto` }} />
-
-                        <div>
-                          <Space wrap style={{ display: 'flex' }}>
-                            <div style={{ fontSize: 18 }}>
-                              Địa chỉ: {value.diaChi}, {value.xaPhuong},{' '}
-                              {value.quanHuyen}, {value.tinhThanhPho} <br />
-                              {
-                                account.diaChi === value.diaChi && account.xaPhuong === value.xaPhuong
-                                && account.quanHuyen === value.quanHuyen && account.tinhThanhPho === value.tinhThanhPho
-                                ? (
-                                 <></> 
-                                ):(
-                                  <div
-                                  style={{
-                                    display: 'inline-block',
-                                    backgroundColor: `#128DE2`,
-                                    color: `white`,
-                                    fontSize: '15px',
-                                    display: 'inline-block',
-                                    padding: '10px',
-                                    borderRadius: '5px',
-                                    marginLeft: 219,
-                                    cursor: 'pointer',
-                                  }}
-                                  variant='outlined'
-                                  onClick={() => handleChooseAddress(value)}
-                                >
-                                  {' '}
-                                  Chọn địa chỉ này{' '}
-                                </div>
-                                )
-                              }
-                             
-                            </div>
-                          </Space>
-                        </div>
-                      </div>
-                        </>
-                      ):(
-                       <></>
-                      )
-                    ))}
-
-
-                  {listOfAddress && listOfAddress.length > 0 && addressSelected === 1 ? (
+                {addressSelected === 1 ? (
+                  <>
                     <div
                       style={{
-                        textAlign: 'right',
-                        padding: `10px`,
-                        fontSize: 14,
-                        color: '#444',
-                        marginLeft: -8,
-                        width: '97%',
-                        color: 'rgb(18, 141, 226)',
-                        cursor: 'pointer'
-                      }}
-                      onClick={() => {
-                        setAddressSelected(2)
+                        display: `flex`,
+                        gap: `15px`,
+                        paddingBottom: `15px`,
+                        width: `49%`,
+                        marginTop: '5px'
                       }}
                     >
-                      chọn từ Số địa chỉ{' '}
-                      <ArrowForwardIosIcon style={{ fontSize: 11 }} />
+                      <FormControl
+                        variant='standard'
+                        sx={{ m: 1, minWidth: '100%', height: 50 }}
+                      >
+                        <InputLabel
+                          className='label-select'
+                          id='demo-simple-select-standard-label'
+                        >
+                          TỈNH/ THÀNH PHỐ
+                        </InputLabel>
+                        <Select
+                          labelId='demo-simple-select-standard-label'
+                          id='demo-simple-select-standard'
+                          value={provinceSelected}
+                          onChange={handleChangeProvinces}
+                          sx={{
+                            height: `50`
+                          }}
+                        >
+                          {provinces.map((item, index) => {
+                            return (
+                              <MenuItem value={item.value}>
+                                {item.label}
+                              </MenuItem>
+                            )
+                          })}
+                        </Select>
+                      </FormControl>
+                      <FormControl
+                        variant='standard'
+                        sx={{ m: 1, minWidth: '100%', height: 50 }}
+                      >
+                        <InputLabel
+                          className='label-select'
+                          id='demo-simple-select-standard-label'
+                        >
+                          QUẬN/ HUYỆN
+                        </InputLabel>
+                        <Select
+                          labelId='demo-simple-select-standard-label'
+                          id='demo-simple-select-standard'
+                          value={districtSelected}
+                          onChange={handleChangeDistricts}
+                          sx={{
+                            height: `50`
+                          }}
+                        >
+                          {districts.map((item, index) => {
+                            return (
+                              <MenuItem value={item.value}>
+                                {item.label}
+                              </MenuItem>
+                            )
+                          })}
+                        </Select>
+                      </FormControl>
                     </div>
-                  ) : (
+                    <div
+                      style={{
+                        display: `flex`,
+                        gap: `15px`,
+                        paddingBottom: `15px`,
+                        width: `49%`,
+                        marginTop: '0px'
+                      }}
+                    >
+                      <FormControl
+                        variant='standard'
+                        sx={{ m: 1, minWidth: '100%', height: 50 }}
+                      >
+                        <InputLabel
+                          className='label-select'
+                          id='demo-simple-select-standard-label'
+                        >
+                          PHƯỜNG/ XÃ
+                        </InputLabel>
+                        <Select
+                          labelId='demo-simple-select-standard-label'
+                          id='demo-simple-select-standard'
+                          value={wardSelected}
+                          onChange={handleChangeWards}
+                          sx={{
+                            height: `50`
+                          }}
+                        >
+                          {wards.map((item, index) => {
+                            return (
+                              <MenuItem value={item.value}>
+                                {item.label}
+                              </MenuItem>
+                            )
+                          })}
+                        </Select>
+                      </FormControl>
+
+                      <div
+                        class='brise-input'
+                        style={{
+                          minWidth: '100%',
+                          height: 50,
+                          marginTop: '-3px'
+                        }}
+                      >
+                        <input
+                          onChange={e => {
+                            setAddressInput(e.target.value)
+                          }}
+                          type='text'
+                          name='text'
+                          required
+                        />
+                        <label>ĐỊA CHỈ </label>
+                        <span class='line'></span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <></>
+                )}
+
+                {listOfAddress &&
+                  addressSelected === 2 &&
+                  listOfAddress.map((value, index) => (
                     <>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between'
+                        }}
+                      >
+                        <input
+                          style={{ width: '2%' }}
+                          type='radio'
+                          id='html'
+                          name='fav_language'
+                          value={value}
+                          checked={
+                            account.diaChiList.id === value.id ? 'checked' : ''
+                          }
+                          onClick={() => handleChooseAddress(value)}
+                        ></input>
+                        <div
+                          style={{
+                            marginTop: '10px',
+                            width: '96%',
+                            position: 'relative',
+                            top: '10px'
+                          }}
+                        >
+                          <div class='title'>
+                            <div
+                              style={{
+                                color: `#212b36`,
+                                display: `flex`,
+                                flexWrap: `wrap`,
+                                fontSize: `15px`,
+                                fontWeight: `600`,
+                                gap: `5px`
+                              }}
+                            >
+                              {' '}
+                              <span className='fw-6'>Địa chỉ {index + 1}</span>
+                              {value.trangThai === 1 ? (
+                                <div
+                                  style={{
+                                    backgroundColor: `rgb(18 141 226/20%)`,
+                                    borderRadius: `6px`,
+                                    color: `rgb(18 141 226)`,
+                                    fontSize: `11px`,
+                                    fontWeight: `500`,
+                                    padding: `3px 8px`,
+                                    textTransform: `uppercase`
+                                  }}
+                                >
+                                  Mặc định
+                                </div>
+                              ) : (
+                                <></>
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <div
+                              style={{
+                                color: `#637381`,
+                                fontSize: `14px`,
+                                marginBottom: `5px`,
+                                marginTop: `5px`
+                              }}
+                            >
+                              {value.diaChi}, {value.xaPhuong},{' '}
+                              {value.quanHuyen}, {value.tinhThanhPho} <br />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </>
+                  ))}
+
+                {listOfAddress &&
+                  addressSelected === 3 &&
+                  listOfAddress.map((value, index) =>
+                    account.diaChiList.id === value.id ? (
+                      <>
+                        <div class='title'>
+                          <h4>
+                            {' '}
+                            <span className='fw-6'>Địa chỉ {index + 1}</span>
+                            {value.trangThai === 1 ? (
+                              <div
+                                style={{
+                                  display: 'inline-block',
+                                  marginLeft: 10,
+                                  color: '#128DE2',
+                                  fontSize: 9,
+                                  padding: 4,
+                                  border: '1px solid #128DE2',
+                                  borderRadius: 5,
+                                  transform: `translateY(-4px)`
+                                }}
+                              >
+                                Mặc định
+                              </div>
+                            ) : (
+                              <></>
+                            )}
+                          </h4>
+                          <h4> </h4>
+                        </div>
+
+                        <div>
+                          <Space wrap style={{ display: 'flex' }}>
+                            <div
+                              style={{
+                                fontSize: 18,
+                                color: '#637381',
+                                fontSize: '14px'
+                              }}
+                            >
+                              {value.diaChi}, {value.xaPhuong},{' '}
+                              {value.quanHuyen}, {value.tinhThanhPho} <br />
+                            </div>
+                          </Space>
+                        </div>
+                      </>
+                    ) : (
+                      <></>
+                    )
                   )}
 
-                  {listOfAddress && listOfAddress.length > 0 && addressSelected === 2 ? (
-                    <div
+                {listOfAddress &&
+                listOfAddress.length > 0 &&
+                addressSelected === 1 ? (
+                  <div
+                    style={{
+                      textAlign: 'right',
+                      padding: `0px`,
+                      fontSize: 14,
+                      color: '#444',
+                      marginLeft: -8,
+                      width: '97%',
+                      color: 'rgb(18, 141, 226)',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => {
+                      setAddressSelected(2)
+                    }}
+                  >
+                    chọn từ Số địa chỉ{' '}
+                    <ArrowForwardIosIcon style={{ fontSize: 11 }} />
+                  </div>
+                ) : (
+                  <></>
+                )}
+
+                {listOfAddress &&
+                listOfAddress.length > 0 &&
+                addressSelected === 2 ? (
+                  <div
                     style={{
                       textAlign: 'right',
                       padding: `10px`,
@@ -528,13 +703,14 @@ const CartPage = props => {
                     chọn địa chỉ mới
                     <ArrowForwardIosIcon style={{ fontSize: 11 }} />
                   </div>
-                  ) : (
-                    <>
-                    </>
-                  )}
+                ) : (
+                  <></>
+                )}
 
-                  {listOfAddress && listOfAddress.length > 0 && addressSelected === 3 ? (
-                    <>
+                {listOfAddress &&
+                listOfAddress.length > 0 &&
+                addressSelected === 3 ? (
+                  <>
                     <span
                       style={{
                         textAlign: 'right',
@@ -542,10 +718,10 @@ const CartPage = props => {
                         fontSize: 14,
                         color: '#444',
                         marginLeft: -8,
-                        width: '75%',
                         color: 'rgb(18, 141, 226)',
                         cursor: 'pointer',
-                        display: 'inline-block'
+                        display: 'inline-block',
+                        textDecoration: `underline`
                       }}
                       onClick={() => {
                         setAddressSelected(2)
@@ -553,52 +729,50 @@ const CartPage = props => {
                     >
                       chọn ({listOfAddress.length - 1}) địa chỉ khác
                     </span>
-                    <span>
-                      Hoặc
-                    </span>
+                    <span>hoặc</span>
                     <span
-                    style={{
-                      textAlign: 'right',
-                      padding: `10px`,
-                      fontSize: 14,
-                      color: '#444',
-                      marginLeft: -8,
-                      width: '21%',
-                      color: 'rgb(18, 141, 226)',
-                      cursor: 'pointer',
-                      display: 'inline-block'
-                    }}
-                    onClick={() => {
-                      setAddressSelected(1)
-                    }}
-                  >
-                    nhập địa chỉ mới
-                  </span>
+                      style={{
+                        textAlign: 'right',
+                        padding: `10px`,
+                        fontSize: 14,
+                        color: '#444',
+                        marginLeft: -8,
+                        width: '20%',
+                        color: 'rgb(18, 141, 226)',
+                        cursor: 'pointer',
+                        display: 'inline-block',
+                        textDecoration: `underline`
+                      }}
+                      onClick={() => {
+                        setAddressSelected(1)
+                      }}
+                    >
+                      nhập địa chỉ mới
+                    </span>
                   </>
-                  ) : (
-                    <>
-                    </>
-                  )}
+                ) : (
+                  <></>
+                )}
 
-                  <TextArea
-                    rows={6}
-                    placeholder='Ghi chú'
-                    maxLength={20}
+                <div class='brise-input'>
+                  <input
                     onChange={e => {
-                      dispatch(SetNote(e.target.value))
                       setNote(e.target.value)
                     }}
-                    style={{ width: `634px`, marginTop: 10 }}
+                    type='text'
+                    name='note'
                   />
-                </CardContent>
+                  <label>GHI CHÚ</label>
+                  <span class='line'></span>
+                </div>
               </div>
             </div>
           </>
         )}
       </div>
-        {/* toaster */}
-        <Toaster
-         position='top-center'
+      {/* toaster */}
+      <Toaster
+        position='top-center'
         reverseOrder={false}
         gutter={8}
         containerClassName=''
@@ -621,12 +795,12 @@ const CartPage = props => {
             },
             iconTheme: {
               primary: 'white',
-              secondary: '#4caf50',
+              secondary: '#4caf50'
             },
             style: {
               background: '#4caf50',
               color: 'white'
-            },
+            }
           },
 
           error: {
@@ -637,15 +811,40 @@ const CartPage = props => {
             },
             iconTheme: {
               primary: 'white',
-              secondary: '#f44336',
+              secondary: '#f44336'
             },
             style: {
               background: '#f44336',
               color: 'white'
-            },
+            }
           }
-        }}/>
+        }}
+      />
       <br />
+      <div
+        className='countProductTemp'
+        style={{ left: 393, width: 706, display: 'block' }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ fontWeight: 'bold' }}>Tổng tiền tạm tính</span>
+          <span style={{ fontWeight: 'bold', color: '#128DE2' }}>
+            {formatMoney(props.totalAmount)}
+          </span>
+        </div>
+        <Button
+          variant='contained'
+          style={{
+            width: '100%',
+            marginTop: 5,
+            fontSize: 14
+          }}
+          onClick={() => {
+            checkValidate(2)
+          }}
+        >
+          Tiếp tục
+        </Button>
+      </div>
     </>
   )
 }
