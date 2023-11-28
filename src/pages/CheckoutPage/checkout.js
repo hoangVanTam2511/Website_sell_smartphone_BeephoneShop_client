@@ -217,7 +217,7 @@ const CartPage = props => {
       flag++
     }
 
-    if (emailSelected.trim() !== '' && emailSelected !== null) {
+    if (emailSelected !== '' && emailSelected !== null) {
       if (!re.test(emailSelected)) {
         if (flag === 0) {
           toast.error(
@@ -290,6 +290,10 @@ const CartPage = props => {
             <div class='brise-input'>
               <input
                 onChange={e => {
+                  setAccount({
+                    ...account,
+                    hoVaTen: e.target.value
+                  })
                   setNameSelected(e.target.value)
                 }}
                 type='text'
@@ -304,6 +308,10 @@ const CartPage = props => {
             <div class='brise-input'>
               <input
                 onChange={e => {
+                  setAccount({
+                    ...account,
+                    soDienThoai: e.target.value
+                  })
                   setPhoneSelected(e.target.value)
                 }}
                 type='text'
@@ -516,6 +524,10 @@ const CartPage = props => {
                         <input
                           onChange={e => {
                             setAddressInput(e.target.value)
+                            setAccount({
+                              ...account,
+                              diaChi: e.target.value
+                            })
                           }}
                           type='text'
                           name='text'
