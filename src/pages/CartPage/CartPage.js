@@ -270,12 +270,6 @@ const CartPage = () => {
                       </div>
 
                       <div className='cart-ctd'>
-                        {/* <span
-                          className="cart-ctxt text-orange fw-5"
-                          style={{ color: "#128DE2" }}
-                        >
-                          {formatPrice(cart?.totalPrice)}
-                        </span> */}
                       </div>
 
                       <div className='cart-ctd'></div>

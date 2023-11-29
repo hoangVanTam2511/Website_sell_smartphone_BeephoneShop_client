@@ -573,7 +573,7 @@ const CategoryProductPage = () => {
               temp.push(item)
             }
           })
-          listFillter = temp
+          listFillter = temp            
         }
       }
 

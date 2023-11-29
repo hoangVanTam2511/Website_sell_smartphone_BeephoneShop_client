@@ -9,12 +9,12 @@
     .shopping-btn{
         padding: 0.65rem 2.8rem;
         margin-top: 1.6rem;
-        border: 1px solid $clr-orange;
+        border: 1px solid rgb(18, 141, 226);
         transition: $transition-ease;
 
         &:hover{
             background-color: transparent;
-            color: $clr-orange;
+            color: rgb(18, 141, 226);
         }
     }
 }

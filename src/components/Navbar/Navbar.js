@@ -36,7 +36,11 @@ const Navbar = () => {
         <div className='navbar-cnt flex align-center'>
           <div className='brand-and-toggler flex align-center'>
           
-            <Link to='/' className='navbar-brand flex align-center'>
+            <Link to='/' className='navbar-brand flex align-center'
+                onClick={() => {
+                  setSearchTerm('')
+                }}
+            >
               <span className='navbar-brand-ico'>
               </span>
               <span className='navbar-brand-txt mx-2'>
@@ -52,6 +56,16 @@ const Navbar = () => {
             <div className='navbar-search bg-white ' style={{ width: `98%`, display: 'flex' }}>
                <Link
                   to={`search/${searchTerm}`}
+                  onClick={() => {
+                    setSearchTerm('')
+                    var data = [
+                      {
+                        path: `/search/${searchTerm}`,
+                        name: `Kết quả tìm kiếm cho: ${searchTerm}`
+                      }
+                    ]
+                    dispatch(AddItemNavbar(data))
+                  }}
                   className='text-white search-btn flex align-center justify-center'
                 >
                   <i className='fa-solid fa-magnifying-glass' style={{ fontSize: 18}}></i>
@@ -60,6 +74,7 @@ const Navbar = () => {
                   type='text'
                   className='form-control fs-14'
                   placeholder='Nhập thông tin bạn muốn tìm'
+                  value={searchTerm}
                   onChange={e => handleSearchTerm(e)}
                 />
               
@@ -85,6 +100,7 @@ const Navbar = () => {
                     name: 'Điện thoại'
                   }
                 ]
+                setSearchTerm('')
                 dispatch(AddItemNavbar(data))
                }}
               className='cart-btn'>
@@ -118,10 +134,11 @@ const Navbar = () => {
             onClick={() => {
               var data = [
                 {
-                  path: '/look-up-order-pag',
+                  path: '/look-up-order-page',
                   name: 'Tra cứu đơn hàng'
                 }
               ]
+              setSearchTerm('')
               dispatch(AddItemNavbar(data))
              }}
             className='cart-btn'>
@@ -152,7 +169,11 @@ const Navbar = () => {
               borderRadius: `10px`
             }}
           >
-            <Link to='/cart' className='cart-btn'>
+            <Link to='/cart' className='cart-btn'
+              onClick={() => {
+                setSearchTerm('')
+              }}
+            >
               <i
                 className='fa-solid fa-bag-shopping'
                 style={{ position: `relative`, right: `-8px`, fontSize: `29px` }}
@@ -178,7 +199,11 @@ const Navbar = () => {
               borderRadius: `10px`
             }}
           >
-                <Link to='/search-order-page' className='cart-btn'>
+                <Link to='/search-order-page' className='cart-btn'
+                onClick={() => {
+                  setSearchTerm('')
+                }}
+                >
                   <UserOutlined style={{ marginLeft: `22px` }} />
                   <div
                     style={{ fontSize: `9px`, width: `80px`, fontWeight: '500' }}
@@ -200,7 +225,11 @@ const Navbar = () => {
               borderRadius: `10px`
             }}
           >
-                <Link to='/login' className='cart-btn'>
+                <Link to='/login' className='cart-btn'
+                onClick={() => {
+                  setSearchTerm('')
+                }}
+                >
                   <UserOutlined style={{ marginLeft: `16px` }} />
                   <div
                     style={{ fontSize: `10px`, width: `80px`, fontWeight: '500' }}

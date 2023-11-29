@@ -1,7 +1,7 @@
 .navbar-custom{
     display: flex;
     align-items: center;
-    width: 30%;
+    width:20%;
     margin: 4px auto;
     background-color: white;
 }
