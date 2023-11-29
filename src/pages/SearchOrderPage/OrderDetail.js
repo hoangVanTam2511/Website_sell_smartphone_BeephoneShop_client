@@ -101,7 +101,7 @@ const OrderDetail = props => {
 
   return (
     <>
-      <div class='card' style={{ width: '100%' }}>
+      <div class='card bg-white' style={{ width: '100%' }}>
         <div
           style={{
             width: '98%',

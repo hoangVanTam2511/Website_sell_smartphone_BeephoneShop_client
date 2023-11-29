@@ -105,7 +105,7 @@ const Orders = () => {
       {changeAddress === 1 ? (
         <div>
 
-          <div class='card'>
+          <div class='card bg-white'>
             <div class='title' style={{ marginLeft: '36%' }}>
               <h4>
                 {' '}
@@ -181,8 +181,8 @@ const Orders = () => {
             <div style={{ marginTop: '35px' }}>
               <div className='title'>
                 <span>
-                  Địa chỉ: {user.diaChi}, {user.xaPhuong}, {user.quanHuyen},{' '}
-                  {user.tinhThanhPho}{' '}
+                  Địa chỉ: {user.diaChiList.find(item => item.trangThai === 1).diaChi}, {user.diaChiList.find(item => item.trangThai === 1).xaPhuong}, {user.diaChiList.find(item => item.trangThai === 1).quanHuyen},{' '}
+                  {user.diaChiList.find(item => item.trangThai === 1).tinhThanhPho}{' '}
                 </span>
 
                 <button

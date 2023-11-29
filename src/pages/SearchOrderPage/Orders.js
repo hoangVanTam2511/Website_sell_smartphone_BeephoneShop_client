@@ -5,6 +5,7 @@ import { Divider, DatePicker,  } from "antd";
 import { useSelector } from 'react-redux'
 import  OrderDetail from './OrderDetail'
 import axios from 'axios'
+import { Empty } from 'antd';
 
 const Orders = () => {
   const user = useSelector(state => state.user.user)
@@ -58,7 +59,8 @@ const Orders = () => {
       color: `#128DE2`, 
       margin:'20px 10px', 
       fontSize: '10px', 
-      fontWeight: '600' 
+      fontWeight: '600',
+      background: 'white'
     }
   }
 
@@ -183,11 +185,17 @@ const Orders = () => {
             
             
         </div>
+
+        {
+          listBillFillter.length === 0 ? (
+            <Empty description={"Không có đơn hàng nào được tìm thấy"} />
+          ):<></>
+        }
   
         {
           listBillFillter.map((bill, index) => (
             <>
-            <div class="card">
+            <div class="card bg-white">
             <div class="title">
               <h4>
                 {" "}
@@ -248,7 +256,7 @@ const Orders = () => {
       ):(
         <>
         <div style={{ width: `110%`, margin: `0px auto` }}>
-        <OrderDetail id_bill={billId} setTab={setTab} />
+         <OrderDetail id_bill={billId} setTab={setTab} />
         </div>
         </>
 

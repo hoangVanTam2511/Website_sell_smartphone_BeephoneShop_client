@@ -20,8 +20,12 @@ import { ResetSelectedCart } from '../../store/cartSlice'
 var stompClient = null
 const ProductSinglePage = () => {
   const { id } = useParams()
+  
+  // products
   const [ramRomConfigs, setRamRomConfigs] = useState([])
   const [productDetails, setProductDetails] = useState([])
+  const [images, setImages] = useState([])
+
   const dispatch = useDispatch()
   const user = useSelector(state => state.user.user)
   const selectedCart = useSelector(state => state.cart.selectedCart)
@@ -148,7 +152,6 @@ const ProductSinglePage = () => {
       .then(item => {
         if (item.status === 200) {
           var res = item.data
-          console.log(item)
           setProduct({
             nameProduct: res.tenSanPham,
             typeDisplay: res.loaiManHinh,
@@ -158,6 +161,17 @@ const ProductSinglePage = () => {
             batteryCapacity: res.dungLuongPin,
             memoryCardType: res.loaiTheNho
           })
+        }
+      })
+      .catch(error => console.log(error))
+
+      await axios
+      .get(`http://localhost:8080/client/product-detail/get-images/${id}`)
+      .then(item => {
+        if (item.status === 200) {
+          var res = item.data
+          console.log(res)
+          setImages(res)
         }
       })
       .catch(error => console.log(error))
@@ -232,7 +246,7 @@ const ProductSinglePage = () => {
           <Divider style={{ margin: '4px 0' }} />
           <div className='product-single-content bg-white grid'>
             <div className='product-single-l'>
-              <Carousel />
+              <Carousel images={images} />
             </div>
 
             <div className='product-single-r'>
