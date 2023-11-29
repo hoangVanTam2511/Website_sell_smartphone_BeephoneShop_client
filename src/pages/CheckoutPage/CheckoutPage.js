@@ -232,7 +232,6 @@ const CartPage = () => {
     toast.success('Đặt hàng thành công')
     dispatch(addToCart(0))
     setCheckoutState(3)
-    window.scrollTo(0, 0)
   }
 
   const checkVoucher = async () => {
@@ -407,7 +406,7 @@ const CartPage = () => {
                         <div className='cart-ctd'>
                           <img
                             style={{ width: 112, height: 105 }}
-                            src='https://cdn.tgdd.vn/Products/Images/42/235838/Galaxy-S22-Ultra-Black-200x200.jpg'
+                            src={product.duongDan}
                           />
                         </div>
                         <div

@@ -194,6 +194,22 @@ const ProductSinglePage = () => {
     }
   }
 
+  const buyNowSelected = async product => {
+    // add to cart
+    await axios
+      .post(
+        `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
+      )
+      .then(res => {
+        if (res.status === 200) {
+          dispatch(addToCart())
+          toast.success('Thêm vào giỏ hàng thành công!')
+        }
+      })
+      .catch(res => console.log(res))
+  }
+
+
   const addConfigs = value => {
     setConfig({
       id: value.id,
@@ -245,7 +261,7 @@ const ProductSinglePage = () => {
           <Divider style={{ margin: '4px 0' }} />
           <div className='product-single-content bg-white grid'>
             <div className='product-single-l'>
-              <Carousel images={images} />
+              <Carousel images={images} colorSelected={config.color} />
             </div>
 
             <div className='product-single-r'>
@@ -386,7 +402,7 @@ const ProductSinglePage = () => {
                               <div>
                                 <img
                                   style={{ width: 38, height: 38 }}
-                                  src='https://cdn2.cellphones.com.vn/insecure/rs:fill:50:50/q:80/plain/https://cellphones.com.vn/media/catalog/product/g/a/galaxy-z-fold-5-xam-1_1__1_2.jpg'
+                                  src={images.find(e => e.tenMauSac === item.tenMauSac) === undefined ? "" : images.find(e => e.tenMauSac === item.tenMauSac).url}
                                 />
                               </div>
 

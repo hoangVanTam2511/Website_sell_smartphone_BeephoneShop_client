@@ -115,7 +115,7 @@
                     .btn{
                         height: 46px;
                         font-size: 15px;
-                        border: 1px solid $clr-orange;
+                        border: 1px solid  #128DE2;
                         padding: 0 1.8rem;
                         transition: $transition-ease;
                         
@@ -127,11 +127,12 @@
                             color: $clr-orange;
                         }
                         &:last-child{
-                            background-color: $clr-orange;
+                            background-color:  #128DE2;
                             color: white;
                         }
                         &:hover{
                             opacity: 0.9;
+                            border: 1px solid  #128DE2!important;
                         }
                     }
                 }
