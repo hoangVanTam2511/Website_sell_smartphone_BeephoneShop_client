@@ -96,7 +96,7 @@ const CategoryProductPage = () => {
     {
       label: 'Trên 15 triệu',
       min: 15000000,
-      max: priceBiggest
+      max: 1000000000000
     },
     {
       label: 'Dưới 500.000',
@@ -105,8 +105,8 @@ const CategoryProductPage = () => {
     },
     {
       label: 'Từ 500.000 - 1 triệu',
-      min: 5000000,
-      max: 10000000
+      min: 500000,
+      max: 1000000
     },
     {
       label: 'Từ 1 triệu - 3 triệu',
@@ -145,7 +145,7 @@ const CategoryProductPage = () => {
           }
         ]
         dispatch(AddItemNavbar(data))
-        searchProductsAll("")
+        searchProductsAll('')
       }
     }
 
@@ -244,7 +244,7 @@ const CategoryProductPage = () => {
       .catch(error => console.log(error))
   }
 
-  const searchProductsAll = async (data) => {
+  const searchProductsAll = async data => {
     await axios
       .post(`http://localhost:8080/client/product-detail/search`, {
         sanPham: '',
@@ -632,29 +632,34 @@ const CategoryProductPage = () => {
           listFillter = temp
         }
       }
-      
-      if(brandFillter === ""){
+
+      if (brandFillter === '') {
         setBrandFillter(brand)
       }
-  
-      if (brandFillter !== 'all' || brandFillter !== "") {
-        if (listFillter.length === 0) {
-          if (flag === 0) {
-            flag++
-            productDetails.forEach(item => {
-              if (brandFillter === item.sanPham.hang.tenHang) {
-                listFillter.push(item)
+
+      if (brandFillter !== undefined) {
+        if (brandFillter !== 'all') {
+          if (listFillter.length === 0) {
+            if (flag === 0) {
+              flag++
+              productDetails.forEach(item => {
+                if (brandFillter === item.sanPham.hang.tenHang) {
+                  listFillter.push(item)
+                }
+              })
+            }
+          } else {
+            var temp = []
+            listFillter.forEach(item => {
+              if (
+                brandFillter.toLowerCase() ===
+                item.sanPham.hang.tenHang.toLowerCase()
+              ) {
+                temp.push(item)
               }
             })
+            listFillter = temp
           }
-        } else {
-          var temp = []
-          listFillter.forEach(item => {
-            if (brandFillter.toLowerCase() === item.sanPham.hang.tenHang.toLowerCase()) {
-              temp.push(item)
-            }
-          })
-          listFillter = temp
         }
       }
 

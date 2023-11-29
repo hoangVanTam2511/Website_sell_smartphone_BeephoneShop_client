@@ -25,6 +25,7 @@ const CartPage = () => {
         `http://localhost:8080/client/cart-detail/get-cart-details?id_customer=${user.id}`
       )
       .then(res => {
+        console.log(res.data)
         setProductDetails(res.data)
         var totalCart = 0
         if (res.data.length === 0) return
@@ -71,7 +72,6 @@ const CartPage = () => {
   }
 
   if (productDetails.length === 0) {
-    
     return (
       <div className='container my-5'>
         <div className='empty-cart flex justify-center align-center flex-column font-manrope'>
@@ -180,8 +180,8 @@ const CartPage = () => {
                     >
                       <div className='cart-ctd'>
                         <img
-                          style={{ width: 112, height: 105 }}
-                          src='https://cdn.tgdd.vn/Products/Images/42/235838/Galaxy-S22-Ultra-Black-200x200.jpg'
+                          style={{ width: 112, height: 115 }}
+                          src={product?.duongDan}
                         />
 
                         <button
@@ -226,7 +226,7 @@ const CartPage = () => {
                           <div style={{ width: '58%' }}>
                             <span
                               className='cart-ctxt'
-                              style={{ color: 'red', fontSize: '16px' }}
+                              style={{ color: 'rgb(18, 141, 226)', fontSize: '16px' }}
                             >
                               {formatMoney(product?.donGiaSauKhuyenMai === 0 ? product?.donGia : product?.donGiaSauKhuyenMai)}
                             </span>

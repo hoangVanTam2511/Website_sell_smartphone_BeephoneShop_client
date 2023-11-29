@@ -170,7 +170,6 @@ const ProductSinglePage = () => {
       .then(item => {
         if (item.status === 200) {
           var res = item.data
-          console.log(res)
           setImages(res)
         }
       })

@@ -60,7 +60,6 @@ const CartPage = () => {
     if(stompClient === null){
       connect()
     }
-    window.scrollTo(0, 0);
   }, [totalAmount, productDetails])
 
   const getProductDetails = async () => {
@@ -1260,7 +1259,7 @@ const CartPage = () => {
                 fontSize: 14
               }}
               onClick={() => {
-                navigate('/look-up-order-page')
+                navigate(`/look-up-order-page`)
               }}
             >
               Kiểm tra đơn hàng
