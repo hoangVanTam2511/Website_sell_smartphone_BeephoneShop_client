@@ -161,7 +161,6 @@ const CartPage = () => {
       tongTien:
         totalAmount + Number(voucher === '' ? 0 : voucher.giaTriVoucher),
       tienThua: 0,
-      idKhachHang: account,
       tongTienSauKhiGiam: Number(totalAmount),
       tienKhachTra:
         totalAmount + Number(voucher === '' ? 0 : voucher.giaTriVoucher),
@@ -172,6 +171,10 @@ const CartPage = () => {
       soDienThoaiNguoiNhan: account && account.soDienThoai,
       tenNguoiNhan: (account && account.hoVaTen) || null,
       diaChiNguoiNhan: account && account.diaChi,
+      quanHuyenNguoiNhan: account && account.quanHuyen,
+      tinhThanhPhoNguoiNhan: account && account.tinhThanhPho,
+      xaPhuongNguoiNhan: account && account.xaPhuong,
+      idKhachHang: account && account.id,
       isPayment: true,
       isUpdateInfo: false,
       isUpdateVoucher: false,
@@ -897,6 +900,8 @@ const CartPage = () => {
           <div
             style={{
               color: `#212b36`,
+              width: '46%',
+              margin: '0 auto',
               fontSize: `16px`,
               fontWeight: `500`,
               lineHeight: `18px`,
@@ -1039,6 +1044,8 @@ const CartPage = () => {
           <div
             style={{
               color: `#212b36`,
+              width: '46%',
+              margin: '0 auto',
               fontSize: `16px`,
               fontWeight: `500`,
               lineHeight: `18px`,
