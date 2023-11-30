@@ -14,7 +14,7 @@ const Footer = () => {
     <>
     {
         selectedCart === 0 ? (
-            <footer class="new_footer_area bg_color" style={{ backgroundColor: 'white', borderTop: '1px solid #e2e2eb', marginTop: 28}}>
+            <footer class="new_footer_area bg_color" style={{ backgroundColor: 'white', borderTop: '1px solid #e2e2eb', marginTop: '-10px'}}>
             <div class="new_footer_top">
                 <div class="container">
                     <div class="row" style={{ display: 'flex', justifyContent: 'space-between'}}>

@@ -56,8 +56,8 @@ const SearchPage = () => {
 
   if(searchProducts.length === 0){
     return (
-      <div className='container' style = {{
-        minHeight: "20vh", marginTop: 80
+      <div className='container bg-white' style = {{
+        minHeight: "60vh", paddingTop: 80
       }}>
         <Empty description={"Không tìm thấy sản phẩm nào phù hợp với tiêu chí!"} />
         <br/>

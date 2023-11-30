@@ -338,6 +338,10 @@ const CartPage = () => {
           </div>
         </div>
       </div>
+      <br/>
+      <br/>
+      <br/>
+
 
       <Toaster
           style={{ zIndex: -1, overflow: 'hidden', opacity: 0 }}

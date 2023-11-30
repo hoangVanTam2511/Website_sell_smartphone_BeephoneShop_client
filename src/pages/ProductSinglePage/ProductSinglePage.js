@@ -195,15 +195,19 @@ const ProductSinglePage = () => {
 
   const addToCartHandler = async product => {
     var soLuong = 0
-    var product = productCart.find(e=> e.idSanPhamChiTiet === product.id);
-    var productDetail = productDetails.find(e=> e.id === product.idSanPhamChiTiet);
+    var product = productCart.find(e=> e.idSanPhamChiTiet === config.id);
+    var productDetail = productDetails.find(e=> e.id === config.id);
     if(product === undefined || product === null){ 
       soLuong = 0
     }else{
       soLuong = product.soLuongSapMua
     }
 
-    if(productDetail.soLuongTonKho  === 0){
+    if(productDetail === undefined || productDetail === null){ 
+      return;
+    }
+
+    if(soLuong > productDetail.soLuongTonKho){
       toast.error("Sản phẩm trong kho không đủ.Vui lòng chọn sản phẩm khác.")
     }else
     if(soLuong >= 4){
@@ -228,15 +232,19 @@ const ProductSinglePage = () => {
 
   const buyNowHandler = async product => {
     var soLuong = 0
-    var product = productCart.find(e=> e.idSanPhamChiTiet === product.id);
-    var productDetail = productDetails.find(e=> e.id === product.idSanPhamChiTiet);
+    var product = productCart.find(e=> e.idSanPhamChiTiet === config.id);
+    var productDetail = productDetails.find(e=> e.id === config.id);
     if(product === undefined || product === null){ 
       soLuong = 0
     }else{
       soLuong = product.soLuongSapMua
     }
 
-    if(productDetail.soLuongTonKho  === 0){
+    if(productDetail === undefined || productDetail === null){ 
+      return;
+    }
+
+    if(soLuong > productDetail.soLuongTonKho  ){
       toast.error("Sản phẩm trong kho không đủ.Vui lòng chọn sản phẩm khác.")
     }else
     if(soLuong >= 4){
@@ -550,7 +558,7 @@ const ProductSinglePage = () => {
                       width: `47%`
                     }}
                     onClick={() => {
-                      buyNowHandler(config)
+                      buyNowHandler()
                     }}
                   >
                     <i className='fas fa-shopping-cart'></i>
@@ -567,7 +575,7 @@ const ProductSinglePage = () => {
                       width: `47%`
                     }}
                     onClick={() => {
-                      addToCartHandler(config)
+                      addToCartHandler()
                     }}
                   >
                     <i className='fas fa-shopping-cart'></i>
