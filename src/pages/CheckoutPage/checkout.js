@@ -43,16 +43,18 @@ const CartPage = props => {
   useEffect(() => {
     dispatch(ResetItemNavbar())
     if (account === undefined) {
-      callAPI('https://provinces.open-api.vn/api/?depth=2')
       setAccount({
         ...props.account,
         tinhThanhPho: '',
         quanHuyen: '',
-        xaPhuong: ''
+        xaPhuong: '',
+        diaChi: ''
       })
+      callAPI('https://provinces.open-api.vn/api/?depth=2')
       setNameSelected(props.account.hoVaTen)
       setPhoneSelected(props.account.soDienThoai)
       setEmailSelected(props.account.email)
+      setAddressInput(props.account.diaChi)
       getAllAddress()
       if (selectedCart === 0) {
         dispatch(SetSelectedCart(1))
@@ -78,6 +80,18 @@ const CartPage = props => {
         setProvinces(modifiedData)
         setDistricts([{ value: '', label: 'Chọn Quận/huyện' }])
         setWards([{ value: '', label: 'Chọn Phường/Xã' }])
+          if(props.account.tinhThanhPho !== ''){
+            console.log( modifiedData.find(e => e.label === props.account.tinhThanhPho).value)
+            setProvinceSelected(
+              modifiedData.find(e => e.label === props.account.tinhThanhPho).value
+            )
+            callApiDistrict(
+              host +
+                'p/' +
+                modifiedData.find(e => e.label === props.account.tinhThanhPho).value +
+                '?depth=2'
+            )
+          }
       })
       .catch(error => console.log(error))
   }
@@ -92,6 +106,17 @@ const CartPage = props => {
         })
 
         setDistricts(modifiedData)
+        if (props.account.quanHuyen !== '') {
+          setDistrictSelected(
+            modifiedData.find(e => e.label === props.account.quanHuyen).value
+          )
+          callApiWard(
+            host +
+              'd/' +
+              modifiedData.find(e => e.label === props.account.quanHuyen).value +
+              '?depth=2'
+          )
+        }
       })
       .catch(error => console.log(error))
   }
@@ -105,6 +130,11 @@ const CartPage = props => {
           modifiedData.push({ value: value.code, label: value.name })
         })
         setWards(modifiedData)
+        if (props.account.xaPhuong !== '') {
+          setWardSelected(
+            modifiedData.find(e => e.label === props.account.xaPhuong).value
+          )
+        }
       })
       .catch(error => console.log(error))
   }
@@ -532,6 +562,7 @@ const CartPage = props => {
                           }}
                           type='text'
                           name='text'
+                          value={addressInput}
                           required
                         />
                         <label>ĐỊA CHỈ </label>
@@ -727,24 +758,29 @@ const CartPage = props => {
                 listOfAddress.length > 0 &&
                 addressSelected === 3 ? (
                   <>
-                    <span
-                      style={{
-                        textAlign: 'right',
-                        padding: `10px`,
-                        fontSize: 14,
-                        color: '#444',
-                        marginLeft: -8,
-                        color: 'rgb(18, 141, 226)',
-                        cursor: 'pointer',
-                        display: 'inline-block',
-                        textDecoration: `underline`
-                      }}
-                      onClick={() => {
-                        setAddressSelected(2)
-                      }}
-                    >
-                      chọn ({listOfAddress.length - 1}) địa chỉ khác
-                    </span>
+                    {listOfAddress.length - 1 === 0 ? (
+                      <></>
+                    ) : (
+                      <span
+                        style={{
+                          textAlign: 'right',
+                          padding: `10px`,
+                          fontSize: 14,
+                          color: '#444',
+                          marginLeft: -8,
+                          color: 'rgb(18, 141, 226)',
+                          cursor: 'pointer',
+                          display: 'inline-block',
+                          textDecoration: `underline`
+                        }}
+                        onClick={() => {
+                          setAddressSelected(2)
+                        }}
+                      >
+                        chọn ({listOfAddress.length - 1}) địa chỉ khác
+                      </span>
+                    )}
+
                     <span>hoặc</span>
                     <span
                       style={{

@@ -48,7 +48,7 @@ function App () {
             {/* check out */}
             <Route path='/check-out' element={<CheckoutPage />} />
             {/* look up order page */}
-            <Route path='/look-up-order-page' element={<LookUpOrderPage />} />
+            <Route path='/look-up-order-page/:id_bill' element={<LookUpOrderPage />} />
              {/* look up order page */}
              <Route path='/order-detail/:id' element={<OrderDetail />} />
           </Routes>

@@ -13,7 +13,7 @@ const Orders = () => {
   useEffect(() => {
     getBillsByIdCustomer()
     dispatch(SetSelectedCart(1));
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
   }, [])
 
   const getBillsByIdCustomer = async () => {

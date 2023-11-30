@@ -16,6 +16,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import LocalAtmOutlinedIcon from '@mui/icons-material/LocalAtmOutlined'
 import { addToCart } from '../../store/cartSlice'
 import toast, { Toaster } from 'react-hot-toast'
+import { AddItemNavbar } from '../../store/navbarSlice'
 import { over } from 'stompjs'
 import SockJS from 'sockjs-client'
 
@@ -57,7 +58,7 @@ const CartPage = () => {
 
   useEffect(() => {
     getProductDetails()
-    if(stompClient === null){
+    if (stompClient === null) {
       connect()
     }
   }, [totalAmount, productDetails])
@@ -180,6 +181,8 @@ const CartPage = () => {
       voucher: voucher === '' ? null : voucher,
       paymentMethod: paymentMethodCss
     }
+  
+    console.log(orderRequest)
 
     try {
       await axios
@@ -189,7 +192,7 @@ const CartPage = () => {
           setBill(response.data)
           idOrder = response.data.id
         })
-    } catch (error) {}
+    } catch (error) { console.log(error) }
 
     if (idOrder !== '') {
       productDetails.forEach(async e => {
@@ -282,7 +285,7 @@ const CartPage = () => {
     }
   }
 
-  const stepCheckOutTwo = (data) => {
+  const stepCheckOutTwo = data => {
     setCheckoutState(2)
   }
 
@@ -299,9 +302,9 @@ const CartPage = () => {
             <i
               onClick={() => {
                 console.log(checkoutState)
-                if(checkoutState === 1){
+                if (checkoutState === 1) {
                   navigate('/cart')
-                }else if(checkoutState === 2){
+                } else if (checkoutState === 2) {
                   setCheckoutState(1)
                 }
               }}
@@ -324,7 +327,12 @@ const CartPage = () => {
       {checkoutState === 3 ? (
         <></>
       ) : (
-        <div className='title_checkout'>
+        <div
+          className='title_checkout'
+          onClick={() => {
+            setCheckoutState(1)
+          }}
+        >
           <div
             style={
               checkoutState === 1
@@ -488,10 +496,14 @@ const CartPage = () => {
             </div>
           </div>
 
-          <Checkout account={account}  stepCheckOutTwo={stepCheckOutTwo} totalAmount={totalAmount}/>
-          <br/>
-          <br/> 
-       
+          <Checkout
+            account={account}
+            stepCheckOutTwo={stepCheckOutTwo}
+            totalAmount={totalAmount}
+          />
+          <br />
+          <br />
+
           <br />
         </div>
       ) : (
@@ -751,7 +763,7 @@ const CartPage = () => {
               marginTop: `15px`,
               textTransform: `uppercase`,
               margin: `10px auto`,
-              width: `47%`,
+              width: `47%`
             }}
           >
             THÔNG TIN NHẬN HÀNG
@@ -794,26 +806,23 @@ const CartPage = () => {
               <div style={{ style: '#707070' }}>{account?.soDienThoai}</div>
             </div>
 
-              {
-                account.email === null || account.email === '' ? (
-                  <>  </>
-                ):(
-                  <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    margin: 15
-                  }}
-                >
-                  <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                    Email
-                  </div>
-    
-                  <div style={{ style: '#707070' }}>{account?.email}</div>
+            {account.email === null || account.email === '' ? (
+              <> </>
+            ) : (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  margin: 15
+                }}
+              >
+                <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
+                  Email
                 </div>
-                )
-              }
-           
+
+                <div style={{ style: '#707070' }}>{account?.email}</div>
+              </div>
+            )}
 
             <div
               style={{
@@ -839,25 +848,23 @@ const CartPage = () => {
               </div>
             </div>
 
-            {
-                note === null || note === '' ? (
-                  <>  </>
-                ):(
-                  <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    margin: 15
-                  }}
-                >
-                  <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                    Ghi chú
-                  </div>
-    
-                  <div style={{ style: '#707070' }}>{note}</div>
+            {note === null || note === '' ? (
+              <> </>
+            ) : (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  margin: 15
+                }}
+              >
+                <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
+                  Ghi chú
                 </div>
-                )
-              }
+
+                <div style={{ style: '#707070' }}>{note}</div>
+              </div>
+            )}
           </div>
           <br />
           <div
@@ -884,10 +891,9 @@ const CartPage = () => {
               </Button>
             </div>
           </div>
-    <br/>
-    <br/>
-    <br/>
-        
+          <br />
+          <br />
+          <br />
         </>
       ) : (
         <></>
@@ -895,438 +901,470 @@ const CartPage = () => {
 
       {checkoutState === 3 ? (
         <>
-          <div
-            style={{
-              color: `#212b36`,
-              width: '46%',
-              margin: '0 auto',
-              fontSize: `16px`,
-              fontWeight: `500`,
-              lineHeight: `18px`,
-              marginBottom: `10px`,
-              marginTop: `15px`,
-              textTransform: `uppercase`
-            }}
-          >
-            THÔNG TIN ĐƠN HÀNG
-          </div>
-
-          <div
-            className='cart bg-white'
-            style={{
-              padding: 15,
-              margin: `5px auto`,
-              width: `47%`,
-              borderRadius: '10px'
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div>
-                <span style={{ marginLeft: '-12px', fontWeight: 600 }}>
-                  Mã đơn hàng
-                </span>
-              </div>
-
-              <div style={{ marginLeft: '-12px', fontWeight: 600 }}>
-                {bill.ma}
-              </div>
-            </div>
-
-            <Divider />
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                Số lượng sản phẩm
-              </div>
-
-              <div style={{ style: '#707070' }}> {productDetails.length}</div>
-            </div>
-
-            {voucher && (
+          {bill === null || bill === undefined ? (
+            <></>
+          ) : (
+            <>
               <div
                 style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  margin: 15
+                  color: `#212b36`,
+                  width: '46%',
+                  margin: '0 auto',
+                  fontSize: `16px`,
+                  fontWeight: `500`,
+                  lineHeight: `18px`,
+                  marginBottom: `10px`,
+                  marginTop: `15px`,
+                  textTransform: `uppercase`
                 }}
               >
-                <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                  Phiếu giảm giá
+                THÔNG TIN ĐƠN HÀNG
+              </div>
+
+              <div
+                className='cart bg-white'
+                style={{
+                  padding: 15,
+                  margin: `5px auto`,
+                  width: `47%`,
+                  borderRadius: '10px'
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div>
+                    <span style={{ marginLeft: '-12px', fontWeight: 600 }}>
+                      Mã đơn hàng
+                    </span>
+                  </div>
+
+                  <div style={{ marginLeft: '-12px', fontWeight: 600 }}>
+                    {bill.ma}
+                  </div>
                 </div>
 
-                <div style={{ color: 'red' }}>
-                  - {formatMoney(voucher?.giaTriVoucher)}
+                <Divider />
+
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div
+                    style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                  >
+                    Số lượng sản phẩm
+                  </div>
+
+                  <div style={{ style: '#707070' }}>
+                    {' '}
+                    {productDetails.length}
+                  </div>
                 </div>
-              </div>
-            )}
 
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                Tổng tiền
-              </div>
+                {voucher && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      margin: 15
+                    }}
+                  >
+                    <div
+                      style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                    >
+                      Phiếu giảm giá
+                    </div>
 
-              <div style={{ style: '#707070' }}>{formatMoney(totalAmount)}</div>
-            </div>
+                    <div style={{ color: 'red' }}>
+                      - {formatMoney(voucher?.giaTriVoucher)}
+                    </div>
+                  </div>
+                )}
 
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                Phí vận chuyển
-              </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div
+                    style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                  >
+                    Tổng tiền
+                  </div>
 
-              <div style={{ style: '#707070' }}>Miễn phí</div>
-            </div>
+                  <div style={{ style: '#707070' }}>
+                    {formatMoney(totalAmount)}
+                  </div>
+                </div>
 
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                Hình thức thanh toán
-              </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div
+                    style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                  >
+                    Phí vận chuyển
+                  </div>
 
-              <div style={{ style: '#707070' }}>
-                {paymentMethodCss === 1
-                  ? 'Thanh toán khi nhận hàng'
-                  : 'Thanh toán online'}
-              </div>
-            </div>
+                  <div style={{ style: '#707070' }}>Miễn phí</div>
+                </div>
 
-            <Divider />
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div
+                    style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                  >
+                    Hình thức thanh toán
+                  </div>
 
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div>
-                <span style={{ marginLeft: '-12px', fontWeight: 600 }}>
-                  Cần thanh toán
-                </span>
-              </div>
+                  <div style={{ style: '#707070' }}>
+                    {paymentMethodCss === 1
+                      ? 'Thanh toán khi nhận hàng'
+                      : 'Thanh toán online'}
+                  </div>
+                </div>
 
-              <div style={{ marginLeft: '-12px', fontWeight: 600 }}>
-                {formatMoney(totalAmount)}
-              </div>
-            </div>
-          </div>
+                <Divider />
 
-          <div
-            style={{
-              color: `#212b36`,
-              width: '46%',
-              margin: '0 auto',
-              fontSize: `16px`,
-              fontWeight: `500`,
-              lineHeight: `18px`,
-              marginBottom: `10px`,
-              marginTop: `15px`,
-              textTransform: `uppercase`
-            }}
-          >
-            THÔNG TIN NHẬN HÀNG
-          </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div>
+                    <span style={{ marginLeft: '-12px', fontWeight: 600 }}>
+                      Cần thanh toán
+                    </span>
+                  </div>
 
-          <div
-            className='cart bg-white'
-            style={{
-              padding: 15,
-              margin: `5px auto`,
-              width: `47%`,
-              borderRadius: '10px'
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                Khách hàng
-              </div>
-
-              <div style={{ style: '#707070' }}>{account?.hoVaTen}</div>
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                Số điện thoại
-              </div>
-
-              <div style={{ style: '#707070' }}>{account?.soDienThoai}</div>
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                Nhận hàng tại
+                  <div style={{ marginLeft: '-12px', fontWeight: 600 }}>
+                    {formatMoney(totalAmount)}
+                  </div>
+                </div>
               </div>
 
               <div
                 style={{
-                  style: '#707070',
-                  wordWrap: 'wrap',
-                  width: '300px',
-                  textAlign: 'right'
+                  color: `#212b36`,
+                  width: '46%',
+                  margin: '0 auto',
+                  fontSize: `16px`,
+                  fontWeight: `500`,
+                  lineHeight: `18px`,
+                  marginBottom: `10px`,
+                  marginTop: `15px`,
+                  textTransform: `uppercase`
                 }}
               >
-                {account?.diaChi}, {account?.xaPhuong}, {account?.quanHuyen},{' '}
-                {account?.tinhThanhPho}
+                THÔNG TIN NHẬN HÀNG
               </div>
-            </div>
-          </div>
 
-          <div
-            style={{
-              margin: `10px auto`,
-              width: `47%`,
-              borderRadius: '10px'
-            }}
-          >
-            DANH SÁCH SẢN PHẨM
-          </div>
+              <div
+                className='cart bg-white'
+                style={{
+                  padding: 15,
+                  margin: `5px auto`,
+                  width: `47%`,
+                  borderRadius: '10px'
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div
+                    style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                  >
+                    Khách hàng
+                  </div>
 
-          <div
-            className='cart bg-white'
-            style={{ width: '47%', margin: '0 auto' }}
-          >
-            <div className='cart-ctable'>
-              <div className='cart-cbody bg-white'>
-                {productDetails.map(product => {
-                  return (
-                    <>
-                      <div
-                        className='cart-ctr'
-                        key={product?.id}
-                        style={{ marginTop: 10 }}
-                      >
-                        <div className='cart-ctd'>
-                          <img
-                            style={{ width: 112, height: 105 }}
-                            src='https://cdn.tgdd.vn/Products/Images/42/235838/Galaxy-S22-Ultra-Black-200x200.jpg'
-                          />
-                        </div>
-                        <div
-                          className='cart-ctd'
-                          style={{ position: 'relative', top: '0px' }}
-                        >
+                  <div style={{ style: '#707070' }}>{account?.hoVaTen}</div>
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div
+                    style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                  >
+                    Số điện thoại
+                  </div>
+
+                  <div style={{ style: '#707070' }}>{account?.soDienThoai}</div>
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div
+                    style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                  >
+                    Nhận hàng tại
+                  </div>
+
+                  <div
+                    style={{
+                      style: '#707070',
+                      wordWrap: 'wrap',
+                      width: '300px',
+                      textAlign: 'right'
+                    }}
+                  >
+                    {account?.diaChi}, {account?.xaPhuong}, {account?.quanHuyen}
+                    , {account?.tinhThanhPho}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  margin: `10px auto`,
+                  width: `47%`,
+                  borderRadius: '10px'
+                }}
+              >
+                DANH SÁCH SẢN PHẨM
+              </div>
+
+              <div
+                className='cart bg-white'
+                style={{ width: '47%', margin: '0 auto' }}
+              >
+                <div className='cart-ctable'>
+                  <div className='cart-cbody bg-white'>
+                    {productDetails.map(product => {
+                      return (
+                        <>
                           <div
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              width: 550,
-                              height: 140,
-                              marginLeft: 10
-                            }}
+                            className='cart-ctr'
+                            key={product?.id}
+                            style={{ marginTop: 10 }}
                           >
-                            <div style={{ width: '127%', marginTop: 17 }}>
-                              <span className='cart-ctxtf fw-7'>
-                                {product?.tenSanPham +
-                                  ' ' +
-                                  product?.dungLuongRam +
-                                  'GB ' +
-                                  product?.dungLuongRom +
-                                  'GB - ' +
-                                  product?.tenMauSac}
-                              </span>
-                              <br />
-                              <span>
-                                <span
-                                  className='cart-ctxt'
-                                  style={{
-                                    color: '#128DE2',
-                                    fontSize: '17px',
-                                    fontWeight: 500
-                                  }}
-                                >
-                                  {formatMoney(
-                                    product?.donGiaSauKhuyenMai === 0
-                                      ? product?.donGia
-                                      : product?.donGiaSauKhuyenMai
-                                  )}
-                                </span>
-                                <del
-                                  style={{
-                                    color: '#999',
-                                    fontSize: '14px',
-                                    marginLeft: '5px',
-                                    fontWeight: 500
-                                  }}
-                                >
-                                  {product?.donGiaSauKhuyenMai === 0
-                                    ? ''
-                                    : formatMoney(product?.donGia)}
-                                </del>
-                              </span>
+                            <div className='cart-ctd'>
+                              <img
+                                style={{ width: 112, height: 105 }}
+                                src={product.duongDan}
+                              />
                             </div>
                             <div
-                              style={{
-                                width: '58%',
-                                marginTop: 42,
-                                fontWeight: 500
-                              }}
+                              className='cart-ctd'
+                              style={{ position: 'relative', top: '0px' }}
                             >
-                              Số lượng :
-                              <span style={{ color: '#128DE2' }}>
-                                {' ' + product?.soLuongSapMua}
-                              </span>
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  width: 550,
+                                  height: 140,
+                                  marginLeft: 10
+                                }}
+                              >
+                                <div style={{ width: '127%', marginTop: 17 }}>
+                                  <span className='cart-ctxtf fw-7'>
+                                    {product?.tenSanPham +
+                                      ' ' +
+                                      product?.dungLuongRam +
+                                      'GB ' +
+                                      product?.dungLuongRom +
+                                      'GB - ' +
+                                      product?.tenMauSac}
+                                  </span>
+                                  <br />
+                                  <span>
+                                    <span
+                                      className='cart-ctxt'
+                                      style={{
+                                        color: '#128DE2',
+                                        fontSize: '17px',
+                                        fontWeight: 500
+                                      }}
+                                    >
+                                      {formatMoney(
+                                        product?.donGiaSauKhuyenMai === 0
+                                          ? product?.donGia
+                                          : product?.donGiaSauKhuyenMai
+                                      )}
+                                    </span>
+                                    <del
+                                      style={{
+                                        color: '#999',
+                                        fontSize: '14px',
+                                        marginLeft: '5px',
+                                        fontWeight: 500
+                                      }}
+                                    >
+                                      {product?.donGiaSauKhuyenMai === 0
+                                        ? ''
+                                        : formatMoney(product?.donGia)}
+                                    </del>
+                                  </span>
+                                </div>
+                                <div
+                                  style={{
+                                    width: '58%',
+                                    marginTop: 42,
+                                    fontWeight: 500
+                                  }}
+                                >
+                                  Số lượng :
+                                  <span style={{ color: '#128DE2' }}>
+                                    {' ' + product?.soLuongSapMua}
+                                  </span>
+                                </div>
+                              </div>
                             </div>
+                            <div className='cart-ctd'></div>
+                            <div className='cart-ctd'></div>
+
+                            <div className='cart-ctd'></div>
                           </div>
-                        </div>
-                        <div className='cart-ctd'></div>
-                        <div className='cart-ctd'></div>
-
-                        <div className='cart-ctd'></div>
-                      </div>
-                    </>
-                  )
-                })}
+                        </>
+                      )
+                    })}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <br />
+              <br />
 
-          <div
-            className='countProductTemp'
-            style={{
-              left: 395,
-              width: '47%',
-              display: 'flex',
-              justifyContent: 'space-between'
-            }}
-          >
-            <Button
-              variant='outlined'
-              style={{
-                width: '48%',
-                marginTop: 5,
-                fontSize: 14
-              }}
-              onClick={() => {
-                navigate('/')
-              }}
-            >
-              Tiếp tục mua hàng
-            </Button>
+              <div
+                className='countProductTemp'
+                style={{
+                  left: 395,
+                  width: '47%',
+                  display: 'flex',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <Button
+                  variant='outlined'
+                  style={{
+                    width: '48%',
+                    marginTop: 5,
+                    fontSize: 14
+                  }}
+                  onClick={() => {
+                    navigate('/')
+                  }}
+                >
+                  Tiếp tục mua hàng
+                </Button>
 
-            <Button
-              variant='contained'
-              style={{
-                width: '48%',
-                marginTop: 5,
-                fontSize: 14
-              }}
-              onClick={() => {
-                navigate(`/look-up-order-page`)
-              }}
-            >
-              Kiểm tra đơn hàng
-            </Button>
-          </div>
-          <br />
-          <br />
-
+                <Button
+                  variant='contained'
+                  style={{
+                    width: '48%',
+                    marginTop: 5,
+                    fontSize: 14
+                  }}
+                  onClick={() => {
+                    navigate(`/look-up-order-page/${bill.ma}`)
+                    var data = [
+                      {
+                        path: `/look-up-order-page/${bill.ma}`,
+                        name: `Đơn hàng ${bill.ma}`
+                      }
+                    ]
+                    dispatch(AddItemNavbar(data))
+                  }}
+                >
+                  Kiểm tra đơn hàng
+                </Button>
+              </div>
+              <br />
+              <br />
+            </>
+          )}
         </>
       ) : (
         <></>
       )}
 
       {/* toaster */}
-      {
-        checkoutState === 2 || checkoutState === 3 ? (
-          <Toaster
+      {checkoutState === 2 || checkoutState === 3 ? (
+        <Toaster
           style={{ zIndex: -1, overflow: 'hidden', opacity: 0 }}
-           position='top-center'
-           reverseOrder={false}
-           gutter={8}
-           containerClassName='hhe'
-           toastOptions={{
-             // Define default options
-             // className: '',
-             // duration: 5000,
-             // style: {
-             //   background: '#4caf50',
-             //   color: 'white'
-             // },
-   
-             // Default options for specific types
-             success: {
-               duration: 3000,
-               theme: {
-                 primary: 'green',
-                 secondary: 'white'
-               },
-               iconTheme: {
-                 primary: 'white',
-                 secondary: '#4caf50'
-               },
-               style: {
-                 background: '#4caf50',
-                 color: 'white'
-               }
-             },
-   
-             error: {
-               duration: 3000,
-               theme: {
-                 primary: '#f44336',
-                 secondary: 'white'
-               },
-               iconTheme: {
-                 primary: 'white',
-                 secondary: '#f44336'
-               },
-               style: {
-                 background: '#f44336',
-                 color: 'white'
-               }
-             }
-           }}
-         />
-        ):(<></>)
-      }
-    
+          position='top-center'
+          reverseOrder={false}
+          gutter={8}
+          containerClassName='hhe'
+          toastOptions={{
+            // Define default options
+            // className: '',
+            // duration: 5000,
+            // style: {
+            //   background: '#4caf50',
+            //   color: 'white'
+            // },
+
+            // Default options for specific types
+            success: {
+              duration: 3000,
+              theme: {
+                primary: 'green',
+                secondary: 'white'
+              },
+              iconTheme: {
+                primary: 'white',
+                secondary: '#4caf50'
+              },
+              style: {
+                background: '#4caf50',
+                color: 'white'
+              }
+            },
+
+            error: {
+              duration: 3000,
+              theme: {
+                primary: '#f44336',
+                secondary: 'white'
+              },
+              iconTheme: {
+                primary: 'white',
+                secondary: '#f44336'
+              },
+              style: {
+                background: '#f44336',
+                color: 'white'
+              }
+            }
+          }}
+        />
+      ) : (
+        <></>
+      )}
     </>
   )
 }

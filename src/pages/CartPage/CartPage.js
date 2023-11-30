@@ -60,7 +60,6 @@ const CartPage = () => {
     dispatch(addToCart());
     dispatch(SetSelectedCart(1));
     dispatch(ResetItemNavbar())
-    window.scrollTo(0, 0);
   }, [totalAmount])
 
 

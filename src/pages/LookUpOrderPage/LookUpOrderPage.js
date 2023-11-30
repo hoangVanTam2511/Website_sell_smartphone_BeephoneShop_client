@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import './LookUpOrderPage.css'
 import TextField from '@mui/material/TextField'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { ResetSelectedCart } from '../../store/cartSlice'
 import { useDispatch } from 'react-redux'
 import axios from 'axios'
 import  OrderDetail from '../SearchOrderPage/OrderDetail'
+import { useSelector } from 'react-redux'
 
 const LookUpOrderPage = () => {
   const dispatch = useDispatch()
+  const { id_bill } = useParams()
+  const account = useSelector(state => state.user.user)
   const [order, setOrder] = useState({
     phone: '',
     code: ''
@@ -17,12 +20,31 @@ const LookUpOrderPage = () => {
 
   useEffect(() => {
     dispatch(ResetSelectedCart())
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
+    if (id_bill !== "no_bill") {
+      if(bill === undefined){
+      console.log(account)
+      getOrderByPhoneAndCode(account.soDienThoai, id_bill)
+      }
+    }
   })
 
   const getOrder = async () => {
     await axios
       .get(`http://localhost:8080/client/bill/get-bill-detail?phone=${order.phone}&code=${order.code}`)
+      .then(res => {
+        if (res.status === 200) {
+          setBill(res.data)
+        }
+        console.log(res)
+      })
+      .catch(error => console.log(error))
+  }
+
+  const getOrderByPhoneAndCode = async (phone,id_bill) => {
+    console.log(phone, id_bill)
+    await axios
+      .get(`http://localhost:8080/client/bill/get-bill-detail?phone=${phone}&code=${id_bill}`)
       .then(res => {
         if (res.status === 200) {
           setBill(res.data)

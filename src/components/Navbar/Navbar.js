@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import './Navbar.scss'
 import './Navbar-custom.css'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../../store/cartSlice'
 import { checkUserAnonymous } from '../../store/userSlice'
@@ -14,6 +14,9 @@ const Navbar = () => {
   const user = useSelector(state => state.user.user)
   const [searchTerm, setSearchTerm] = useState('')
   const countOfProductDetail = useSelector(state => state.cart.quantity)
+
+  //navigate
+  const navigate = useNavigate()
 
   const handleSearchTerm = e => {
     e.preventDefault()
@@ -54,7 +57,30 @@ const Navbar = () => {
 
           <div className='navbar-collapse w-100'>
             <div className='navbar-search bg-white ' style={{ width: `98%`, display: 'flex' }}>
-               <Link
+             
+                <input
+                  type='text'
+                  className='form-control fs-14'
+                  placeholder='Nhập tên sản phẩm bạn muốn tìm'
+                  value={searchTerm}
+                  onChange={e => handleSearchTerm(e)}
+                  onKeyDown={event => {
+                    console.log(event)
+                    if(event.key === 'Enter') {
+                    setSearchTerm('')
+                    var data = [
+                      {
+                        path: `/search/${searchTerm}`,
+                        name: `Kết quả tìm kiếm cho: ${searchTerm}`
+                      }
+                    ]
+                    dispatch(AddItemNavbar(data))
+                    navigate(`/search/${searchTerm}`)
+                  }
+                  }}
+                />
+
+              <Link
                   to={`search/${searchTerm}`}
                   onClick={() => {
                     setSearchTerm('')
@@ -70,13 +96,6 @@ const Navbar = () => {
                 >
                   <i className='fa-solid fa-magnifying-glass' style={{ fontSize: 18}}></i>
                 </Link>
-                <input
-                  type='text'
-                  className='form-control fs-14'
-                  placeholder='Nhập thông tin bạn muốn tìm'
-                  value={searchTerm}
-                  onChange={e => handleSearchTerm(e)}
-                />
               
             </div>
 
@@ -130,11 +149,11 @@ const Navbar = () => {
               borderRadius: `17%`
             }}
           >
-            <Link to='/look-up-order-page'
+            <Link to='/look-up-order-page/no_bill'
             onClick={() => {
               var data = [
                 {
-                  path: '/look-up-order-page',
+                  path: `/look-up-order-page/no_bill`,
                   name: 'Tra cứu đơn hàng'
                 }
               ]
