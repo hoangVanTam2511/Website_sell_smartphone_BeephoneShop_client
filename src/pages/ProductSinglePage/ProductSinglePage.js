@@ -25,10 +25,13 @@ const ProductSinglePage = () => {
   const [ramRomConfigs, setRamRomConfigs] = useState([])
   const [productDetails, setProductDetails] = useState([])
   const [images, setImages] = useState([])
+  const [productCart, setProductCart] = useState([])
 
+  //redux
   const dispatch = useDispatch()
   const user = useSelector(state => state.user.user)
   const selectedCart = useSelector(state => state.cart.selectedCart)
+  const cartProducts = useSelector(state => state.cart.carts)
   const navigate = useNavigate()
 
   //ram, rom, color
@@ -39,7 +42,7 @@ const ProductSinglePage = () => {
     color: '',
     price: 0,
     priceDiscount: 0,
-    discount: 0
+    discount: 0,
   })
 
   // product
@@ -74,6 +77,17 @@ const ProductSinglePage = () => {
     }
   }))
 
+  const getCartProduct = async () => {
+    await axios
+      .get(
+        `http://localhost:8080/client/cart-detail/get-cart-details?id_customer=${user.id}`
+      )
+      .then(res => {
+        setProductCart(res.data)
+      })
+      .catch(res => console.log(res))
+  }
+
   function createData (name, value) {
     return { name, value }
   }
@@ -95,6 +109,7 @@ const ProductSinglePage = () => {
     getConfig()
     dispatch(ResetSelectedCart())
     window.scrollTo(0, 0);
+    getCartProduct()
   }, [])
 
   const checkRomRamDistinct = (listRamRomDistinct, ram, rom) => {
@@ -121,6 +136,7 @@ const ProductSinglePage = () => {
       .get(`http://localhost:8080/client/product-detail/get-config/${id}`)
       .then(res => {
         if (res.status === 200) {
+          console.log(res.data)
           setProductDetails(res.data)
           let listRamRomDistinct = []
           res.data.map(e => {
@@ -152,6 +168,7 @@ const ProductSinglePage = () => {
       .then(item => {
         if (item.status === 200) {
           var res = item.data
+          console.log(res)
           setProduct({
             nameProduct: res.tenSanPham,
             typeDisplay: res.loaiManHinh,
@@ -177,36 +194,69 @@ const ProductSinglePage = () => {
   }
 
   const addToCartHandler = async product => {
-    console.log("hehe")
-    // add to cart
-    if(selectedCart === 0){
-    await axios
-      .post(
-        `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
-      )
-      .then(res => {
-        if (res.status === 200) {
-          dispatch(addToCart())
-          toast.success('Thêm vào giỏ hàng thành công!')
+    var soLuong = 0
+    var product = productCart.find(e=> e.idSanPhamChiTiet === product.id);
+    var productDetail = productDetails.find(e=> e.id === product.idSanPhamChiTiet);
+    if(product === undefined || product === null){ 
+      soLuong = 0
+    }else{
+      soLuong = product.soLuongSapMua
+    }
+
+    if(productDetail.soLuongTonKho  === 0){
+      toast.error("Sản phẩm trong kho không đủ.Vui lòng chọn sản phẩm khác.")
+    }else
+    if(soLuong >= 4){
+      toast.error("Sản phẩm trong giỏ hàng đã đạt tới số lượng giới hạn.Vui lòng chọn sản phẩm khác.")
+    }else{
+      if(selectedCart === 0){
+        await axios
+          .post(
+            `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
+          )
+          .then(res => {
+            if (res.status === 200) {
+              dispatch(addToCart())
+              toast.success("Bạn đã thêm sản phẩm giỏ hàng thành công")
+              getCartProduct()
+            }
+          })
+          .catch(res => console.log(res))
         }
-      })
-      .catch(res => console.log(res))
     }
   }
 
-  const buyNowSelected = async product => {
-    // add to cart
-    await axios
-      .post(
-        `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
-      )
-      .then(res => {
-        if (res.status === 200) {
-          dispatch(addToCart())
-          toast.success('Thêm vào giỏ hàng thành công!')
+  const buyNowHandler = async product => {
+    var soLuong = 0
+    var product = productCart.find(e=> e.idSanPhamChiTiet === product.id);
+    var productDetail = productDetails.find(e=> e.id === product.idSanPhamChiTiet);
+    if(product === undefined || product === null){ 
+      soLuong = 0
+    }else{
+      soLuong = product.soLuongSapMua
+    }
+
+    if(productDetail.soLuongTonKho  === 0){
+      toast.error("Sản phẩm trong kho không đủ.Vui lòng chọn sản phẩm khác.")
+    }else
+    if(soLuong >= 4){
+      toast.error("Sản phẩm trong giỏ hàng đã đạt tới số lượng giới hạn.Vui lòng chọn sản phẩm khác.")
+    }else{
+      if(selectedCart === 0){
+        await axios
+          .post(
+            `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
+          )
+          .then(res => {
+            if (res.status === 200) {
+              dispatch(addToCart())
+              getCartProduct()
+              navigate('/cart')
+            }
+          })
+          .catch(res => console.log(res))
         }
-      })
-      .catch(res => console.log(res))
+    }
   }
 
 
@@ -500,8 +550,7 @@ const ProductSinglePage = () => {
                       width: `47%`
                     }}
                     onClick={() => {
-                      addToCartHandler()
-                      navigate('/cart')
+                      buyNowHandler(config)
                     }}
                   >
                     <i className='fas fa-shopping-cart'></i>
@@ -518,7 +567,7 @@ const ProductSinglePage = () => {
                       width: `47%`
                     }}
                     onClick={() => {
-                      addToCartHandler()
+                      addToCartHandler(config)
                     }}
                   >
                     <i className='fas fa-shopping-cart'></i>
@@ -606,35 +655,54 @@ const ProductSinglePage = () => {
 
       {/* toaster */}
       <Toaster
-        position='top-center'
-        reverseOrder={false}
-        gutter={8}
-        containerClassName='hehe'
-        containerStyle={{}}
-        toastOptions={{
-          // Define default options
-          className: '',
-          duration: 5000,
-          style: {
-            background: '#4caf50',
-            color: 'white'
-          },
+          style={{ zIndex: -1, overflow: 'hidden', opacity: 0 }}
+          position='top-center'
+          reverseOrder={false}
+          gutter={8}
+          containerClassName='hhe'
+          toastOptions={{
+            // Define default options
+            // className: '',
+            // duration: 5000,
+            // style: {
+            //   background: '#4caf50',
+            //   color: 'white'
+            // },
 
-          // Default options for specific types
-          success: {
-            className: 'hhehehe',
-            duration: 1000,
-            theme: {
-              primary: 'green',
-              secondary: 'white'
+            // Default options for specific types
+            success: {
+              duration: 3000,
+              theme: {
+                primary: 'green',
+                secondary: 'white'
+              },
+              iconTheme: {
+                primary: 'white',
+                secondary: '#4caf50'
+              },
+              style: {
+                background: '#4caf50',
+                color: 'white'
+              }
             },
-            iconTheme: {
-              primary: 'white',
-              secondary: '#4caf50'
+
+            error: {
+              duration: 3000,
+              theme: {
+                primary: '#f44336',
+                secondary: 'white'
+              },
+              iconTheme: {
+                primary: 'white',
+                secondary: '#f44336'
+              },
+              style: {
+                background: '#f44336',
+                color: 'white'
+              }
             }
-          }
-        }}
-      />
+          }}
+        />
     </main>
   )
 }

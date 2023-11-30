@@ -42,6 +42,7 @@ const cartSlice = createSlice({
     quantity: 0,
     note: "",
     selectedCart:0,
+    carts: "",
   },
   reducers: {},
   extraReducers: builder => {
@@ -57,7 +58,7 @@ const cartSlice = createSlice({
     .addCase(ResetSelectedCart.fulfilled, (state, action) => {
       state.selectedCart = action.payload
     })
-  }
+     }
 })
 
 export default cartSlice.reducer
