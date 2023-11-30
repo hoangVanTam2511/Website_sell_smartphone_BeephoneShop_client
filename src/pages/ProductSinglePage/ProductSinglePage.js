@@ -207,7 +207,7 @@ const ProductSinglePage = () => {
       return;
     }
 
-    if(soLuong > productDetail.soLuongTonKho){
+    if((soLuong+1) > productDetail.soLuongTonKho){
       toast.error("Sản phẩm trong kho không đủ.Vui lòng chọn sản phẩm khác.")
     }else
     if(soLuong >= 4){
@@ -244,7 +244,7 @@ const ProductSinglePage = () => {
       return;
     }
 
-    if(soLuong > productDetail.soLuongTonKho  ){
+    if((soLuong+1) > productDetail.soLuongTonKho  ){
       toast.error("Sản phẩm trong kho không đủ.Vui lòng chọn sản phẩm khác.")
     }else
     if(soLuong >= 4){
