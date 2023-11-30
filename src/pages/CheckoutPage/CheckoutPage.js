@@ -19,6 +19,9 @@ import toast, { Toaster } from 'react-hot-toast'
 import { AddItemNavbar } from '../../store/navbarSlice'
 import { over } from 'stompjs'
 import SockJS from 'sockjs-client'
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+
 
 var stompClient = null
 const CartPage = () => {
@@ -156,85 +159,101 @@ const CartPage = () => {
   }
 
   const orderSuccess = async () => {
-    let idOrder = ''
-    const orderRequest = {
-      tongTien:
-        totalAmount + Number(voucher === '' ? 0 : voucher.giaTriVoucher),
-      tienThua: 0,
-      tongTienSauKhiGiam: Number(totalAmount),
-      tienKhachTra:
-        totalAmount + Number(voucher === '' ? 0 : voucher.giaTriVoucher),
-      trangThai: 'PENDING_CONFIRM',
-      loaiHoaDon: 'DELIVERY',
-      phiShip: 0,
-      ghiChu: note,
-      soDienThoaiNguoiNhan: account && account.soDienThoai,
-      tenNguoiNhan: (account && account.hoVaTen) || null,
-      diaChiNguoiNhan: account && account.diaChi,
-      quanHuyenNguoiNhan: account && account.quanHuyen,
-      tinhThanhPhoNguoiNhan: account && account.tinhThanhPho,
-      xaPhuongNguoiNhan: account && account.xaPhuong,
-      idKhachHang: account && account.id,
-      isPayment: true,
-      isUpdateInfo: false,
-      isUpdateVoucher: false,
-      voucher: voucher === '' ? null : voucher,
-      paymentMethod: paymentMethodCss
-    }
-  
-    console.log(orderRequest)
-
-    try {
-      await axios
-        .post(`http://localhost:8080/client/bill/create-bill`, orderRequest)
-        .then(response => {
-          console.log(response)
-          setBill(response.data)
-          idOrder = response.data.id
-        })
-    } catch (error) { console.log(error) }
-
-    if (idOrder !== '') {
-      productDetails.forEach(async e => {
-        console.log(e)
-        let productDetail = {
-          donGia: e.donGia,
-          soLuong: e.soLuongSapMua,
-          thanhTien:
-            Number(e.donGiaSauKhuyenMai) === 0
-              ? Number(e.donGia) * Number(e.soLuongSapMua)
-              : Number(e.donGiaSauKhuyenMai) * Number(e.soLuongSapMua),
-          idSanPhamChiTiet: e.idSanPhamChiTiet,
-          idHoaDon: idOrder,
-          donGiaSauKhiGiam: e.donGiaSauKhuyenMai,
-          idKhachHang: account.id
+    confirmAlert({
+      title: 'Xác nhận đơn hàng',
+      message: 'Bạn có muốn xác nhận đơn hàng này?',
+      buttons: [
+        {
+          label: 'Có',
+          onClick: async() => {
+            let idOrder = ''
+            const orderRequest = {
+              tongTien:
+                totalAmount + Number(voucher === '' ? 0 : voucher.giaTriVoucher),
+              tienThua: 0,
+              tongTienSauKhiGiam: Number(totalAmount),
+              tienKhachTra:
+                totalAmount + Number(voucher === '' ? 0 : voucher.giaTriVoucher),
+              trangThai: 'PENDING_CONFIRM',
+              loaiHoaDon: 'DELIVERY',
+              phiShip: 0,
+              ghiChu: note,
+              soDienThoaiNguoiNhan: account && account.soDienThoai,
+              tenNguoiNhan: (account && account.hoVaTen) || null,
+              diaChiNguoiNhan: account && account.diaChi,
+              quanHuyenNguoiNhan: account && account.quanHuyen,
+              tinhThanhPhoNguoiNhan: account && account.tinhThanhPho,
+              xaPhuongNguoiNhan: account && account.xaPhuong,
+              idKhachHang: account && account.id,
+              isPayment: true,
+              isUpdateInfo: false,
+              isUpdateVoucher: false,
+              voucher: voucher === '' ? null : voucher,
+              paymentMethod: paymentMethodCss
+            }
+        
+            try {
+              await axios
+                .post(`http://localhost:8080/client/bill/create-bill`, orderRequest)
+                .then(response => {
+                  console.log(response)
+                  setBill(response.data)
+                  idOrder = response.data.id
+                })
+            } catch (error) { console.log(error) }
+        
+            if (idOrder !== '') {
+              productDetails.forEach(async e => {
+                console.log(e)
+                let productDetail = {
+                  donGia: e.donGia,
+                  soLuong: e.soLuongSapMua,
+                  thanhTien:
+                    Number(e.donGiaSauKhuyenMai) === 0
+                      ? Number(e.donGia) * Number(e.soLuongSapMua)
+                      : Number(e.donGiaSauKhuyenMai) * Number(e.soLuongSapMua),
+                  idSanPhamChiTiet: e.idSanPhamChiTiet,
+                  idHoaDon: idOrder,
+                  donGiaSauKhiGiam: e.donGiaSauKhuyenMai,
+                  idKhachHang: account.id
+                }
+                try {
+                  await axios
+                    .post(
+                      `http://localhost:8080/client/bill-detail/create-bill-detail`,
+                      productDetail
+                    )
+                    .then(response => {
+                      console.log(response)
+                    })
+                } catch (error) {
+                  console.log(error)
+                }
+              })
+            }
+        
+            var hello = {
+              name: 'hello server'
+            }
+        
+            if (stompClient) {
+              stompClient.send('/app/bills', {}, JSON.stringify(hello))
+            }
+        
+            toast.success('Đặt hàng thành công')
+            dispatch(addToCart(0))
+            setCheckoutState(3)
+          }
+        },
+        {
+          label: 'Không',
+          onClick: () => {
+            console.log("Không đồng ý")
+          }
         }
-        try {
-          await axios
-            .post(
-              `http://localhost:8080/client/bill-detail/create-bill-detail`,
-              productDetail
-            )
-            .then(response => {
-              console.log(response)
-            })
-        } catch (error) {
-          console.log(error)
-        }
-      })
-    }
-
-    var hello = {
-      name: 'hello server'
-    }
-
-    if (stompClient) {
-      stompClient.send('/app/bills', {}, JSON.stringify(hello))
-    }
-
-    toast.success('Đặt hàng thành công')
-    dispatch(addToCart(0))
-    setCheckoutState(3)
+      ]
+    });
+    
   }
 
   const checkVoucher = async () => {

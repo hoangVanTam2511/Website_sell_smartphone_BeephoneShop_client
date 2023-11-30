@@ -41,6 +41,7 @@ const OrderDetail = props => {
     if (stompClient === null) {
       connect()
     }
+    console.log(props.id_bill.orderItems)
   }, [changeRealTime])
 
   const formatMoney = number => {
@@ -342,8 +343,8 @@ const OrderDetail = props => {
               >
                 <div className='cart-ctd'>
                   <img
-                    style={{ width: 112, height: 105 }}
-                    src='https://cdn.tgdd.vn/Products/Images/42/235838/Galaxy-S22-Ultra-Black-200x200.jpg'
+                    style={{ width: 112, height: 115 }}
+                    src={product?.sanPhamChiTiet.image.path}
                   />
                 </div>
                 <div
