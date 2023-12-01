@@ -23,7 +23,6 @@ const LookUpOrderPage = () => {
     // window.scrollTo(0, 0);
     if (id_bill !== "no_bill") {
       if(bill === undefined){
-      console.log(account)
       getOrderByPhoneAndCode(account.soDienThoai, id_bill)
       }
     }

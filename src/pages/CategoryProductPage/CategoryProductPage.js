@@ -577,6 +577,52 @@ const CategoryProductPage = () => {
         }
       }
 
+      if (danhMucFillter.length !== 0) {
+        if (listFillter.length === 0) {
+          if (flag === 0) {
+            flag++
+            productDetails.forEach(item => {
+              var count = 0;
+              item.sanPham.danhMucs.forEach(danhMuc => {
+                if (
+                  danhMucFillter.find(
+                    e => e.value === danhMuc.danhMuc.id
+                  ) !== undefined
+                ) {
+                  count++;
+                  }
+                })
+              if (
+               count > 0
+              ) {
+                listFillter.push(item)
+              }
+            })
+          }
+        } else {
+          var temp = []
+          listFillter.forEach(item => {
+            var count = 0;
+            item.sanPham.danhMucs.forEach(danhMuc => {
+              if (
+                danhMucFillter.find(
+                  e => e.value === danhMuc.danhMuc.id
+                ) !== undefined
+              ) {
+                count++;
+                }
+              })
+            if (
+             count > 0
+            ) {
+              temp.push(item)
+            }
+          })
+          listFillter = temp            
+        }
+      }
+
+
       if (chipFillter.length !== 0) {
         if (listFillter.length === 0) {
           if (flag === 0) {
@@ -662,13 +708,13 @@ const CategoryProductPage = () => {
           }
         }
       }
+      console.log(listFillter)
 
       listFillter.forEach(item => {
         setFillter.add(item.sanPham.id)
       })
 
       listFillter = []
-
       products.forEach(item => {
         if (Array.from(setFillter).find(e => e === item.id)) {
           listFillter.push(item)

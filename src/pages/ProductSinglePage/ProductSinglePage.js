@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import './ProductSinglePage.scss'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
@@ -15,7 +15,9 @@ import Carousel from './carousel'
 import { addToCart } from '../../store/cartSlice'
 import { useNavigate } from 'react-router-dom'
 import toast, { Toaster } from 'react-hot-toast'
+import { addProductToCart } from '../../store/cartDetailSlice'
 import { ResetSelectedCart } from '../../store/cartSlice'
+
 
 var stompClient = null
 const ProductSinglePage = () => {
@@ -31,7 +33,7 @@ const ProductSinglePage = () => {
   const dispatch = useDispatch()
   const user = useSelector(state => state.user.user)
   const selectedCart = useSelector(state => state.cart.selectedCart)
-  const cartProducts = useSelector(state => state.cart.carts)
+  var cartDetails = useSelector(state => state.cartDetail.products) 
   const navigate = useNavigate()
 
   //ram, rom, color
@@ -43,6 +45,9 @@ const ProductSinglePage = () => {
     price: 0,
     priceDiscount: 0,
     discount: 0,
+    nameProduct: '',
+    urlImage: '',
+    quantityInventory: 0,
   })
 
   // product
@@ -78,6 +83,9 @@ const ProductSinglePage = () => {
   }))
 
   const getCartProduct = async () => {
+    if(user.id === '') {
+      setProductCart(cartDetails)
+    }else{
     await axios
       .get(
         `http://localhost:8080/client/cart-detail/get-cart-details?id_customer=${user.id}`
@@ -86,6 +94,7 @@ const ProductSinglePage = () => {
         setProductCart(res.data)
       })
       .catch(res => console.log(res))
+    }
   }
 
   function createData (name, value) {
@@ -153,7 +162,10 @@ const ProductSinglePage = () => {
                 dungLuongRom: e.dungLuongRom,
                 tenMauSac: e.tenMauSac,
                 donGia: e.donGia,
-                donGiaSauKhuyenMai: e.donGiaSauKhuyenMai
+                donGiaSauKhuyenMai: e.donGiaSauKhuyenMai,
+                duongDan: e.duongDan,
+                tenSanPham: e.tenSanPham,
+                soLuongTonKho: e.soLuongTonKho
               })
             }
           })
@@ -195,49 +207,24 @@ const ProductSinglePage = () => {
 
   const addToCartHandler = async product => {
     var soLuong = 0
-    var product = productCart.find(e=> e.idSanPhamChiTiet === config.id);
+    var product = null;
+
+    if(user.id === ''){
+      product = cartDetails.find(e=> e.data.id === config.id);
+     
+    }else{
+      product = productCart.find(e=> e.idSanPhamChiTiet === config.id);
+    }
+
     var productDetail = productDetails.find(e=> e.id === config.id);
     if(product === undefined || product === null){ 
       soLuong = 0
     }else{
-      soLuong = product.soLuongSapMua
-    }
-
-    if(productDetail === undefined || productDetail === null){ 
-      return;
-    }
-
-    if((soLuong+1) > productDetail.soLuongTonKho){
-      toast.error("Sản phẩm trong kho không đủ.Vui lòng chọn sản phẩm khác.")
-    }else
-    if(soLuong >= 4){
-      toast.error("Sản phẩm trong giỏ hàng đã đạt tới số lượng giới hạn.Vui lòng chọn sản phẩm khác.")
-    }else{
-      if(selectedCart === 0){
-        await axios
-          .post(
-            `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
-          )
-          .then(res => {
-            if (res.status === 200) {
-              dispatch(addToCart())
-              toast.success("Bạn đã thêm sản phẩm giỏ hàng thành công")
-              getCartProduct()
-            }
-          })
-          .catch(res => console.log(res))
-        }
-    }
-  }
-
-  const buyNowHandler = async product => {
-    var soLuong = 0
-    var product = productCart.find(e=> e.idSanPhamChiTiet === config.id);
-    var productDetail = productDetails.find(e=> e.id === config.id);
-    if(product === undefined || product === null){ 
-      soLuong = 0
-    }else{
-      soLuong = product.soLuongSapMua
+      if(user.id !== ''){
+        soLuong = product.soLuongSapMua
+      }else{
+        soLuong = product.quantity
+      }
     }
 
     if(productDetail === undefined || productDetail === null){ 
@@ -251,6 +238,67 @@ const ProductSinglePage = () => {
       toast.error("Sản phẩm trong giỏ hàng đã đạt tới số lượng giới hạn.Vui lòng chọn sản phẩm khác.")
     }else{
       if(selectedCart === 0){
+        if(user.id === ''){
+          dispatch(addProductToCart(config))
+          getCartProduct()
+          toast.success("Thêm sản phẩm vào giỏ hàng thành công")
+        }else{
+        await axios
+          .post(
+            `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
+          )
+          .then(res => {
+            if (res.status === 200) {
+              dispatch(addToCart())
+              getCartProduct()
+              toast.success("Thêm sản phẩm vào giỏ hàng thành công")
+            }
+          })
+          .catch(res => console.log(res))
+        }
+      }
+    }
+
+  }
+
+  const buyNowHandler = async product => {
+    var soLuong = 0
+    var product = null;
+
+    if(user.id === ''){
+      product = cartDetails.find(e=> e.data.id === config.id);
+     
+    }else{
+      product = productCart.find(e=> e.idSanPhamChiTiet === config.id);
+    }
+
+    var productDetail = productDetails.find(e=> e.id === config.id);
+    if(product === undefined || product === null){ 
+      soLuong = 0
+    }else{
+      if(user.id !== ''){
+        soLuong = product.soLuongSapMua
+      }else{
+        soLuong = product.quantity
+      }
+    }
+
+    if(productDetail === undefined || productDetail === null){ 
+      return;
+    }
+
+    if((soLuong+1) > productDetail.soLuongTonKho  ){
+      toast.error("Sản phẩm trong kho không đủ.Vui lòng chọn sản phẩm khác.")
+    }else
+    if(soLuong >= 4){
+      toast.error("Sản phẩm trong giỏ hàng đã đạt tới số lượng giới hạn.Vui lòng chọn sản phẩm khác.")
+    }else{
+      if(selectedCart === 0){
+        if(user.id === ''){
+          dispatch(addProductToCart(config))
+          getCartProduct()
+          navigate('/cart')
+        }else{
         await axios
           .post(
             `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
@@ -264,11 +312,13 @@ const ProductSinglePage = () => {
           })
           .catch(res => console.log(res))
         }
+      }
     }
   }
 
 
   const addConfigs = value => {
+    console.log(value)
     setConfig({
       id: value.id,
       ram: value.dungLuongRam,
@@ -279,7 +329,10 @@ const ProductSinglePage = () => {
       discount: (
         ((value.donGia - value.donGiaSauKhuyenMai) / value.donGia) *
         100
-      ).toFixed(0)
+      ).toFixed(0),
+      nameProduct: value.tenSanPham,
+      urlImage: value.duongDan,
+      quantityInventory: value.soLuongTonKho
     })
   }
 

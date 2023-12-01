@@ -14,6 +14,7 @@ const Navbar = () => {
   const user = useSelector(state => state.user.user)
   const [searchTerm, setSearchTerm] = useState('')
   const countOfProductDetail = useSelector(state => state.cart.quantity)
+  const productDetailsRedux = useSelector(state => state.cartDetail.products)
 
   //navigate
   const navigate = useNavigate()
@@ -197,7 +198,7 @@ const Navbar = () => {
                 className='fa-solid fa-bag-shopping'
                 style={{ position: `relative`, right: `-8px`, fontSize: `29px` }}
               ></i>
-              <div className='cart-items-value'>{countOfProductDetail}</div>
+              <div className='cart-items-value'>{user.id === '' ? productDetailsRedux.length : countOfProductDetail}</div>
               {/* <CartModal carts = {carts} /> */}
               <div style={{ fontSize: `10px`, width: `50px`, fontWeight: '500' }}>
                 Giỏ hàng

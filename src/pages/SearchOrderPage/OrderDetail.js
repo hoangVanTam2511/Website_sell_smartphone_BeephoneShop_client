@@ -63,6 +63,18 @@ const OrderDetail = props => {
     return time + ' ' + date
   }
 
+  const formatDay = data => {
+    var dateOfTime = new Date(data)
+    var date =
+      dateOfTime.getDate() +
+      '/' +
+      (dateOfTime.getMonth() + 1) +
+      '/' +
+      dateOfTime.getFullYear()
+    return date
+  }
+
+
   const getOrderHistory = async () => {
     if (props.id_bill.orderHistories.length === 0) return
 
@@ -299,22 +311,44 @@ const OrderDetail = props => {
               </span>
             </div>
 
-            <div>
-              <span
-                style={{
-                  color: '#000000',
-                  width: '100px',
-                  display: 'inline-block'
-                }}
-              >
-                Nhận lúc:
-              </span>
-              <span>
-                {bill.ngayNhanHang === null
-                  ? 'Chưa có thông tin'
-                  : bill.ngayNhanHang}
-              </span>
-            </div>
+            {
+              bill.ngayNhanHang === null?(
+                <div>
+                <span
+                  style={{
+                    color: '#000000',
+                    width: '33%',
+                    display: 'inline-block'
+                  }}
+                >
+                  Thời gian nhận hàng dự kiến :
+                </span>
+                <span>
+                  {bill.ngayMongMuonNhan === null
+                    ? 'Chưa có thông tin'
+                    : formatDay(bill.ngayMongMuonNhan)}
+                </span>
+              </div>
+              ):(
+                <div>
+                <span
+                  style={{
+                    color: '#000000',
+                    width: '100px',
+                    display: 'inline-block'
+                  }}
+                >
+                  Nhận lúc :
+                </span>
+                <span>
+                  {bill.ngayNhanHang === null
+                    ? 'Chưa có thông tin'
+                    : formatDay(bill.ngayNhanHang)}
+                </span>
+              </div>
+              )
+            }
+         
           </div>
 
           <div class='card' style={{ width: '30%' }}>
@@ -344,7 +378,7 @@ const OrderDetail = props => {
                 <div className='cart-ctd'>
                   <img
                     style={{ width: 112, height: 115 }}
-                    src={product?.sanPhamChiTiet.image.path}
+                    src={product?.sanPhamChiTiet.image ? product?.sanPhamChiTiet.image.path : ''}
                   />
                 </div>
                 <div
@@ -435,9 +469,10 @@ const OrderDetail = props => {
             }}
           >
             <h4>Tổng tiền hàng</h4>
-            <span>{formatMoney(bill.tongTien)}</span>
+            <span>{formatMoney(bill.tongTien - bill.phiShip)}</span>
           </div>
-          <br />
+          <Divider style={{ minWidth:'50%', 
+              marginLeft: '50%', marginTop:0, marginBottom:0}} />
 
           <div
             style={{
@@ -450,9 +485,10 @@ const OrderDetail = props => {
             }}
           >
             <h4>Phí vận chuyển</h4>
-            <span>{formatMoney(bill.phiShip)}</span>
+            <span> {formatMoney(bill.phiShip)}</span>
           </div>
-          <br />
+          <Divider style={{ minWidth:'50%', 
+              marginLeft: '50%', marginTop:0, marginBottom:0}} />
 
           <div
             style={{
@@ -465,9 +501,10 @@ const OrderDetail = props => {
             }}
           >
             <h4>Voucher từ shop</h4>
-            <span>{formatMoney(bill.tongTien - bill.tongTienSauKhiGiam)}</span>
+            <span>- {formatMoney(bill.tongTien - bill.tongTienSauKhiGiam)}</span>
           </div>
-          <br />
+          <Divider style={{ minWidth:'50%', 
+              marginLeft: '50%', marginTop:0, marginBottom:0}} />
 
           <div
             style={{
@@ -478,21 +515,23 @@ const OrderDetail = props => {
             }}
           >
             <h4>Thành tiền</h4>
-            <span>{formatMoney(bill.tongTien)}</span>
+            <span>{formatMoney(bill.tongTienSauKhiGiam)}</span>
           </div>
-          <br />
+
+          <Divider style={{ minWidth:'50%', 
+              marginLeft: '50%', marginTop:0, marginBottom:0}} />
 
           <div
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               width: '50%',
-              float: 'right'
+              float: 'right',
             }}
           >
-            <h4 className='fw-6'>Cần thanh toán</h4>
-            <span style={{ color: '#d0021c', fontWeight: 600 }}>
-              {formatMoney(bill.tongTien + bill.phiShip)}
+            <h4 className='fw-6' style={{ marginBottom: '-20px'}}>Cần thanh toán</h4>
+            <span style={{ color: '#d0021c', fontWeight: 600, fontSize: '20px' }}>
+              {formatMoney(bill.tongTienSauKhiGiam)}
             </span>
           </div>
           <br />

@@ -19,9 +19,10 @@ import toast, { Toaster } from 'react-hot-toast'
 import { AddItemNavbar } from '../../store/navbarSlice'
 import { over } from 'stompjs'
 import SockJS from 'sockjs-client'
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-
+import { confirmAlert } from 'react-confirm-alert' // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
+import { changeInformationUser } from '../../store/userSlice'
+import { resetAllCartDetail } from '../../store/cartDetailSlice'
 
 var stompClient = null
 const CartPage = () => {
@@ -31,13 +32,36 @@ const CartPage = () => {
   const [changeCount, setChangeCount] = useState(new Map())
   const [checkoutState, setCheckoutState] = useState(1)
   const account = useSelector(state => state.user.user)
-  const note = useSelector(state => state.cart.note)
   const [voucher, setVoucher] = useState('')
   const [codeVoucher, setCodeVoucher] = useState()
   const [paymentMethodCss, setPaymentMethodCss] = useState(1)
   const [bill, setBill] = useState()
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const [totalTemp, setTotatTemp] = useState(0)
+
+
+  // information bill
+  const [informationBill, setInformationBill] = useState({
+    name: '',
+    address: '',
+    phone: '',
+    email: '',
+    note: '',
+    ward: '',
+    district: '',
+    province: '',
+    shipFee: '',
+    receivedDate: '',
+    wardSelected: '',
+    districtSelected: '',
+    provinesSelected: ''
+  })
+
+  // redux
+  const productDetailsRedux = useSelector(state => state.cartDetail.products)
+  const quantityRedux = useSelector(state => state.cartDetail.quantity)
+  const totalAmountRedux = useSelector(state => state.cartDetail.totalAmount)
 
   // connect websocket
   const connect = () => {
@@ -60,9 +84,22 @@ const CartPage = () => {
   }
 
   useEffect(() => {
-    getProductDetails()
+    if (account.id !== '') {
+      getProductDetails()
+    }
     if (stompClient === null) {
       connect()
+    }
+    if (account.id === '') {
+      if (voucher === null || voucher === '' || voucher === undefined) {
+        setTotalAmount(totalAmountRedux + informationBill.shipFee)
+      } else {
+        setTotalAmount(
+          totalAmountRedux +
+            informationBill.shipFee -
+            Number(voucher.giaTriVoucher)
+        )
+      }
     }
   }, [totalAmount, productDetails])
 
@@ -86,6 +123,7 @@ const CartPage = () => {
         })
 
         setTotalAmount(totalCart)
+        setTotatTemp(totalCart)
         setChangeCount(
           new Map(
             res.data.map(item => [item.idSanPhamChiTiet, item.soLuongSapMua])
@@ -102,7 +140,29 @@ const CartPage = () => {
     }).format(number)
   }
 
-  if (productDetails.length === 0) {
+  if (account.id !== '' && productDetails.length === 0) {
+    return (
+      <div className='container my-5'>
+        <div className='empty-cart flex justify-center align-center flex-column font-manrope'>
+          <img src={shopping_cart} alt='' />
+          <span className='fw-6 fs-15 '>Giỏ hàng đang trống.</span>
+          <Link
+            to='/'
+            className='shopping-btn text-white fw-5'
+            style={{
+              backgroundColor: `#128DE2`,
+              border: '1px solid #128DE2',
+              borderRadius: '10px'
+            }}
+          >
+            Đi tới trang chủ
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  if (account.id === '' && productDetailsRedux.length === 0) {
     return (
       <div className='container my-5'>
         <div className='empty-cart flex justify-center align-center flex-column font-manrope'>
@@ -165,98 +225,155 @@ const CartPage = () => {
       buttons: [
         {
           label: 'Có',
-          onClick: async() => {
+          onClick: async () => {
             let idOrder = ''
             const orderRequest = {
               tongTien:
-                totalAmount + Number(voucher === '' ? 0 : voucher.giaTriVoucher),
+                totalAmount +
+                Number(voucher === '' ? 0 : voucher.giaTriVoucher),
               tienThua: 0,
               tongTienSauKhiGiam: Number(totalAmount),
               tienKhachTra:
-                totalAmount + Number(voucher === '' ? 0 : voucher.giaTriVoucher),
+                totalAmount +
+                Number(voucher === '' ? 0 : voucher.giaTriVoucher),
               trangThai: 'PENDING_CONFIRM',
               loaiHoaDon: 'DELIVERY',
-              phiShip: 0,
-              ghiChu: note,
-              soDienThoaiNguoiNhan: account && account.soDienThoai,
-              tenNguoiNhan: (account && account.hoVaTen) || null,
-              diaChiNguoiNhan: account && account.diaChi,
-              quanHuyenNguoiNhan: account && account.quanHuyen,
-              tinhThanhPhoNguoiNhan: account && account.tinhThanhPho,
-              xaPhuongNguoiNhan: account && account.xaPhuong,
+              phiShip: informationBill.shipFee,
+              ghiChu: informationBill.note,
+              soDienThoaiNguoiNhan: informationBill.phone,
+              tenNguoiNhan: informationBill.name,
+              diaChiNguoiNhan: informationBill.address,
+              quanHuyenNguoiNhan: informationBill.district,
+              tinhThanhPhoNguoiNhan: informationBill.province,
+              xaPhuongNguoiNhan: informationBill.ward,
               idKhachHang: account && account.id,
+              ngayNhanHang: informationBill.receivedDate,
               isPayment: true,
               isUpdateInfo: false,
               isUpdateVoucher: false,
               voucher: voucher === '' ? null : voucher,
               paymentMethod: paymentMethodCss
             }
-        
+
             try {
               await axios
-                .post(`http://localhost:8080/client/bill/create-bill`, orderRequest)
+                .post(
+                  `http://localhost:8080/client/bill/create-bill`,
+                  orderRequest
+                )
                 .then(response => {
+                  var user = {
+                    ...account,
+                    soDienThoai: informationBill.phone
+                  }
+                  dispatch(changeInformationUser(user))
                   console.log(response)
                   setBill(response.data)
                   idOrder = response.data.id
                 })
-            } catch (error) { console.log(error) }
-        
-            if (idOrder !== '') {
-              productDetails.forEach(async e => {
-                console.log(e)
-                let productDetail = {
-                  donGia: e.donGia,
-                  soLuong: e.soLuongSapMua,
-                  thanhTien:
-                    Number(e.donGiaSauKhuyenMai) === 0
-                      ? Number(e.donGia) * Number(e.soLuongSapMua)
-                      : Number(e.donGiaSauKhuyenMai) * Number(e.soLuongSapMua),
-                  idSanPhamChiTiet: e.idSanPhamChiTiet,
-                  idHoaDon: idOrder,
-                  donGiaSauKhiGiam: e.donGiaSauKhuyenMai,
-                  idKhachHang: account.id
-                }
-                try {
-                  await axios
-                    .post(
-                      `http://localhost:8080/client/bill-detail/create-bill-detail`,
-                      productDetail
-                    )
-                    .then(response => {
-                      console.log(response)
-                    })
-                } catch (error) {
-                  console.log(error)
-                }
-              })
+            } catch (error) {
+              console.log(error)
             }
-        
+
+            if (idOrder !== '') {
+              if (account.id === '') {
+                productDetailsRedux.forEach(async e => {
+                  let productDetail = {
+                    donGia: e.data.price,
+                    soLuong: e.quantity,
+                    thanhTien:
+                      Number(e.data.priceDiscount) === 0
+                        ? Number(e.data.price) * Number(e.quantity)
+                        : Number(e.data.priceDiscount) * Number(e.quantity),
+                    idSanPhamChiTiet: e.data.id,
+                    idHoaDon: idOrder,
+                    donGiaSauKhiGiam: e.data.priceDiscount,
+                    idKhachHang: account.id
+                  }
+                  try {
+                    await axios
+                      .post(
+                        `http://localhost:8080/client/bill-detail/create-bill-detail`,
+                        productDetail
+                      )
+                      .then(response => {
+                        console.log(response)
+                      })
+                  } catch (error) {
+                    console.log(error)
+                  }
+                })
+              } else {
+                productDetails.forEach(async e => {
+                  console.log(e)
+                  let productDetail = {
+                    donGia: e.donGia,
+                    soLuong: e.soLuongSapMua,
+                    thanhTien:
+                      Number(e.donGiaSauKhuyenMai) === 0
+                        ? Number(e.donGia) * Number(e.soLuongSapMua)
+                        : Number(e.donGiaSauKhuyenMai) *
+                          Number(e.soLuongSapMua),
+                    idSanPhamChiTiet: e.idSanPhamChiTiet,
+                    idHoaDon: idOrder,
+                    donGiaSauKhiGiam: e.donGiaSauKhuyenMai,
+                    idKhachHang: account.id
+                  }
+                  try {
+                    await axios
+                      .post(
+                        `http://localhost:8080/client/bill-detail/create-bill-detail`,
+                        productDetail
+                      )
+                      .then(response => {
+                        console.log(response)
+                      })
+                  } catch (error) {
+                    console.log(error)
+                  }
+                })
+              }
+            }
+
             var hello = {
               name: 'hello server'
             }
-        
+
             if (stompClient) {
               stompClient.send('/app/bills', {}, JSON.stringify(hello))
             }
-        
+
             toast.success('Đặt hàng thành công')
-            dispatch(addToCart(0))
+            if(account.id === ""){
+             
+            }else{
+              dispatch(addToCart(0))
+            }
             setCheckoutState(3)
           }
         },
         {
           label: 'Không',
           onClick: () => {
-            console.log("Không đồng ý")
+            console.log('Không đồng ý')
           }
         }
       ]
-    });
-    
+    })
   }
 
   const checkVoucher = async () => {
+    if (
+      codeVoucher === '' ||
+      codeVoucher === null ||
+      codeVoucher === undefined
+    ) {
+      if (codeVoucher.trim()) {
+        toast('Vui lòng nhập mã voucher')
+      }
+      return
+    }
+
     if (voucher !== null || voucher !== undefined || voucher !== '') {
       if (voucher.ma === codeVoucher) {
         toast.error('Bạn đã sử dụng voucher này rồi.Vui lòng nhập voucher khác')
@@ -306,6 +423,20 @@ const CartPage = () => {
 
   const stepCheckOutTwo = data => {
     setCheckoutState(2)
+  }
+
+  const changeValueInformationBill = data => {
+    setInformationBill(data)
+    console.log(data)
+  }
+
+  const setTotalCount = data => {
+    if(account.id === ""){
+      setTotalAmount(data)
+    }else{
+      console.log(data)
+      setTotalAmount(totalTemp + data)
+    }
   }
 
   return (
@@ -422,103 +553,198 @@ const CartPage = () => {
           <div className='cart bg-white'>
             <div className='cart-ctable'>
               <div className='cart-cbody bg-white'>
-                {productDetails.map(product => {
-                  return (
-                    <>
-                      <div
-                        className='cart-ctr'
-                        key={product?.id}
-                        style={{ marginTop: 10 }}
-                      >
-                        <div className='cart-ctd'>
-                          <img
-                            style={{ width: 112, height: 105 }}
-                            src={product.duongDan}
-                          />
-                        </div>
+                {account.id !== '' &&
+                  productDetails.map(product => {
+                    return (
+                      <>
                         <div
-                          className='cart-ctd'
-                          style={{ position: 'relative', top: '0px' }}
+                          className='cart-ctr'
+                          key={product?.id}
+                          style={{ marginTop: 10 }}
                         >
+                          <div className='cart-ctd'>
+                            <img
+                              style={{ width: 112, height: 105 }}
+                              src={product.duongDan}
+                            />
+                          </div>
                           <div
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              width: 550,
-                              height: 140,
-                              marginLeft: 10
-                            }}
+                            className='cart-ctd'
+                            style={{ position: 'relative', top: '0px' }}
                           >
-                            <div style={{ width: '127%', marginTop: 17 }}>
-                              <span className='cart-ctxtf fw-7'>
-                                {product?.tenSanPham +
-                                  ' ' +
-                                  product?.dungLuongRam +
-                                  'GB ' +
-                                  product?.dungLuongRom +
-                                  'GB - ' +
-                                  product?.tenMauSac}
-                              </span>
-                              <br />
-                              <span>
-                                <span
-                                  className='cart-ctxt'
-                                  style={{
-                                    color: '#128DE2',
-                                    fontSize: '17px',
-                                    fontWeight: 500
-                                  }}
-                                >
-                                  {formatMoney(
-                                    product?.donGiaSauKhuyenMai === 0
-                                      ? product?.donGia
-                                      : product?.donGiaSauKhuyenMai
-                                  )}
-                                </span>
-                                <del
-                                  style={{
-                                    color: '#999',
-                                    fontSize: '14px',
-                                    marginLeft: '5px',
-                                    fontWeight: 500
-                                  }}
-                                >
-                                  {product?.donGiaSauKhuyenMai === 0
-                                    ? ''
-                                    : formatMoney(product?.donGia)}
-                                </del>
-                              </span>
-                            </div>
                             <div
                               style={{
-                                width: '58%',
-                                marginTop: 42,
-                                fontWeight: 500
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                width: 550,
+                                height: 140,
+                                marginLeft: 10
                               }}
                             >
-                              Số lượng :
-                              <span style={{ color: '#128DE2' }}>
-                                {' ' + product?.soLuongSapMua}
-                              </span>
+                              <div style={{ width: '127%', marginTop: 17 }}>
+                                <span className='cart-ctxtf fw-7'>
+                                  {product?.tenSanPham +
+                                    ' ' +
+                                    product?.dungLuongRam +
+                                    'GB ' +
+                                    product?.dungLuongRom +
+                                    'GB - ' +
+                                    product?.tenMauSac}
+                                </span>
+                                <br />
+                                <span>
+                                  <span
+                                    className='cart-ctxt'
+                                    style={{
+                                      color: '#128DE2',
+                                      fontSize: '17px',
+                                      fontWeight: 500
+                                    }}
+                                  >
+                                    {formatMoney(
+                                      product?.donGiaSauKhuyenMai === 0
+                                        ? product?.donGia
+                                        : product?.donGiaSauKhuyenMai
+                                    )}
+                                  </span>
+                                  <del
+                                    style={{
+                                      color: '#999',
+                                      fontSize: '14px',
+                                      marginLeft: '5px',
+                                      fontWeight: 500
+                                    }}
+                                  >
+                                    {product?.donGiaSauKhuyenMai === 0
+                                      ? ''
+                                      : formatMoney(product?.donGia)}
+                                  </del>
+                                </span>
+                              </div>
+                              <div
+                                style={{
+                                  width: '58%',
+                                  marginTop: 42,
+                                  fontWeight: 500
+                                }}
+                              >
+                                Số lượng :
+                                <span style={{ color: '#128DE2' }}>
+                                  {' ' + product?.soLuongSapMua}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className='cart-ctd'></div>
-                        <div className='cart-ctd'></div>
+                          <div className='cart-ctd'></div>
+                          <div className='cart-ctd'></div>
 
-                        <div className='cart-ctd'></div>
-                      </div>
-                    </>
-                  )
-                })}
+                          <div className='cart-ctd'></div>
+                        </div>
+                      </>
+                    )
+                  })}
+
+                {account.id === '' &&
+                  productDetailsRedux.map(product => {
+                    return (
+                      <>
+                        <div
+                          className='cart-ctr'
+                          key={product?.id}
+                          style={{ marginTop: 10 }}
+                        >
+                          <div className='cart-ctd'>
+                            <img
+                              style={{ width: 112, height: 105 }}
+                              src={product.data.urlImage}
+                            />
+                          </div>
+                          <div
+                            className='cart-ctd'
+                            style={{ position: 'relative', top: '0px' }}
+                          >
+                            <div
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                width: 550,
+                                height: 140,
+                                marginLeft: 10
+                              }}
+                            >
+                              <div style={{ width: '127%', marginTop: 17 }}>
+                                <span className='cart-ctxtf fw-7'>
+                                  {product?.data.nameProduct +
+                                    ' ' +
+                                    product?.data.ram +
+                                    'GB ' +
+                                    product?.data.rom +
+                                    'GB - ' +
+                                    product?.data.color}
+                                </span>
+                                <br />
+                                <span>
+                                  <span
+                                    className='cart-ctxt'
+                                    style={{
+                                      color: '#128DE2',
+                                      fontSize: '17px',
+                                      fontWeight: 500
+                                    }}
+                                  >
+                                    {formatMoney(
+                                      product?.data.priceDiscount === 0
+                                        ? product?.data.price
+                                        : product?.data.priceDiscount
+                                    )}
+                                  </span>
+                                  <del
+                                    style={{
+                                      color: '#999',
+                                      fontSize: '14px',
+                                      marginLeft: '5px',
+                                      fontWeight: 500
+                                    }}
+                                  >
+                                    {product?.data.priceDiscount === 0
+                                      ? ''
+                                      : formatMoney(product?.data.price)}
+                                  </del>
+                                </span>
+                              </div>
+                              <div
+                                style={{
+                                  width: '58%',
+                                  marginTop: 42,
+                                  fontWeight: 500
+                                }}
+                              >
+                                Số lượng :
+                                <span style={{ color: '#128DE2' }}>
+                                  {' ' + product?.quantity}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className='cart-ctd'></div>
+                          <div className='cart-ctd'></div>
+
+                          <div className='cart-ctd'></div>
+                        </div>
+                      </>
+                    )
+                  })}
               </div>
             </div>
           </div>
 
           <Checkout
             account={account}
+            informationBill={informationBill}
             stepCheckOutTwo={stepCheckOutTwo}
             totalAmount={totalAmount}
+            changeValueInformationBill={changeValueInformationBill}
+            setTotalCount={setTotalCount}
           />
           <br />
           <br />
@@ -579,7 +805,10 @@ const CartPage = () => {
                 Số lượng sản phẩm
               </div>
 
-              <div style={{ style: '#707070' }}> {productDetails.length}</div>
+              <div style={{ style: '#707070' }}>
+                {' '}
+                {account.id === '' ? quantityRedux : productDetails.length}
+              </div>
             </div>
 
             <div
@@ -608,11 +837,20 @@ const CartPage = () => {
                 margin: 15
               }}
             >
-              <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
+              <div
+                style={{
+                  color: 'rgb(155 148 148)',
+                  marginLeft: '-12px'
+                }}
+              >
                 Phí vận chuyển
               </div>
 
-              <div style={{ style: '#707070' }}>Miễn phí</div>
+              <div style={{ style: '#707070' }}>
+                {informationBill.shipFee === 0
+                  ? 'Miễn phí'
+                  : formatMoney(informationBill.shipFee)}
+              </div>
             </div>
 
             {voucher && (
@@ -808,7 +1046,7 @@ const CartPage = () => {
                 Khách hàng
               </div>
 
-              <div style={{ style: '#707070' }}>{account?.hoVaTen}</div>
+              <div style={{ style: '#707070' }}>{informationBill?.name}</div>
             </div>
 
             <div
@@ -822,10 +1060,10 @@ const CartPage = () => {
                 Số điện thoại
               </div>
 
-              <div style={{ style: '#707070' }}>{account?.soDienThoai}</div>
+              <div style={{ style: '#707070' }}>{informationBill?.phone}</div>
             </div>
 
-            {account.email === null || account.email === '' ? (
+            {informationBill.email === null || informationBill.email === '' ? (
               <> </>
             ) : (
               <div
@@ -839,9 +1077,30 @@ const CartPage = () => {
                   Email
                 </div>
 
-                <div style={{ style: '#707070' }}>{account?.email}</div>
+                <div style={{ style: '#707070' }}>{informationBill?.email}</div>
               </div>
             )}
+
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                margin: 15
+              }}
+            >
+              <div
+                style={{
+                  color: 'rgb(155 148 148)',
+                  marginLeft: '-12px'
+                }}
+              >
+                Thời gian nhận hàng dự kiến
+              </div>
+
+              <div style={{ style: '#707070' }}>
+                {informationBill?.receivedDate}
+              </div>
+            </div>
 
             <div
               style={{
@@ -862,12 +1121,12 @@ const CartPage = () => {
                   textAlign: 'right'
                 }}
               >
-                {account?.diaChi}, {account?.xaPhuong}, {account?.quanHuyen},{' '}
-                {account?.tinhThanhPho}
+                {informationBill?.address}, {informationBill?.ward},{' '}
+                {informationBill?.district}, {informationBill?.province}
               </div>
             </div>
 
-            {note === null || note === '' ? (
+            {informationBill.note === null || informationBill.note === '' ? (
               <> </>
             ) : (
               <div
@@ -881,7 +1140,7 @@ const CartPage = () => {
                   Ghi chú
                 </div>
 
-                <div style={{ style: '#707070' }}>{note}</div>
+                <div style={{ style: '#707070' }}>{informationBill.note}</div>
               </div>
             )}
           </div>
@@ -984,7 +1243,7 @@ const CartPage = () => {
 
                   <div style={{ style: '#707070' }}>
                     {' '}
-                    {productDetails.length}
+                    {account.id === '' ? quantityRedux : productDetails.length}
                   </div>
                 </div>
 
@@ -1022,7 +1281,7 @@ const CartPage = () => {
                   </div>
 
                   <div style={{ style: '#707070' }}>
-                    {formatMoney(totalAmount)}
+                    {formatMoney(totalAmount - informationBill.shipFee)}
                   </div>
                 </div>
 
@@ -1039,7 +1298,9 @@ const CartPage = () => {
                     Phí vận chuyển
                   </div>
 
-                  <div style={{ style: '#707070' }}>Miễn phí</div>
+                  <div style={{ style: '#707070' }}>
+                    {formatMoney(informationBill.shipFee)}
+                  </div>
                 </div>
 
                 <div
@@ -1121,7 +1382,7 @@ const CartPage = () => {
                     Khách hàng
                   </div>
 
-                  <div style={{ style: '#707070' }}>{account?.hoVaTen}</div>
+                  <div style={{ style: '#707070' }}>{informationBill.name}</div>
                 </div>
 
                 <div
@@ -1137,7 +1398,30 @@ const CartPage = () => {
                     Số điện thoại
                   </div>
 
-                  <div style={{ style: '#707070' }}>{account?.soDienThoai}</div>
+                  <div style={{ style: '#707070' }}>
+                    {informationBill.phone}
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div
+                    style={{
+                      color: 'rgb(155 148 148)',
+                      marginLeft: '-12px'
+                    }}
+                  >
+                    Thời gian nhận hàng dự kiến
+                  </div>
+
+                  <div style={{ style: '#707070' }}>
+                    {informationBill?.receivedDate}
+                  </div>
                 </div>
 
                 <div
@@ -1161,8 +1445,8 @@ const CartPage = () => {
                       textAlign: 'right'
                     }}
                   >
-                    {account?.diaChi}, {account?.xaPhuong}, {account?.quanHuyen}
-                    , {account?.tinhThanhPho}
+                    {informationBill.address}, {informationBill.ward},{' '}
+                    {informationBill.district}, {informationBill.province}
                   </div>
                 </div>
               </div>
@@ -1183,95 +1467,187 @@ const CartPage = () => {
               >
                 <div className='cart-ctable'>
                   <div className='cart-cbody bg-white'>
-                    {productDetails.map(product => {
-                      return (
-                        <>
-                          <div
-                            className='cart-ctr'
-                            key={product?.id}
-                            style={{ marginTop: 10 }}
-                          >
-                            <div className='cart-ctd'>
-                              <img
-                                style={{ width: 112, height: 105 }}
-                                src={product.duongDan}
-                              />
-                            </div>
+                    {account.id !== '' &&
+                      productDetails.map(product => {
+                        return (
+                          <>
                             <div
-                              className='cart-ctd'
-                              style={{ position: 'relative', top: '0px' }}
+                              className='cart-ctr'
+                              key={product?.id}
+                              style={{ marginTop: 10 }}
                             >
+                              <div className='cart-ctd'>
+                                <img
+                                  style={{ width: 112, height: 105 }}
+                                  src={product.duongDan}
+                                />
+                              </div>
                               <div
-                                style={{
-                                  display: 'flex',
-                                  justifyContent: 'space-between',
-                                  width: 550,
-                                  height: 140,
-                                  marginLeft: 10
-                                }}
+                                className='cart-ctd'
+                                style={{ position: 'relative', top: '0px' }}
                               >
-                                <div style={{ width: '127%', marginTop: 17 }}>
-                                  <span className='cart-ctxtf fw-7'>
-                                    {product?.tenSanPham +
-                                      ' ' +
-                                      product?.dungLuongRam +
-                                      'GB ' +
-                                      product?.dungLuongRom +
-                                      'GB - ' +
-                                      product?.tenMauSac}
-                                  </span>
-                                  <br />
-                                  <span>
-                                    <span
-                                      className='cart-ctxt'
-                                      style={{
-                                        color: '#128DE2',
-                                        fontSize: '17px',
-                                        fontWeight: 500
-                                      }}
-                                    >
-                                      {formatMoney(
-                                        product?.donGiaSauKhuyenMai === 0
-                                          ? product?.donGia
-                                          : product?.donGiaSauKhuyenMai
-                                      )}
-                                    </span>
-                                    <del
-                                      style={{
-                                        color: '#999',
-                                        fontSize: '14px',
-                                        marginLeft: '5px',
-                                        fontWeight: 500
-                                      }}
-                                    >
-                                      {product?.donGiaSauKhuyenMai === 0
-                                        ? ''
-                                        : formatMoney(product?.donGia)}
-                                    </del>
-                                  </span>
-                                </div>
                                 <div
                                   style={{
-                                    width: '58%',
-                                    marginTop: 42,
-                                    fontWeight: 500
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    width: 550,
+                                    height: 140,
+                                    marginLeft: 10
                                   }}
                                 >
-                                  Số lượng :
-                                  <span style={{ color: '#128DE2' }}>
-                                    {' ' + product?.soLuongSapMua}
-                                  </span>
+                                  <div style={{ width: '127%', marginTop: 17 }}>
+                                    <span className='cart-ctxtf fw-7'>
+                                      {product?.tenSanPham +
+                                        ' ' +
+                                        product?.dungLuongRam +
+                                        'GB ' +
+                                        product?.dungLuongRom +
+                                        'GB - ' +
+                                        product?.tenMauSac}
+                                    </span>
+                                    <br />
+                                    <span>
+                                      <span
+                                        className='cart-ctxt'
+                                        style={{
+                                          color: '#128DE2',
+                                          fontSize: '17px',
+                                          fontWeight: 500
+                                        }}
+                                      >
+                                        {formatMoney(
+                                          product?.donGiaSauKhuyenMai === 0
+                                            ? product?.donGia
+                                            : product?.donGiaSauKhuyenMai
+                                        )}
+                                      </span>
+                                      <del
+                                        style={{
+                                          color: '#999',
+                                          fontSize: '14px',
+                                          marginLeft: '5px',
+                                          fontWeight: 500
+                                        }}
+                                      >
+                                        {product?.donGiaSauKhuyenMai === 0
+                                          ? ''
+                                          : formatMoney(product?.donGia)}
+                                      </del>
+                                    </span>
+                                  </div>
+                                  <div
+                                    style={{
+                                      width: '58%',
+                                      marginTop: 42,
+                                      fontWeight: 500
+                                    }}
+                                  >
+                                    Số lượng :
+                                    <span style={{ color: '#128DE2' }}>
+                                      {' ' + product?.soLuongSapMua}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            <div className='cart-ctd'></div>
-                            <div className='cart-ctd'></div>
+                              <div className='cart-ctd'></div>
+                              <div className='cart-ctd'></div>
 
-                            <div className='cart-ctd'></div>
-                          </div>
-                        </>
-                      )
-                    })}
+                              <div className='cart-ctd'></div>
+                            </div>
+                          </>
+                        )
+                      })}
+
+                    {account.id === '' &&
+                      productDetailsRedux.map(product => {
+                        return (
+                          <>
+                            <div
+                              className='cart-ctr'
+                              key={product?.id}
+                              style={{ marginTop: 10 }}
+                            >
+                              <div className='cart-ctd'>
+                                <img
+                                  style={{ width: 112, height: 115 }}
+                                  src={product.data.urlImage}
+                                />
+                              </div>
+                              <div
+                                className='cart-ctd'
+                                style={{ position: 'relative', top: '0px' }}
+                              >
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    width: 550,
+                                    height: 140,
+                                    marginLeft: 10
+                                  }}
+                                >
+                                  <div style={{ width: '127%', marginTop: 17 }}>
+                                    <span className='cart-ctxtf fw-7'>
+                                      {product?.data.nameProduct +
+                                        ' ' +
+                                        product?.data.ram +
+                                        'GB ' +
+                                        product?.data.rom +
+                                        'GB - ' +
+                                        product?.data.color}
+                                    </span>
+                                    <br />
+                                    <span>
+                                      <span
+                                        className='cart-ctxt'
+                                        style={{
+                                          color: '#128DE2',
+                                          fontSize: '17px',
+                                          fontWeight: 500
+                                        }}
+                                      >
+                                        {formatMoney(
+                                          product?.data.priceDiscount === 0
+                                            ? product?.data.price
+                                            : product?.data.priceDiscount
+                                        )}
+                                      </span>
+                                      <del
+                                        style={{
+                                          color: '#999',
+                                          fontSize: '14px',
+                                          marginLeft: '5px',
+                                          fontWeight: 500
+                                        }}
+                                      >
+                                        {product?.data.priceDiscount === 0
+                                          ? ''
+                                          : formatMoney(product?.data.price)}
+                                      </del>
+                                    </span>
+                                  </div>
+                                  <div
+                                    style={{
+                                      width: '58%',
+                                      marginTop: 42,
+                                      fontWeight: 500
+                                    }}
+                                  >
+                                    Số lượng :
+                                    <span style={{ color: '#128DE2' }}>
+                                      {' ' + product?.quantity}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className='cart-ctd'></div>
+                              <div className='cart-ctd'></div>
+
+                              <div className='cart-ctd'></div>
+                            </div>
+                          </>
+                        )
+                      })}
                   </div>
                 </div>
               </div>
@@ -1294,6 +1670,9 @@ const CartPage = () => {
                     fontSize: 14
                   }}
                   onClick={() => {
+                    if(account.id === ''){
+                      dispatch(resetAllCartDetail())
+                    }
                     navigate('/')
                   }}
                 >
@@ -1308,6 +1687,9 @@ const CartPage = () => {
                     fontSize: 14
                   }}
                   onClick={() => {
+                    if(account.id === ''){
+                      dispatch(resetAllCartDetail())
+                    }
                     navigate(`/look-up-order-page/${bill.ma}`)
                     var data = [
                       {

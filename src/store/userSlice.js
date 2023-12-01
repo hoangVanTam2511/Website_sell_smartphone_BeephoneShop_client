@@ -21,20 +21,11 @@ export const loginUser = createAsyncThunk('user/login', async data => {
 export const checkUserAnonymous = createAsyncThunk(
   'user/checkUser',
   async () => {
-    let user = null
-    await axios
-      .get('http://localhost:8080/client/account/create-account-anonymous')
-      .then(res => {
-        if (res.status === 200) {
-          user = res.data
-        }
-      })
-      .catch(error =>
-        user = {
-          id: '',
-          ma: ''
-        }
-        )
+    let user = {
+      id: '',
+      ma: '',
+      soDienThoai: '',
+    }
     localStorage.setItem('user', JSON.stringify(user))
     return user
   }

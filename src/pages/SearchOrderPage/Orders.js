@@ -25,6 +25,7 @@ const Orders = () => {
       let sum = 0;
       await axios.get(`http://localhost:8080/client/bill/get-list-bills?id_customer=${user.id}`).then(
         res => {
+          console.log(res.data)
           setListBill(res.data)
           setListBillFillter(res.data)
           console.log(res.data)
@@ -215,13 +216,37 @@ const Orders = () => {
               <h4 class="title">
                  <img
                       style={{ width: `20%` }}
-                      src="https://cdn.tgdd.vn/Products/Images/522/281633/Redmi-Pad-Sliver-thumb-org-200x200.jpg"
+                      src={bill.orderItems[0].sanPhamChiTiet.image.path}
                     />
                     <span className="fw-6" style={{ marginLeft: "-120px", width: '78%',  }}>
                     {bill.orderItems[0].sanPhamChiTiet.sanPham.tenSanPham +
                     "(" + bill.orderItems[0].sanPhamChiTiet.ram.dungLuong + "GB +" + bill.orderItems[0].sanPhamChiTiet.rom.dungLuong + "GB" + ") "+
                     bill.orderItems[0].sanPhamChiTiet.mauSac.tenMauSac
                     } 
+                    <span
+                     style={{
+                      textTransform: `lowercase`,
+                      color: `rgb(18, 141, 226)`,
+                      textDecoration: `underline`,
+                      fontSize: `14px`,
+                      marginLeft: `4px`,
+                     }}
+                     onClick={() => {
+                      setBillSelected(1)
+                      setBillId(bill)
+                    }}
+                    >
+                      {
+                        bill.orderItems.length-1 === 0 ?(
+                          <></>
+                        ):(
+                          <>
+                           và {bill.orderItems.length-1} sản phẩm khác...
+                          </>
+                        )
+                      }
+                    
+                    </span>
                     </span>
                 
               </h4>

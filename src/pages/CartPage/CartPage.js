@@ -8,6 +8,7 @@ import { addToCart, SetSelectedCart } from '../../store/cartSlice'
 import Button from '@mui/material/Button'
 import { useDispatch, useSelector } from 'react-redux'
 import { checkUserAnonymous } from '../../store/userSlice'
+import { addProductToCart, removeProductToCart, deleteProduct } from '../../store/cartDetailSlice'
 import { ResetItemNavbar } from '../../store/navbarSlice'
 import toast, { Toaster } from 'react-hot-toast'
 
@@ -19,8 +20,16 @@ const CartPage = () => {
   const dispatch = useDispatch()
   const user = useSelector(state => state.user.user)
 
+  // redux
+  const productDetailsRedux = useSelector(state => state.cartDetail.products)
+  const quantityRedux = useSelector(state => state.cartDetail.quantity)
+  const totalAmountRedux = useSelector(state => state.cartDetail.totalAmount)
+
   const getProductDetails = async () => {
     if (productDetails.length !== 0) return
+    if(user.id === ''){
+
+    }else{
     await axios
       .get(
         `http://localhost:8080/client/cart-detail/get-cart-details?id_customer=${user.id}`
@@ -44,6 +53,7 @@ const CartPage = () => {
         )
       })
       .catch(res => console.log(res))
+    }
   }
 
   const countTotalAmountAgain = () => {
@@ -58,12 +68,10 @@ const CartPage = () => {
   }
 
   useEffect(() => {
-    if (user.id === null || user.id === '') {
-      dispatch(checkUserAnonymous())
-    }
     if (user.id !== null || user.id !== '') {
       getProductDetails()
     }
+    console.log(productDetailsRedux)
     countTotalAmountAgain()
     dispatch(addToCart())
     dispatch(SetSelectedCart(1))
@@ -77,7 +85,7 @@ const CartPage = () => {
     }).format(number)
   }
 
-  if (productDetails.length === 0) {
+  if (user.id === '' ? productDetailsRedux.length === 0 : productDetails.length === 0) {
     return (
       <div className='container my-5'>
         <div className='empty-cart flex justify-center align-center flex-column font-manrope'>
@@ -100,6 +108,21 @@ const CartPage = () => {
   }
 
   const handlePlusCart = async product => {
+    if(user.id === ''){
+      if (product.data.quantityInventory < quantityRedux + 1) {
+        toast.error(
+          "Không còn đủ sản phẩm trong kho. Vui lòng chọn sản phẩm khác"
+        )
+      } else {
+        if(product.quantity >3){
+          toast.error(
+            "Vượt quá số lượng cho phép"
+          )
+        }else{
+          dispatch(addProductToCart(product.data))
+        }
+      }
+    }else{
     if (product.soLuongTonKho < changeCount.get(product.idSanPhamChiTiet) + 1) {
       toast.error(
         "Không còn đủ sản phẩm trong kho. Vui lòng chọn sản phẩm khác"
@@ -124,8 +147,12 @@ const CartPage = () => {
         )
     }
   }
+  }
 
   const handleMinusCart = async product => {
+    if(user.id === ''){
+      dispatch(removeProductToCart(product.data))
+    }else{
     var id = product.idSanPhamChiTiet
     const countOfProductDetail = changeCount.get(product.idSanPhamChiTiet)
     if (countOfProductDetail === 1) {
@@ -145,32 +172,40 @@ const CartPage = () => {
         .catch(res => {})
     }
   }
+  }
 
   const deleteCartDetail = async product => {
-    if (productDetails.length === 1) {
-      dispatch(addToCart(0))
-    }
+    console.log(product)
 
-    if (product.idGioHangChiTiet !== null) {
-      await axios
-        .delete(
-          `http://localhost:8080/client/cart-detail/delete-cart-details?id_customer=${user.id}&id_cart_detail=${product.idGioHangChiTiet}`
-        )
-        .then(res => {
-          setProductDetails(res.data)
-          var totalCart = 0
-          if (res.data.length === 0) return
-          res.data.map(e => {
-            totalCart +=
-              Number(
-                e.donGiaSauKhuyenMai === 0 ? e?.donGia : e?.donGiaSauKhuyenMai
-              ) * Number(e.soLuongSapMua)
+    if(user.id === ""){
+        dispatch(deleteProduct(product))
+    }else{
+      if (productDetails.length === 1) {
+        dispatch(addToCart(0))
+      }
+
+      if (product.idGioHangChiTiet !== null) {
+        await axios
+          .delete(
+            `http://localhost:8080/client/cart-detail/delete-cart-details?id_customer=${user.id}&id_cart_detail=${product.idGioHangChiTiet}`
+          )
+          .then(res => {
+            setProductDetails(res.data)
+            var totalCart = 0
+            if (res.data.length === 0) return
+            res.data.map(e => {
+              totalCart +=
+                Number(
+                  e.donGiaSauKhuyenMai === 0 ? e?.donGia : e?.donGiaSauKhuyenMai
+                ) * Number(e.soLuongSapMua)
+            })
+            setTotalAmount(totalCart)
+            dispatch(addToCart())
           })
-          setTotalAmount(totalCart)
-          dispatch(addToCart())
-        })
-        .catch(res => console.log(res))
+          .catch(res => console.log(res))
+      }
     }
+   
   }
 
   return (
@@ -193,7 +228,8 @@ const CartPage = () => {
         <div className='container'>
           <div className='cart-ctable'>
             <div className='cart-cbody bg-white'>
-              {productDetails.map(product => {
+              {user.id !== '' && productDetails.map(product => {
+                console.log("hehe")
                 return (
                   <>
                     <div
@@ -308,6 +344,123 @@ const CartPage = () => {
                   </>
                 )
               })}
+
+              {user.id === '' && productDetailsRedux.map(product => {
+                 console.log("hihi")
+                return (
+                  <>
+                    <div
+                      className='cart-ctr'
+                      key={product?.id}
+                      style={{ marginTop: 10 }}
+                    >
+                      <div className='cart-ctd'>
+                        <img
+                          style={{ width: 112, height: 115 }}
+                          src={product?.data.urlImage}
+                        />
+
+                        <button
+                          type='button'
+                          className='delete-btn text-dark'
+                          onClick={() => deleteCartDetail(product.data)}
+                          style={{
+                            color: '#999',
+                            position: 'relative',
+                            right: '-42px',
+                            marginTop: '7px'
+                          }}
+                        >
+                          <i class='fa-regular fa-circle-xmark'></i> Xóa
+                        </button>
+                      </div>
+                      <div
+                        className='cart-ctd'
+                        style={{ position: 'relative', top: '0px' }}
+                      >
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            width: 550,
+                            height: 140,
+                            marginLeft: 10
+                          }}
+                        >
+                          <div style={{ width: '127%' }}>
+                            <span className='cart-ctxtf fw-7'>
+                              {product?.data.nameProduct +
+                                ' ' +
+                                product?.data.ram +
+                                'GB ' +
+                                product?.data.rom +
+                                'GB'}
+                            </span>
+                            <br />
+                            <span>Màu : {product.data.color}</span>
+                          </div>
+                          <div style={{ width: '58%' }}>
+                            <span
+                              className='cart-ctxt'
+                              style={{
+                                color: 'rgb(18, 141, 226)',
+                                fontSize: '16px'
+                              }}
+                            >
+                              {formatMoney(
+                                product?.data.priceDiscount === 0
+                                  ? product?.data.price
+                                  : product?.data.priceDiscount
+                              )}
+                            </span>
+                            <br />
+                            <del style={{ color: '#999', fontSize: '16px' }}>
+                              {product?.data.priceDiscount === 0
+                                ? ''
+                                : formatMoney(product?.data.price)}
+                            </del>
+                          </div>
+                        </div>
+                      </div>
+                      <div className='cart-ctd'></div>
+                      <div className='cart-ctd'>
+                        <div
+                          className='qty-change flex align-center'
+                          style={{
+                            position: `relative`,
+                            top: `39px`,
+                            right: `171px`
+                          }}
+                        >
+                          <button
+                            type='button'
+                            className='qty-decrease flex align-center justify-center'
+                            onClick={() => handleMinusCart(product)}
+                          >
+                            <i className='fas fa-minus'></i>
+                          </button>
+
+                          <div className='qty-value flex align-center justify-center'>
+                            {product.quantity}
+                          </div>
+
+                          <button
+                            type='button'
+                            className='qty-increase flex align-center justify-center'
+                            onClick={() => handlePlusCart(product)}
+                          >
+                            <i className='fas fa-plus'></i>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className='cart-ctd'></div>
+
+                      <div className='cart-ctd'></div>
+                    </div>
+                  </>
+                )
+              })}
             </div>
 
             <div className='countProductTemp'>
@@ -315,7 +468,7 @@ const CartPage = () => {
                 Tạm tính :
                 <br />
                 <span style={{ fontWeight: 'bold', color: '#128DE2' }}>
-                  {formatMoney(totalAmount)}
+                  {user.id === '' ? formatMoney(totalAmountRedux) : formatMoney(totalAmount)}
                 </span>
               </div>
               <div>
@@ -328,7 +481,7 @@ const CartPage = () => {
                       fontSize: 16
                     }}
                   >
-                    Mua ngay({productDetails.length})
+                    Mua ngay({user.id === '' ? quantityRedux : productDetails.length})
                   </Button>
                 </Link>
               </div>

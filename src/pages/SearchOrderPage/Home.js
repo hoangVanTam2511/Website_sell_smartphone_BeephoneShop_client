@@ -4,6 +4,7 @@ import './SearchOrderPage.css'
 import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
 import { SetSelectedCart } from '../../store/cartSlice'
+import { ResetItemNavbar } from '../../store/navbarSlice'
 
 const Orders = () => {
   const user = useSelector(state => state.user.user)
@@ -13,6 +14,7 @@ const Orders = () => {
   useEffect(() => {
     getBillsByIdCustomer()
     dispatch(SetSelectedCart(1));
+    dispatch(ResetItemNavbar())
     // window.scrollTo(0, 0);
   }, [])
 
