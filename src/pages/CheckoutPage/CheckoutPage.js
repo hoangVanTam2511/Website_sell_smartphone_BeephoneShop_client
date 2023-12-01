@@ -825,7 +825,7 @@ const CartPage = () => {
               <div style={{ style: '#707070' }}>
                 {formatMoney(
                   totalAmount +
-                    Number(voucher === '' ? 0 : voucher.giaTriVoucher)
+                    Number(voucher === '' ? 0 : voucher.giaTriVoucher) - informationBill.shipFee
                 )}
               </div>
             </div>
