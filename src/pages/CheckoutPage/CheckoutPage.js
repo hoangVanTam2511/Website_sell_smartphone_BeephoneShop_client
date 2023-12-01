@@ -913,36 +913,6 @@ const CartPage = () => {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-              <div
-                style={
-                  paymentMethodCss === 3
-                    ? paymentMethodSelected()
-                    : paymentMethodNotSelected()
-                }
-                onClick={() => {
-                  setPaymentMethodCss(3)
-                }}
-              >
-                <CreditCardIcon
-                  style={{
-                    fontSize: '27px',
-                    position: 'relative',
-                    padding: 3,
-                    left: '44px',
-                    color: '#444'
-                  }}
-                />
-                <span
-                  style={{
-                    fontSize: '11px',
-                    position: 'relative',
-                    top: '15px',
-                    left: '-13px'
-                  }}
-                >
-                  Thanh toán online
-                </span>
-              </div>
 
               <div
                 style={
@@ -953,26 +923,9 @@ const CartPage = () => {
                 onClick={() => {
                   setPaymentMethodCss(2)
                 }}
+                
               >
-                <CalendarMonthIcon
-                  style={{
-                    fontSize: '27px',
-                    position: 'relative',
-                    padding: 3,
-                    left: '63px',
-                    color: '#444'
-                  }}
-                />
-                <span
-                  style={{
-                    fontSize: '11px',
-                    position: 'relative',
-                    top: '15px',
-                    left: '-13px'
-                  }}
-                >
-                  Chuyển khoản ngân hàng
-                </span>
+              <img src='https://vnpay.vn/assets/images/logo-icon/logo-primary.svg' style={{ width: '69%', marginLeft: '20px', marginTop: '10px'}}/>
               </div>
 
               <div
