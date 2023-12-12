@@ -6,10 +6,12 @@ import { useSelector } from 'react-redux'
 import axios from 'axios'
 import TextField from '@mui/material/TextField'
 import InformationAddress from './InformationAddress'
+import { request, setAuthHeader } from '../../helpers/axios_helper'
+import { getUser, setUserNoToken } from '../../store/userSlice'
 
 const Orders = () => {
   const host = 'https://provinces.open-api.vn/api/'
-  const user = useSelector(state => state.user.user)
+  const user = getUser()
   const [provinces, setProvinces] = useState([])
   const [districts, setDistricts] = useState([])
   const [wards, setWards] = useState([])
@@ -19,14 +21,17 @@ const Orders = () => {
   
   const getBillsByIdCustomer = async() => {
     let sum = 0;
-    await axios.get(`http://localhost:8080/client/bill/get-list-bills?id_customer=${user.id}`).then(
+    request("GET",`/client/bill/get-list-bills?id_customer=${user.id}`).then(
       res => {
         res.data.forEach(item => {
           sum += item.tongTienSauKhiGiam
         })
         setTotalAmount(sum)
       }
-    )
+    ).catch(error => {
+      setUserNoToken()
+      console.log(error)
+    })
 }
 
   useEffect(() => {

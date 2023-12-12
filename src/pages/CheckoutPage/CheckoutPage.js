@@ -11,8 +11,6 @@ import { Input } from 'antd'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import CreditCardIcon from '@mui/icons-material/CreditCard'
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import LocalAtmOutlinedIcon from '@mui/icons-material/LocalAtmOutlined'
 import { addToCart } from '../../store/cartSlice'
 import toast, { Toaster } from 'react-hot-toast'
@@ -23,6 +21,8 @@ import { confirmAlert } from 'react-confirm-alert' // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import { changeInformationUser } from '../../store/userSlice'
 import { resetAllCartDetail } from '../../store/cartDetailSlice'
+import { request, setAuthHeader } from '../../helpers/axios_helper'
+import { getUser, setUserNoToken } from '../../store/userSlice'
 
 var stompClient = null
 const CartPage = () => {
@@ -31,7 +31,7 @@ const CartPage = () => {
   const [totalAmount, setTotalAmount] = useState()
   const [changeCount, setChangeCount] = useState(new Map())
   const [checkoutState, setCheckoutState] = useState(1)
-  const account = useSelector(state => state.user.user)
+  const account = getUser()
   const [voucher, setVoucher] = useState('')
   const [codeVoucher, setCodeVoucher] = useState()
   const [paymentMethodCss, setPaymentMethodCss] = useState(1)
@@ -84,6 +84,7 @@ const CartPage = () => {
   }
 
   useEffect(() => {
+    console.log(account)
     if (account.id !== '') {
       getProductDetails()
     }
@@ -105,9 +106,7 @@ const CartPage = () => {
 
   const getProductDetails = async () => {
     if (productDetails.length !== 0) return
-    await axios
-      .get(
-        `http://localhost:8080/client/cart-detail/get-cart-details?id_customer=${account.id}`
+    request("GET",`/client/cart-detail/get-cart-details?id_customer=${account.id}`
       )
       .then(res => {
         setProductDetails(res.data)
@@ -130,7 +129,10 @@ const CartPage = () => {
           )
         )
       })
-      .catch(res => console.log(res))
+      .catch(res => {
+        setUserNoToken()
+        console.log(res)
+      })
   }
 
   const formatMoney = number => {
@@ -230,9 +232,10 @@ const CartPage = () => {
             const orderRequest = {
               tongTien:
                 totalAmount +
-                Number(voucher === '' ? 0 : voucher.giaTriVoucher),
+                Number(voucher === '' ? 0 : voucher.giaTriVoucher) - informationBill.shipFee,
               tienThua: 0,
-              tongTienSauKhiGiam: Number(totalAmount),
+              tongTienSauKhiGiam: Number( totalAmount -
+                Number(voucher === '' ? 0 : voucher.giaTriVoucher) - informationBill.shipFee),
               tienKhachTra:
                 totalAmount +
                 Number(voucher === '' ? 0 : voucher.giaTriVoucher),
@@ -252,13 +255,12 @@ const CartPage = () => {
               isUpdateInfo: false,
               isUpdateVoucher: false,
               voucher: voucher === '' ? null : voucher,
-              paymentMethod: paymentMethodCss
+              paymentMethod: paymentMethodCss,
+              email: account && account.email
             }
 
             try {
-              await axios
-                .post(
-                  `http://localhost:8080/client/bill/create-bill`,
+              request("POST",`/client/bill/create-bill`,
                   orderRequest
                 )
                 .then(response => {
@@ -270,69 +272,74 @@ const CartPage = () => {
                   console.log(response)
                   setBill(response.data)
                   idOrder = response.data.id
+                  if (idOrder !== '') {
+                    if (account.id === '') {
+                      productDetailsRedux.forEach(async e => {
+                        let productDetail = {
+                          donGia: e.data.price,
+                          soLuong: e.quantity,
+                          thanhTien:
+                            Number(e.data.priceDiscount) === 0
+                              ? Number(e.data.price) * Number(e.quantity)
+                              : Number(e.data.priceDiscount) * Number(e.quantity),
+                          idSanPhamChiTiet: e.data.id,
+                          idHoaDon: idOrder,
+                          donGiaSauKhiGiam: e.data.priceDiscount,
+                          idKhachHang: account.id
+                        }
+                        try {
+                          request("POST",`/client/bill-detail/create-bill-detail`,
+                              productDetail
+                            )
+                            .then(response => {
+                              console.log(response)
+                            })
+                        } catch (error) {
+                          console.log(error)
+                        }
+                      })
+                    } else {
+                      productDetails.forEach(async e => {
+                        console.log(e)
+                        let productDetail = {
+                          donGia: e.donGia,
+                          soLuong: e.soLuongSapMua,
+                          thanhTien:
+                            Number(e.donGiaSauKhuyenMai) === 0
+                              ? Number(e.donGia) * Number(e.soLuongSapMua)
+                              : Number(e.donGiaSauKhuyenMai) *
+                                Number(e.soLuongSapMua),
+                          idSanPhamChiTiet: e.idSanPhamChiTiet,
+                          idHoaDon: idOrder,
+                          donGiaSauKhiGiam: e.donGiaSauKhuyenMai,
+                          idKhachHang: account.id
+                        }
+                        try {
+                          request("POST",`/client/bill-detail/create-bill-detail`,
+                              productDetail
+                            )
+                            .then(response => {
+                              console.log(response)
+                            })
+                        } catch (error) {
+                          console.log(error)
+                        }
+                      })
+                    }
+
+                     request("GET", `/client/bill-detail/send-email-bill?id_bill=${idOrder}`)
+                     .then(response => {
+                       
+                     }).catch(error => {
+                       
+                     })
+
+                  }
+      
                 })
             } catch (error) {
               console.log(error)
-            }
-
-            if (idOrder !== '') {
-              if (account.id === '') {
-                productDetailsRedux.forEach(async e => {
-                  let productDetail = {
-                    donGia: e.data.price,
-                    soLuong: e.quantity,
-                    thanhTien:
-                      Number(e.data.priceDiscount) === 0
-                        ? Number(e.data.price) * Number(e.quantity)
-                        : Number(e.data.priceDiscount) * Number(e.quantity),
-                    idSanPhamChiTiet: e.data.id,
-                    idHoaDon: idOrder,
-                    donGiaSauKhiGiam: e.data.priceDiscount,
-                    idKhachHang: account.id
-                  }
-                  try {
-                    await axios
-                      .post(
-                        `http://localhost:8080/client/bill-detail/create-bill-detail`,
-                        productDetail
-                      )
-                      .then(response => {
-                        console.log(response)
-                      })
-                  } catch (error) {
-                    console.log(error)
-                  }
-                })
-              } else {
-                productDetails.forEach(async e => {
-                  console.log(e)
-                  let productDetail = {
-                    donGia: e.donGia,
-                    soLuong: e.soLuongSapMua,
-                    thanhTien:
-                      Number(e.donGiaSauKhuyenMai) === 0
-                        ? Number(e.donGia) * Number(e.soLuongSapMua)
-                        : Number(e.donGiaSauKhuyenMai) *
-                          Number(e.soLuongSapMua),
-                    idSanPhamChiTiet: e.idSanPhamChiTiet,
-                    idHoaDon: idOrder,
-                    donGiaSauKhiGiam: e.donGiaSauKhuyenMai,
-                    idKhachHang: account.id
-                  }
-                  try {
-                    await axios
-                      .post(
-                        `http://localhost:8080/client/bill-detail/create-bill-detail`,
-                        productDetail
-                      )
-                      .then(response => {
-                        console.log(response)
-                      })
-                  } catch (error) {
-                    console.log(error)
-                  }
-                })
-              }
+              setUserNoToken()
             }
 
             var hello = {
@@ -342,6 +349,7 @@ const CartPage = () => {
             if (stompClient) {
               stompClient.send('/app/bills', {}, JSON.stringify(hello))
             }
+
 
             toast.success('Đặt hàng thành công')
             if(account.id === ""){
@@ -381,9 +389,7 @@ const CartPage = () => {
       }
     }
 
-    await axios
-      .get(
-        `http://localhost:8080/client/voucher/check-voucher?code=${codeVoucher}`
+    request("GET",`/client/voucher/check-voucher?code=${codeVoucher}`
       )
       .then(res => {
         if (res.data.dieuKienApDung > totalAmount) {
@@ -397,6 +403,7 @@ const CartPage = () => {
         }
       })
       .catch(error => {
+        setUserNoToken()
         if (error.response.status === 400) toast.error(error.response.data)
       })
   }
@@ -914,21 +921,7 @@ const CartPage = () => {
           >
             <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
 
-              <div
-                style={
-                  paymentMethodCss === 2
-                    ? paymentMethodSelected()
-                    : paymentMethodNotSelected()
-                }
-                onClick={() => {
-                  setPaymentMethodCss(2)
-                }}
-                
-              >
-              <img src='https://vnpay.vn/assets/images/logo-icon/logo-primary.svg' style={{ width: '69%', marginLeft: '20px', marginTop: '10px'}}/>
-              </div>
-
-              <div
+             <div
                 style={
                   paymentMethodCss === 1
                     ? paymentMethodSelected()
@@ -957,6 +950,20 @@ const CartPage = () => {
                 >
                   Thanh toán khi nhận hàng
                 </span>
+              </div>
+
+              <div
+                style={
+                  paymentMethodCss === 2
+                    ? paymentMethodSelected()
+                    : paymentMethodNotSelected()
+                }
+                onClick={() => {
+                  setPaymentMethodCss(2)
+                }}
+                
+              >
+              <img src='https://vnpay.vn/assets/images/logo-icon/logo-primary.svg' style={{ width: '69%', marginLeft: '20px', marginTop: '10px'}}/>
               </div>
 
               <div></div>

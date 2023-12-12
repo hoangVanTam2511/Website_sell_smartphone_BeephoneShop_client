@@ -8,6 +8,7 @@ import InformationUser from "./InformationUser";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { changeInformationUser } from "../../store/userSlice";
+import { setAuthHeader } from "../../helpers/axios_helper";
 
 const App = () => {
   const [component, setComponent] = useState(1);
@@ -117,6 +118,7 @@ const App = () => {
                   ma: ''
                 }))
                 navigate("/")
+                setAuthHeader(null);
               }}
             >
               Đăng xuất

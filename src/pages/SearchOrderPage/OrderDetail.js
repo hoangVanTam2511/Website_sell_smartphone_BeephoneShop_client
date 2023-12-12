@@ -4,10 +4,14 @@ import { Divider, DatePicker } from 'antd'
 import axios from 'axios'
 import { over } from 'stompjs'
 import SockJS from 'sockjs-client'
+import { request, setAuthHeader } from '../../helpers/axios_helper'
+import { setUserNoToken } from '../../store/userSlice'
 
 var stompClient = null
 const OrderDetail = props => {
   const [bill, setBill] = useState([])
+  const [productDetails, setProductDetails] = useState([])
+
   const [state1, setState1] = useState()
   const [state2, setState2] = useState()
   const [state3, setState3] = useState()
@@ -38,11 +42,13 @@ const OrderDetail = props => {
   useEffect(() => {
     setBill(props.id_bill)
     getOrderHistory()
+    console.log(props.id_bill)
+    getProductDetails()
     if (stompClient === null) {
       connect()
     }
     console.log(props.id_bill.orderItems)
-  }, [changeRealTime])
+  }, [])
 
   const formatMoney = number => {
     return new Intl.NumberFormat('vi-VN', {
@@ -74,32 +80,30 @@ const OrderDetail = props => {
     return date
   }
 
-
   const getOrderHistory = async () => {
     if (props.id_bill.orderHistories.length === 0) return
 
     let max =
       props.id_bill.orderHistories[props.id_bill.orderHistories.length - 1]
-    await axios
-      .get(
-        `http://localhost:8080/client/bill/get-order-history?id_bill=${props.id_bill.ma}`
+      request("GET",`/client/bill/get-order-history?id_bill=${props.id_bill.ma}`
       )
       .then(res => {
         console.log(res.data)
         res.data.map((item, index) => {
-          if (item.loaiThaoTac === 0) {
+          
+          if (Number(item.loaiThaoTac) === 0) {
             setState1(item)
           }
 
-          if (item.loaiThaoTac === 1) {
+          if (Number(item.loaiThaoTac) === 1) {
             setState2(item)
           }
 
-          if (item.loaiThaoTac === 3) {
+          if (Number(item.loaiThaoTac) === 3) {
             setState3(item)
           }
 
-          if (item.loaiThaoTac === 4) {
+          if (Number(item.loaiThaoTac) === 4) {
             setState4(item)
           }
 
@@ -109,7 +113,22 @@ const OrderDetail = props => {
         })
         setStateSelected(max)
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        setUserNoToken()
+        console.log(error)})
+  }
+
+  const getProductDetails = async () => {
+    request("GET",`/client/bill-detail/get-product-details?id_bill=${props.id_bill.id}`
+      ).then(res => {
+        if(res.status === 200){
+          setProductDetails(res.data)
+        }
+        console.log(res)
+      }).catch(error => {
+        setUserNoToken()
+        console.log(error)
+      })
   }
 
   return (
@@ -172,7 +191,7 @@ const OrderDetail = props => {
                     : 'img_no_active'
                 }
               >
-                <i class='fa fa-money-check'></i>
+                <i class='fa fa-money-check' style={{ transform: `translateY(3px)` }}></i>
               </div>
               <div class='caption'>
                 <span className='text-top' style={{ marginLeft: '-47px' }}>
@@ -368,17 +387,17 @@ const OrderDetail = props => {
             <Divider></Divider>
           </h5>
 
-          {props.id_bill.orderItems.map((product, index) => (
+          {productDetails.map((product, index) => (
             <>
               <div
                 className='cart-ctr'
-                key={product?.sanPhamChiTiet.id}
+                key={product?.id}
                 style={{ marginTop: 10, display: 'flex', alignItems: 'center' }}
               >
                 <div className='cart-ctd'>
                   <img
                     style={{ width: 112, height: 115 }}
-                    src={product?.sanPhamChiTiet.image ? product?.sanPhamChiTiet.image.path : ''}
+                    src={product?.duongDan}
                   />
                 </div>
                 <div
@@ -389,20 +408,20 @@ const OrderDetail = props => {
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      width: 787,
+                      width: 970,
                       height: 140,
                       marginLeft: 10
                     }}
                   >
                     <div style={{ width: '90%', marginTop: 17 }}>
                       <span className='cart-ctxtf fw-7'>
-                        {product?.sanPhamChiTiet.sanPham.tenSanPham +
+                        {product?.tenSanPham +
                           ' ' +
-                          product?.sanPhamChiTiet.ram.dungLuong +
+                          product?.ram +
                           'GB ' +
-                          product?.sanPhamChiTiet.rom.dungLuong +
+                          product?.rom +
                           'GB - ' +
-                          product?.sanPhamChiTiet.mauSac.tenMauSac}
+                          product?.tenMauSac}
                       </span>
                       <br />
                       <span>
@@ -436,7 +455,7 @@ const OrderDetail = props => {
                     </div>
                     <div
                       style={{
-                        width: '35%',
+                        width: '30%',
                         marginTop: 22,
                         fontWeight: 500,
                         textAlign: 'right'
@@ -469,7 +488,7 @@ const OrderDetail = props => {
             }}
           >
             <h4>Tổng tiền hàng</h4>
-            <span>{formatMoney(bill.tongTien - bill.phiShip)}</span>
+            <span>{formatMoney(bill.tongTien)}</span>
           </div>
           <Divider style={{ minWidth:'50%', 
               marginLeft: '50%', marginTop:0, marginBottom:0}} />
@@ -490,19 +509,25 @@ const OrderDetail = props => {
           <Divider style={{ minWidth:'50%', 
               marginLeft: '50%', marginTop:0, marginBottom:0}} />
 
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              width: '50%',
-              float: 'right',
-              fontSize: 14,
-              color: '#222'
-            }}
-          >
-            <h4>Voucher từ shop</h4>
-            <span>- {formatMoney(bill.tongTien - bill.tongTienSauKhiGiam)}</span>
-          </div>
+          {
+            bill.tongTien === bill.tongTienSauKhiGiam ?"":(
+              <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '50%',
+                float: 'right',
+                fontSize: 14,
+                color: '#222'
+              }}
+            >
+              <h4>Voucher từ shop</h4>
+              <span>- {formatMoney(bill.tongTien - bill.tongTienSauKhiGiam)}</span>
+            </div>
+            )
+          }
+      
+
           <Divider style={{ minWidth:'50%', 
               marginLeft: '50%', marginTop:0, marginBottom:0}} />
 
@@ -515,7 +540,7 @@ const OrderDetail = props => {
             }}
           >
             <h4>Thành tiền</h4>
-            <span>{formatMoney(bill.tongTienSauKhiGiam)}</span>
+            <span>{formatMoney(bill.tongTienSauKhiGiam + bill.phiShip)}</span>
           </div>
 
           <Divider style={{ minWidth:'50%', 
@@ -531,7 +556,7 @@ const OrderDetail = props => {
           >
             <h4 className='fw-6' style={{ marginBottom: '-20px'}}>Cần thanh toán</h4>
             <span style={{ color: '#d0021c', fontWeight: 600, fontSize: '20px' }}>
-              {formatMoney(bill.tongTienSauKhiGiam)}
+              {formatMoney(bill.tongTienSauKhiGiam + bill.phiShip)}
             </span>
           </div>
           <br />

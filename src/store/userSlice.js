@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { request, setAuthHeader, getAuthToken } from '../helpers/axios_helper'
 import axios from 'axios'
 
 export const loginUser = createAsyncThunk('user/login', async data => {
@@ -6,14 +7,19 @@ export const loginUser = createAsyncThunk('user/login', async data => {
     id: '',
     ma: ''
   }
-  await axios
-    .post('http://localhost:8080/client/account/login', data)
+  request("POST",'/client/account/login', data)
     .then(res => {
-      if (res.status === 200) {
-        user = res.data
-      }
+      setAuthHeader(res.data.token);
+      console.log(res.data)
+      user = res.data
+      localStorage.setItem('user', JSON.stringify(user))
+      return user
     })
-    .catch(error => console.log(error))
+    .catch(error => {
+      console.log(error)
+      setAuthHeader(null);
+      // setUserNoToken()
+    })
   localStorage.setItem('user', JSON.stringify(user))
   return user
 })
@@ -38,6 +44,34 @@ export const changeInformationUser = createAsyncThunk(
     return data
   }
 )
+
+export const getUser = () => {
+  var token = getAuthToken();
+  
+  if(token === null){
+    const user = {
+      id: '',
+      ma: '',
+      soDienThoai: '',
+    }
+    return user;
+  }else{
+    var user = localStorage.getItem('user');
+    return JSON.parse(user) 
+  }
+};
+
+export const setUserNoToken = () => {
+  const user = {
+    id: '',
+    ma: '',
+    soDienThoai: '',
+  }
+
+  // set user
+  setAuthHeader(null);
+  localStorage.setItem('user', JSON.stringify(user))
+};
 
 const userSlice = createSlice({
   name: 'user',

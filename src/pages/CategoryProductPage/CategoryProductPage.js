@@ -12,6 +12,8 @@ import { AddItemNavbar } from '../../store/navbarSlice'
 import Button from '@mui/material/Button'
 import { Empty } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
+import { request, setAuthHeader } from '../../helpers/axios_helper'
+import { setUserNoToken } from '../../store/userSlice'
 
 const CategoryProductPage = () => {
   const dispatch = useDispatch()
@@ -43,8 +45,7 @@ const CategoryProductPage = () => {
   const { brand } = useParams()
   const flag = useSelector(state => state.navbar.flag)
   const navbar = useSelector(state => state.navbar.navbar)
-  const navigate = useNavigate()
-
+  const navigate = useNavigate();
   const [chiTietSanPham, setchiTietSanPham] = useState({
     sanPham: '',
     dongSanPham: '',
@@ -160,8 +161,7 @@ const CategoryProductPage = () => {
   }, [dispatch, chiTietSanPham, flag, brand])
 
   const loadDataComboBox = async () => {
-    axios
-      .get(`http://localhost:8080/client/danh-muc/get-list`)
+    request("GET",`/client/danh-muc/get-list`)
       .then(response => {
         const modifiedData = response.data.map((item, index) => ({
           label: item.tenDanhMuc,
@@ -169,10 +169,12 @@ const CategoryProductPage = () => {
         }))
         setListDanhMuc(modifiedData)
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        console.log(error)
+        setUserNoToken()
+      })
 
-    axios
-      .get(`http://localhost:8080/client/ram/get-all-ram`)
+      request("GET",`/client/ram/get-all-ram`)
       .then(response => {
         const modifiedData = response.data.map((item, index) => ({
           label: item.dungLuong + ' GB',
@@ -180,10 +182,12 @@ const CategoryProductPage = () => {
         }))
         setListRam(modifiedData)
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        console.log(error)
+        setUserNoToken()
+      })
 
-    axios
-      .get(`http://localhost:8080/client/rom/get-all-rom`)
+      request("GET",`/client/rom/get-all-rom`)
       .then(response => {
         const modifiedData = response.data.map((item, index) => ({
           label: item.dungLuong + ' GB',
@@ -191,10 +195,12 @@ const CategoryProductPage = () => {
         }))
         setlistRom(modifiedData)
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        console.log(error)
+        setUserNoToken()
+      })
 
-    axios
-      .get(`http://localhost:8080/client/chip/get-list-chips`)
+      request("GET",`/client/chip/get-list-chips`)
       .then(response => {
         const modifiedData = response.data.map((item, index) => ({
           label: item.tenChip,
@@ -202,10 +208,12 @@ const CategoryProductPage = () => {
         }))
         setlistChip(modifiedData)
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        console.log(error)
+        setUserNoToken()
+      })
 
-    axios
-      .get(`http://localhost:8080/client/display/get-list-displays`)
+      request("GET",`/client/display/get-list-displays`)
       .then(response => {
         const modifiedData = response.data.map((item, index) => ({
           label: item.kichThuoc + ' inch',
@@ -219,20 +227,24 @@ const CategoryProductPage = () => {
         setlistManHinh(modifiedData)
         setListTanSoQuet(modifiedDataTanSoQuet)
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        console.log(error)
+        setUserNoToken()
+      })
 
-    axios
-      .get('http://localhost:8080/client/product-detail/get-max-price')
+      request("GET",`/client/product-detail/get-max-price`)
       .then(response => {
         setpriceBiggest(response.data)
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        console.log(error)
+        setUserNoToken()
+      })
   }
 
   const searchProducts = async () => {
-    await axios
-      .post(
-        `http://localhost:8080/client/product-detail/search`,
+    
+    request("POST",`/client/product-detail/search`,
         chiTietSanPham
       )
       .then(res => {
@@ -241,12 +253,14 @@ const CategoryProductPage = () => {
           setProductFillter(res.data)
         }
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        console.log(error)
+        setUserNoToken()
+      })
   }
 
   const searchProductsAll = async data => {
-    await axios
-      .post(`http://localhost:8080/client/product-detail/search`, {
+    request("POST",`/client/product-detail/search`, {
         sanPham: '',
         dongSanPham: '',
         nhaSanXuat: data,
@@ -267,18 +281,24 @@ const CategoryProductPage = () => {
           setProductFillter(res.data)
         }
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        console.log(error)
+        setUserNoToken()
+      })
   }
 
   const loadListProductDetails = async () => {
-    await axios
-      .get(`http://localhost:8080/client/product-detail/get-product-detail`)
+    request("GET",`/client/product-detail/get-product-detail`)
       .then(res => {
         if (res.status === 200) {
           setProductDetails(res.data)
         }
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        console.log(error)
+        setUserNoToken()
+        navigate("/login")
+      })
   }
 
   const itemNotSelected = () => {
@@ -2887,8 +2907,12 @@ const CategoryProductPage = () => {
               <ProductListNormal products={productFillter} />
             )}
           </div>
+
         </div>
       </div>
+          <br/>
+          <br/>
+          <br/>
     </div>
   )
 }

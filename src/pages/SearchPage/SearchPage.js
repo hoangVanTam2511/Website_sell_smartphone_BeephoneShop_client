@@ -7,9 +7,11 @@ import Loader from '../../components/Loader/Loader';
 import ProductListNormal   from '../../components/ProductList/ProductList';
 import { getSearchProductsStatus, clearSearch } from '../../store/searchSlice';
 import { ResetSelectedCart } from '../../store/cartSlice'
+import { setUserNoToken } from '../../store/userSlice';
 import { Empty } from 'antd';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { request, setAuthHeader } from '../../helpers/axios_helper'
 
 const SearchPage = () => {
   const dispatch = useDispatch();
@@ -24,9 +26,7 @@ const SearchPage = () => {
   }, [searchTerm]);
 
   const searchProductsByAllPosition = async () => {
-    await axios
-      .post(
-        `http://localhost:8080/client/product-detail/search`,
+    request("POST",`/client/product-detail/search`,
         {
           tenSanPham: searchTerm,
           dongSanPham: '',
@@ -51,7 +51,9 @@ const SearchPage = () => {
         }
        
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        setUserNoToken()
+        console.log(error)})
   }
 
   if(searchProducts.length === 0){

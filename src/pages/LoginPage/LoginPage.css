@@ -75,7 +75,7 @@ section{
     height: 100%;
 }
 
-.container-login input{
+/* .container-login input{
     background-color: #eee;
     border: none;
     margin: 8px 0;
@@ -84,7 +84,7 @@ section{
     border-radius: 8px;
     width: 100%;
     outline: none;
-}
+} */
 
 .form-container-login{
     position: absolute;
@@ -206,4 +206,17 @@ section{
 
 .container-login.active .toggle-right{
     transform: translateX(200%);
+}
+
+
+.passLogin{
+
+}
+
+.css-aqpgxn-MuiFormLabel-root-MuiInputLabel-root{
+    font-size: 16px!important;
+}
+
+.css-v4u5dn-MuiInputBase-root-MuiInput-root:before{
+    border-bottom: 1px solid #e8e8e8!important;
 }

@@ -7,13 +7,15 @@ import ProductList from '../../components/ProductList/ProductList'
 import { getAllProductsStatus } from '../../store/productSlice'
 import Loader from '../../components/Loader/Loader'
 import { STATUS } from '../../utils/status'
-import axios from 'axios'
 import { ResetSelectedCart } from '../../store/cartSlice'
 import 'react-multi-carousel/lib/styles.css'
 import { over } from 'stompjs'
 import SockJS from 'sockjs-client'
 import { useNavigate } from 'react-router-dom'
 import { AddItemNavbar, ResetItemNavbar } from '../../store/navbarSlice'
+import { request, setAuthHeader } from '../../helpers/axios_helper'
+import { setUserNoToken } from '../../store/userSlice'
+
 
 var stompClient = null
 const HomePage = () => {
@@ -58,29 +60,29 @@ const HomePage = () => {
   const productStatus = useSelector(getAllProductsStatus)
 
   const getNewProducts = async () => {
-    await axios
-      .get(`http://localhost:8080/client/product-detail/get-list-products`)
+    request("GET",'/client/product-detail/get-list-products')
       .then(res => {
         if (res.status === 200) {
           setProducts(res.data)
         }
         console.log(res)
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        setUserNoToken()
+        console.log(error)})
   }
 
   const getListProductBestSeller = async () => {
-    await axios
-      .get(
-        `http://localhost:8080/client/product-detail/get-products-best-seller`
-      )
+    request("GET",'/client/product-detail/get-products-best-seller')
       .then(res => {
         if (res.status === 200) {
           setProductBestSeller(res.data)
         }
         console.log(res)
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        setUserNoToken()
+        console.log(error)})
   }
 
   return (

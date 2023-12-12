@@ -6,12 +6,14 @@ import { ResetSelectedCart } from '../../store/cartSlice'
 import { useDispatch } from 'react-redux'
 import axios from 'axios'
 import  OrderDetail from '../SearchOrderPage/OrderDetail'
-import { useSelector } from 'react-redux'
+import { request, setAuthHeader } from '../../helpers/axios_helper'
+import { getUser, setUserNoToken } from '../../store/userSlice'
+import toast, { Toaster } from 'react-hot-toast'
 
 const LookUpOrderPage = () => {
   const dispatch = useDispatch()
   const { id_bill } = useParams()
-  const account = useSelector(state => state.user.user)
+  const account = getUser()
   const [order, setOrder] = useState({
     phone: '',
     code: ''
@@ -29,28 +31,55 @@ const LookUpOrderPage = () => {
   })
 
   const getOrder = async () => {
-    await axios
-      .get(`http://localhost:8080/client/bill/get-bill-detail?phone=${order.phone}&code=${order.code}`)
+    var vnf_regex = /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/;
+
+    if(order.code === '' || order.code  === undefined){
+      toast.error('Vui lòng nhập mã đơn hàng')
+      return;
+    }
+
+    if(order.phone === '' || order.phone  === undefined){
+      toast.error('Vui lòng nhập số điện thoại')
+      return;
+    }
+   
+   if (order.phone.trim() === '') {
+      toast.error('Quý khách vui này điền đầy đủ số điện thoại')
+      return;
+    }
+
+    if (!vnf_regex.test(order.phone)) {
+      toast.error('Quý khách phải nhập đúng định dạng số điện thoại')
+      return;
+     }
+
+    request("GET",`/client/bill/get-bill-detail?phone=${order.phone}&code=${order.code}`)
       .then(res => {
         if (res.status === 200) {
           setBill(res.data)
         }
-        console.log(res)
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        console.log(error)
+        if(error.response.status === 400){
+          toast.error('Không tìm thấy đơn hàng')
+        }
+        // setUserNoToken()
+        console.log(error)})
   }
 
   const getOrderByPhoneAndCode = async (phone,id_bill) => {
     console.log(phone, id_bill)
-    await axios
-      .get(`http://localhost:8080/client/bill/get-bill-detail?phone=${phone}&code=${id_bill}`)
+    request("GET",`/client/bill/get-bill-detail?phone=${phone}&code=${id_bill}`)
       .then(res => {
         if (res.status === 200) {
           setBill(res.data)
         }
         console.log(res)
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        setUserNoToken()
+        console.log(error)})
   }
 
   const setTab = (data) => {
@@ -125,6 +154,55 @@ const LookUpOrderPage = () => {
         </div>
         </>
       }
+        <Toaster
+        position='top-center'
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=''
+        containerStyle={{}}
+        toastOptions={{
+          // Define default options
+          // className: '',
+          // duration: 5000,
+          // style: {
+          //   background: '#4caf50',
+          //   color: 'white'
+          // },
+
+          // Default options for specific types
+          success: {
+            duration: 3000,
+            theme: {
+              primary: 'green',
+              secondary: 'white'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#4caf50'
+            },
+            style: {
+              background: '#4caf50',
+              color: 'white'
+            }
+          },
+
+          error: {
+            duration: 3000,
+            theme: {
+              primary: '#f44336',
+              secondary: 'white'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#f44336'
+            },
+            style: {
+              background: '#f44336',
+              color: 'white'
+            }
+          }
+        }}
+      />
     </>
   )
 }

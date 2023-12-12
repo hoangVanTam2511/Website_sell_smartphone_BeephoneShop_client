@@ -14,6 +14,8 @@ import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
 import { useSelector } from 'react-redux'
 import { ResetItemNavbar } from '../../store/navbarSlice'
+import { request, setAuthHeader } from '../../helpers/axios_helper'
+import { setUserNoToken } from '../../store/userSlice'
 
 const CartPage = props => {
   const host = 'https://provinces.open-api.vn/api/'
@@ -112,6 +114,7 @@ const CartPage = props => {
         }
       }).catch(error => {
         console.log(error)
+        setUserNoToken()
       })
   }
 
@@ -137,6 +140,7 @@ const CartPage = props => {
             if(district_id !== undefined){
               setDistrictSelected(district_id.DistrictID)
               getAllWardGhnByIdDistrictByAddressCustonmer(district_id.DistrictID, 2, data)
+              setAddressInput(props.account.diaChi)
             }
           }
         
@@ -167,11 +171,12 @@ const CartPage = props => {
             setWardSelected(ward_id.WardCode)
             getShipFeeGhnWithAddressCustomer(ward_id.WardCode, ward_id.DistrictID)
             getReceiveDateWithAddress(ward_id.WardCode, ward_id.DistrictID)
-            setAddressInput(props.account.diaChi)
+            console.log(addressInput)
           }
         }
       }).catch(error => {
         console.log(error)
+        setUserNoToken()
       })
   }
 
@@ -312,9 +317,7 @@ const CartPage = props => {
   }
 
   const getAllAddress = async () => {
-    await axios
-      .get(
-        `http://localhost:8080/client/address/get-all-address?id_account=${props.account.id}`
+    request("GET",`/client/address/get-all-address?id_account=${props.account.id}`
       )
       .then(res => {
         if (res.status === 200) {
@@ -330,7 +333,10 @@ const CartPage = props => {
           }
         }
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        console.log(error)
+        setUserNoToken()
+      })
   }
 
   const checkValidate = data => {

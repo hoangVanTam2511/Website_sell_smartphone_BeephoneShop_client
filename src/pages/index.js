@@ -9,6 +9,7 @@ import CheckoutPage from "./CheckoutPage/CheckoutPage"
 import LookUpOrderPage from "./LookUpOrderPage/LookUpOrderPage"
 import FlashsalePage from "./FlashsalePage/FlashsalePage"
 import OrderDetail from "./SearchOrderPage/OrderDetail"
+import Page403 from "./Page403/Page403"
 
 
-export {Home, CategoryProduct, ProductSingle, Cart, Search, LoginPage, SearchOrderPage, CheckoutPage, LookUpOrderPage, FlashsalePage, OrderDetail};
+export {Home, CategoryProduct, ProductSingle, Cart, Search, LoginPage, SearchOrderPage, CheckoutPage, LookUpOrderPage, FlashsalePage, OrderDetail, Page403};

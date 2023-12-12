@@ -17,7 +17,8 @@ import { useNavigate } from 'react-router-dom'
 import toast, { Toaster } from 'react-hot-toast'
 import { addProductToCart } from '../../store/cartDetailSlice'
 import { ResetSelectedCart } from '../../store/cartSlice'
-
+import { request, setAuthHeader } from '../../helpers/axios_helper'
+import { getUser, setUserNoToken } from '../../store/userSlice'
 
 var stompClient = null
 const ProductSinglePage = () => {
@@ -31,7 +32,7 @@ const ProductSinglePage = () => {
 
   //redux
   const dispatch = useDispatch()
-  const user = useSelector(state => state.user.user)
+  const user = getUser()
   const selectedCart = useSelector(state => state.cart.selectedCart)
   var cartDetails = useSelector(state => state.cartDetail.products) 
   const navigate = useNavigate()
@@ -86,14 +87,14 @@ const ProductSinglePage = () => {
     if(user.id === '') {
       setProductCart(cartDetails)
     }else{
-    await axios
-      .get(
-        `http://localhost:8080/client/cart-detail/get-cart-details?id_customer=${user.id}`
+      request("GET",`/client/cart-detail/get-cart-details?id_customer=${user.id}`
       )
       .then(res => {
         setProductCart(res.data)
       })
-      .catch(res => console.log(res))
+      .catch(res => {
+        setUserNoToken()
+        console.log(res)})
     }
   }
 
@@ -141,8 +142,7 @@ const ProductSinglePage = () => {
   }
 
   const getConfig = async () => {
-    await axios
-      .get(`http://localhost:8080/client/product-detail/get-config/${id}`)
+    request("GET",`/client/product-detail/get-config/${id}`)
       .then(res => {
         if (res.status === 200) {
           console.log(res.data)
@@ -173,10 +173,11 @@ const ProductSinglePage = () => {
           addConfigs(listRamRomDistinct[0])
         }
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        setUserNoToken()
+        console.log(error)})
 
-    await axios
-      .get(`http://localhost:8080/client/product-detail/get-product/${id}`)
+      request("GET",`/client/product-detail/get-product/${id}`)
       .then(item => {
         if (item.status === 200) {
           var res = item.data
@@ -192,17 +193,20 @@ const ProductSinglePage = () => {
           })
         }
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        setUserNoToken()
+        console.log(error)})
 
-      await axios
-      .get(`http://localhost:8080/client/product-detail/get-images/${id}`)
+      request("GET",`/client/product-detail/get-images/${id}`)
       .then(item => {
         if (item.status === 200) {
           var res = item.data
           setImages(res)
         }
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        setUserNoToken()
+        console.log(error)})
   }
 
   const addToCartHandler = async product => {
@@ -243,9 +247,7 @@ const ProductSinglePage = () => {
           getCartProduct()
           toast.success("Thêm sản phẩm vào giỏ hàng thành công")
         }else{
-        await axios
-          .post(
-            `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
+          request("POST",`/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
           )
           .then(res => {
             if (res.status === 200) {
@@ -254,7 +256,9 @@ const ProductSinglePage = () => {
               toast.success("Thêm sản phẩm vào giỏ hàng thành công")
             }
           })
-          .catch(res => console.log(res))
+          .catch(res => {
+            setUserNoToken()
+            console.log(res)})
         }
       }
     }
@@ -299,9 +303,7 @@ const ProductSinglePage = () => {
           getCartProduct()
           navigate('/cart')
         }else{
-        await axios
-          .post(
-            `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
+          request("POST",`/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
           )
           .then(res => {
             if (res.status === 200) {
@@ -310,7 +312,9 @@ const ProductSinglePage = () => {
               navigate('/cart')
             }
           })
-          .catch(res => console.log(res))
+          .catch(res =>{
+            setUserNoToken()
+            console.log(res)})
         }
       }
     }
@@ -359,6 +363,16 @@ const ProductSinglePage = () => {
     color: 'black',
     border: '1px solid #d1d5db',
     marginBottom: 10
+  }
+
+  const borderButtonNoSell = {
+    marginRight: 10,
+    width: 150,
+    height: 46,
+    color: 'black',
+    border: '1px solid #d1d5db',
+    marginBottom: 10,
+    opacity: 0.5
   }
 
   return (
@@ -470,12 +484,12 @@ const ProductSinglePage = () => {
                             onClick={() => addConfigs(item)}
                             style={
                               config.color === item.tenMauSac
-                                ? borderButtonChoise
+                                ? item.soLuongTonKho > 0 ? borderButtonChoise : borderButtonNoSell
                                 : borderButtonNoChoise
                             }
                             ghost
                           >
-                            {config.color === item.tenMauSac ? (
+                            {config.color === item.tenMauSac && item.soLuongTonKho > 0 ? (
                               <i
                                 class='fa fa-check'
                                 style={{

@@ -4,14 +4,14 @@ import './Navbar-custom.css'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../../store/cartSlice'
-import { checkUserAnonymous } from '../../store/userSlice'
+import { checkUserAnonymous, getUser } from '../../store/userSlice'
 import { UserOutlined } from '@ant-design/icons'
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 import { AddItemNavbar } from '../../store/navbarSlice'
 
 const Navbar = () => {
   const dispatch = useDispatch()
-  const user = useSelector(state => state.user.user)
+  const user = getUser()
   const [searchTerm, setSearchTerm] = useState('')
   const countOfProductDetail = useSelector(state => state.cart.quantity)
   const productDetailsRedux = useSelector(state => state.cartDetail.products)
@@ -26,7 +26,7 @@ const Navbar = () => {
 
   useEffect(() => {
     dispatch(addToCart())
-
+    console.log(countOfProductDetail)
     if(user.id === null || user.id === "" || user === null){
       dispatch(checkUserAnonymous());
       dispatch(addToCart(0));
@@ -199,7 +199,6 @@ const Navbar = () => {
                 style={{ position: `relative`, right: `-8px`, fontSize: `29px` }}
               ></i>
               <div className='cart-items-value'>{user.id === '' ? productDetailsRedux.length : countOfProductDetail}</div>
-              {/* <CartModal carts = {carts} /> */}
               <div style={{ fontSize: `10px`, width: `50px`, fontWeight: '500' }}>
                 Giỏ hàng
               </div>

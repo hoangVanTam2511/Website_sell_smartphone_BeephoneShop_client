@@ -5,11 +5,15 @@ import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
 import { SetSelectedCart } from '../../store/cartSlice'
 import { ResetItemNavbar } from '../../store/navbarSlice'
+import { request, setAuthHeader } from '../../helpers/axios_helper'
+import { useNavigate } from 'react-router-dom'
+import { getUser } from '../../store/userSlice'
 
 const Orders = () => {
-  const user = useSelector(state => state.user.user)
+  const user = getUser()
   const [listBill, setListBill] = useState([])
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   useEffect(() => {
     getBillsByIdCustomer()
@@ -20,12 +24,13 @@ const Orders = () => {
 
   const getBillsByIdCustomer = async () => {
     if (listBill && listBill.length > 0) return
-    await axios
-      .get(
-        `http://localhost:8080/client/bill/get-list-bills?id_customer=${user.id}`
+    request("GET",`/client/bill/get-list-bills?id_customer=${user.id}`
       )
       .then(res => {
         setListBill(res.data)
+      }).catch(error=>{
+        setAuthHeader(null)
+        // navigate('/403-not-found')
       })
   }
 

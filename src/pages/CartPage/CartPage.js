@@ -7,10 +7,11 @@ import axios from 'axios'
 import { addToCart, SetSelectedCart } from '../../store/cartSlice'
 import Button from '@mui/material/Button'
 import { useDispatch, useSelector } from 'react-redux'
-import { checkUserAnonymous } from '../../store/userSlice'
+import { getUser } from '../../store/userSlice'
 import { addProductToCart, removeProductToCart, deleteProduct } from '../../store/cartDetailSlice'
 import { ResetItemNavbar } from '../../store/navbarSlice'
 import toast, { Toaster } from 'react-hot-toast'
+import { request, setAuthHeader } from '../../helpers/axios_helper'
 
 const CartPage = () => {
   // const { itemsCount, totalAmount } = useSelector(state => state.cart)
@@ -18,7 +19,7 @@ const CartPage = () => {
   const [totalAmount, setTotalAmount] = useState()
   const [changeCount, setChangeCount] = useState(new Map())
   const dispatch = useDispatch()
-  const user = useSelector(state => state.user.user)
+  const user = getUser()
 
   // redux
   const productDetailsRedux = useSelector(state => state.cartDetail.products)
@@ -30,10 +31,7 @@ const CartPage = () => {
     if(user.id === ''){
 
     }else{
-    await axios
-      .get(
-        `http://localhost:8080/client/cart-detail/get-cart-details?id_customer=${user.id}`
-      )
+      request("GET",`/client/cart-detail/get-cart-details?id_customer=${user.id}`)
       .then(res => {
         setProductDetails(res.data)
         var totalCart = 0
@@ -129,10 +127,7 @@ const CartPage = () => {
       )
     } else {
       var id = product.idSanPhamChiTiet
-      await axios
-        .post(
-          `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${id}&type=plus`
-        )
+      request("POST",`/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${id}&type=plus`)
         .then(res => {
           if (res.status === 200) {
             var temp = Number(changeCount.get(id)) + 1
@@ -158,10 +153,7 @@ const CartPage = () => {
     if (countOfProductDetail === 1) {
       deleteCartDetail(product)
     } else {
-      await axios
-        .post(
-          `http://localhost:8080/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${id}&type=minus`
-        )
+      request("POST",`/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${id}&type=minus`)
         .then(res => {
           if (res.status === 200) {
             var temp = Number(changeCount.get(id)) - 1
@@ -185,10 +177,7 @@ const CartPage = () => {
       }
 
       if (product.idGioHangChiTiet !== null) {
-        await axios
-          .delete(
-            `http://localhost:8080/client/cart-detail/delete-cart-details?id_customer=${user.id}&id_cart_detail=${product.idGioHangChiTiet}`
-          )
+         request("DELETE",`/client/cart-detail/delete-cart-details?id_customer=${user.id}&id_cart_detail=${product.idGioHangChiTiet}`)
           .then(res => {
             setProductDetails(res.data)
             var totalCart = 0
@@ -229,7 +218,6 @@ const CartPage = () => {
           <div className='cart-ctable'>
             <div className='cart-cbody bg-white'>
               {user.id !== '' && productDetails.map(product => {
-                console.log("hehe")
                 return (
                   <>
                     <div

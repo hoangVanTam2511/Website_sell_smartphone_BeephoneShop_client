@@ -6,9 +6,12 @@ import { useSelector } from 'react-redux'
 import  OrderDetail from './OrderDetail'
 import axios from 'axios'
 import { Empty } from 'antd';
+import { request, setAuthHeader } from '../../helpers/axios_helper'
+import { getUser, setUserNoToken } from '../../store/userSlice'
+import toast, { Toaster } from 'react-hot-toast'
 
 const Orders = () => {
-  const user = useSelector(state => state.user.user)
+  const user = getUser()
   const [listBill, setListBill] = useState([])
   const [listBillFillter, setListBillFillter] = useState([])
   const [totalAmount, setTotalAmount] = useState(0)
@@ -23,18 +26,21 @@ const Orders = () => {
   const getBillsByIdCustomer = async() => {
       if(listBill  && listBill.length > 0) return
       let sum = 0;
-      await axios.get(`http://localhost:8080/client/bill/get-list-bills?id_customer=${user.id}`).then(
+      request("GET",`/client/bill/get-list-bills?id_customer=${user.id}`).then(
         res => {
-          console.log(res.data)
+          // console.log(res.data)
           setListBill(res.data)
           setListBillFillter(res.data)
-          console.log(res.data)
+          // console.log(res.data)
           res.data.forEach(item => {
             sum += item.tongTienSauKhiGiam
           })
           setTotalAmount(sum)
         }
-      )
+      ).catch(error => {
+        setUserNoToken()
+        console.log(error)
+      })
   }
 
   const formatMoney = (number) => {
@@ -71,14 +77,25 @@ const Orders = () => {
     }else{
       var data = []
       listBill.forEach(item => {
-        if(item.orderHistories.length === state){
+        if(item.trangThai === state){
           data.push(item)
         }
       })
       setListBillFillter(data)
     }
+  }
 
-    
+  const getDetailBill = async (id) => {
+    await request("GET",`/client/bill/get-bill?id_bill=${id}`).then(
+      res => {
+        console.log(res.data)
+        setBillSelected(1)
+        setBillId(res.data)
+      }
+    ).catch(error => {
+      setUserNoToken()
+      console.log(error)
+    })
   }
 
   return (
@@ -127,7 +144,7 @@ const Orders = () => {
               onClick={() => 
                 {
                   setStateOfOrder(1)
-                  loadDataWhenSelectButton(1)
+                  loadDataWhenSelectButton("PENDING_CONFIRM")
                  }
               }
             >
@@ -216,12 +233,12 @@ const Orders = () => {
               <h4 class="title">
                  <img
                       style={{ width: `20%` }}
-                      src={bill.orderItems[0].sanPhamChiTiet.image.path}
+                      src={bill.duongDan}
                     />
                     <span className="fw-6" style={{ marginLeft: "-120px", width: '78%',  }}>
-                    {bill.orderItems[0].sanPhamChiTiet.sanPham.tenSanPham +
-                    "(" + bill.orderItems[0].sanPhamChiTiet.ram.dungLuong + "GB +" + bill.orderItems[0].sanPhamChiTiet.rom.dungLuong + "GB" + ") "+
-                    bill.orderItems[0].sanPhamChiTiet.mauSac.tenMauSac
+                    {bill.tenSanPham +
+                    "(" + bill.ram + "GB +" + bill.rom + "GB" + ") "+
+                    bill.tenMauSac
                     } 
                     <span
                      style={{
@@ -231,17 +248,14 @@ const Orders = () => {
                       fontSize: `14px`,
                       marginLeft: `4px`,
                      }}
-                     onClick={() => {
-                      setBillSelected(1)
-                      setBillId(bill)
-                    }}
+                     onClick={() => getDetailBill(bill.id)}
                     >
                       {
-                        bill.orderItems.length-1 === 0 ?(
+                        bill.soLuongSanPham -1 === 0 ?(
                           <></>
                         ):(
                           <>
-                           và {bill.orderItems.length-1} sản phẩm khác...
+                           và {bill.soLuongSanPham-1} sản phẩm khác...
                           </>
                         )
                       }
@@ -262,10 +276,7 @@ const Orders = () => {
                 <Button
                   style={{ backgroundColor: `#128DE2`, color: `white` }}
                   variant="outlined"
-                  onClick={() => {
-                    setBillSelected(1)
-                    setBillId(bill)
-                  }}
+                  onClick={() => getDetailBill(bill.id)}
                 >
                   Xem chi tiết
                 </Button>
@@ -287,6 +298,7 @@ const Orders = () => {
 
       )
     }
+    
        
     </>
   );

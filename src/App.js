@@ -12,7 +12,8 @@ import {
   SearchOrderPage,
   CheckoutPage,
   LookUpOrderPage,
-  OrderDetail
+  OrderDetail,
+  Page403
 } from './pages/index'
 // components
 import Header from './components/Header/Header'
@@ -51,10 +52,15 @@ function App () {
             <Route path='/look-up-order-page/:id_bill' element={<LookUpOrderPage />} />
              {/* look up order page */}
              <Route path='/order-detail/:id' element={<OrderDetail />} />
+
+            {/* look up order page */}
+            <Route path='/403-not-found' element={<Page403 />} />
           </Routes>
 
           <Footer />
         </BrowserRouter>
+
+        
       </Provider>
     </div>
   )

@@ -5,10 +5,12 @@ import { Divider } from 'antd'
 import { Select, Space, Input, Checkbox } from 'antd'
 import { useSelector } from 'react-redux'
 import axios from 'axios'
+import { request, setAuthHeader } from '../../helpers/axios_helper'
+import { getUser, setUserNoToken } from '../../store/userSlice'
 
 const Orders = () => {
   const host = 'https://provinces.open-api.vn/api/'
-  const user = useSelector(state => state.user.user)
+  const user = getUser()
   const [provinces, setProvinces] = useState([])
   const [districts, setDistricts] = useState([])
   const [wards, setWards] = useState([])
@@ -20,9 +22,7 @@ const Orders = () => {
   }, [])
 
   const getAllAddress = async () => {
-    await axios
-      .get(
-        `http://localhost:8080/client/address/get-all-address?id_account=${user.id}`
+    request("POST",`/client/address/get-all-address?id_account=${user.id}`
       )
       .then(res => {
         if (res.status === 200) {
@@ -30,7 +30,9 @@ const Orders = () => {
           console.log(res.data)
         }
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        setUserNoToken()
+        console.log(error)})
   }
 
   var callAPI = api => {
