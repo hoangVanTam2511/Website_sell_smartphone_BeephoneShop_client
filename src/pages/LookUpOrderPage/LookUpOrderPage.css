@@ -78,8 +78,10 @@
     height: 200px;
     width: 100%;
     /* colors */
-    background-image: url(https://cdn.tgdd.vn/2022/10/banner/TGDD-540x270.png);
-    background-size: cover;
+    background-image: url("../../assets/images/xanh.png");
+    background-size: 51%;
+    background-repeat: no-repeat;
+    background-position-x: 50%;
   }
   
   .circle-score {

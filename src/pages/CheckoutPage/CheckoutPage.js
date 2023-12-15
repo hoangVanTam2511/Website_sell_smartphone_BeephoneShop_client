@@ -5,25 +5,27 @@ import { shopping_cart } from '../../utils/images'
 import { Link } from 'react-router-dom'
 import { Divider } from 'antd'
 import Checkout from './checkout'
-import axios from 'axios'
+import { ExclamationCircleFilled } from '@ant-design/icons'
 import Button from '@mui/material/Button'
-import { Input } from 'antd'
+import { Input, Modal } from 'antd'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import LocalAtmOutlinedIcon from '@mui/icons-material/LocalAtmOutlined'
-import { addToCart } from '../../store/cartSlice'
 import toast, { Toaster } from 'react-hot-toast'
 import { AddItemNavbar } from '../../store/navbarSlice'
 import { over } from 'stompjs'
 import SockJS from 'sockjs-client'
-import { confirmAlert } from 'react-confirm-alert' // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import { changeInformationUser } from '../../store/userSlice'
-import { resetAllCartDetail } from '../../store/cartDetailSlice'
 import { request, setAuthHeader } from '../../helpers/axios_helper'
 import { getUser, setUserNoToken } from '../../store/userSlice'
+import { getSelectedProductDetails, getTotalProductDetails, addToCart } from '../../store/cartSlice'
+import { deleteProduct } from '../../store/cartDetailSlice'
+import { LoadingOutlined } from '@ant-design/icons';
+import { Spin } from 'antd';
 
+const { confirm } = Modal
 var stompClient = null
 const CartPage = () => {
   // const { itemsCount, totalAmount } = useSelector(state => state.cart)
@@ -40,6 +42,8 @@ const CartPage = () => {
   const dispatch = useDispatch()
   const [totalTemp, setTotatTemp] = useState(0)
 
+  // redux
+  const [isLoadingRequest, setIsLoadingRequest] = useState(true)
 
   // information bill
   const [informationBill, setInformationBill] = useState({
@@ -59,9 +63,9 @@ const CartPage = () => {
   })
 
   // redux
-  const productDetailsRedux = useSelector(state => state.cartDetail.products)
+  const productDetailsRedux = getSelectedProductDetails()
   const quantityRedux = useSelector(state => state.cartDetail.quantity)
-  const totalAmountRedux = useSelector(state => state.cartDetail.totalAmount)
+  const totalAmountRedux = Number(getTotalProductDetails())
 
   // connect websocket
   const connect = () => {
@@ -93,7 +97,7 @@ const CartPage = () => {
     }
     if (account.id === '') {
       if (voucher === null || voucher === '' || voucher === undefined) {
-        setTotalAmount(totalAmountRedux + informationBill.shipFee)
+        setTotalAmount(Number(totalAmountRedux) + Number(informationBill.shipFee))
       } else {
         setTotalAmount(
           totalAmountRedux +
@@ -106,33 +110,9 @@ const CartPage = () => {
 
   const getProductDetails = async () => {
     if (productDetails.length !== 0) return
-    request("GET",`/client/cart-detail/get-cart-details?id_customer=${account.id}`
-      )
-      .then(res => {
-        setProductDetails(res.data)
-
-        var totalCart = 0
-        if (res.data.length === 0) return
-        res.data.map(e => {
-          console.log(e.donGia)
-          totalCart +=
-            Number(
-              e.donGiaSauKhuyenMai === 0 ? e.donGia : e.donGiaSauKhuyenMai
-            ) * Number(e.soLuongSapMua)
-        })
-
-        setTotalAmount(totalCart)
-        setTotatTemp(totalCart)
-        setChangeCount(
-          new Map(
-            res.data.map(item => [item.idSanPhamChiTiet, item.soLuongSapMua])
-          )
-        )
-      })
-      .catch(res => {
-        setUserNoToken()
-        console.log(res)
-      })
+    setProductDetails(getSelectedProductDetails)
+    setTotalAmount(Number(getTotalProductDetails()))
+    setTotatTemp(Number(getTotalProductDetails()))
   }
 
   const formatMoney = number => {
@@ -220,153 +200,179 @@ const CartPage = () => {
     }
   }
 
-  const orderSuccess = async () => {
-    confirmAlert({
-      title: 'Xác nhận đơn hàng',
-      message: 'Bạn có muốn xác nhận đơn hàng này?',
-      buttons: [
-        {
-          label: 'Có',
-          onClick: async () => {
-            let idOrder = ''
-            const orderRequest = {
-              tongTien:
-                totalAmount +
-                Number(voucher === '' ? 0 : voucher.giaTriVoucher) - informationBill.shipFee,
-              tienThua: 0,
-              tongTienSauKhiGiam: Number( totalAmount -
-                Number(voucher === '' ? 0 : voucher.giaTriVoucher) - informationBill.shipFee),
-              tienKhachTra:
-                totalAmount +
-                Number(voucher === '' ? 0 : voucher.giaTriVoucher),
-              trangThai: 'PENDING_CONFIRM',
-              loaiHoaDon: 'DELIVERY',
-              phiShip: informationBill.shipFee,
-              ghiChu: informationBill.note,
-              soDienThoaiNguoiNhan: informationBill.phone,
-              tenNguoiNhan: informationBill.name,
-              diaChiNguoiNhan: informationBill.address,
-              quanHuyenNguoiNhan: informationBill.district,
-              tinhThanhPhoNguoiNhan: informationBill.province,
-              xaPhuongNguoiNhan: informationBill.ward,
-              idKhachHang: account && account.id,
-              ngayNhanHang: informationBill.receivedDate,
-              isPayment: true,
-              isUpdateInfo: false,
-              isUpdateVoucher: false,
-              voucher: voucher === '' ? null : voucher,
-              paymentMethod: paymentMethodCss,
-              email: account && account.email
-            }
+  const handleRedirectPayment = (url) => {
+    window.location.href = url;
+  };
 
-            try {
-              request("POST",`/client/bill/create-bill`,
-                  orderRequest
-                )
-                .then(response => {
-                  var user = {
-                    ...account,
-                    soDienThoai: informationBill.phone
-                  }
-                  dispatch(changeInformationUser(user))
-                  console.log(response)
-                  setBill(response.data)
-                  idOrder = response.data.id
-                  if (idOrder !== '') {
-                    if (account.id === '') {
-                      productDetailsRedux.forEach(async e => {
-                        let productDetail = {
-                          donGia: e.data.price,
-                          soLuong: e.quantity,
-                          thanhTien:
-                            Number(e.data.priceDiscount) === 0
-                              ? Number(e.data.price) * Number(e.quantity)
-                              : Number(e.data.priceDiscount) * Number(e.quantity),
-                          idSanPhamChiTiet: e.data.id,
-                          idHoaDon: idOrder,
-                          donGiaSauKhiGiam: e.data.priceDiscount,
-                          idKhachHang: account.id
-                        }
-                        try {
-                          request("POST",`/client/bill-detail/create-bill-detail`,
-                              productDetail
-                            )
-                            .then(response => {
-                              console.log(response)
-                            })
-                        } catch (error) {
-                          console.log(error)
-                        }
-                      })
-                    } else {
-                      productDetails.forEach(async e => {
-                        console.log(e)
-                        let productDetail = {
-                          donGia: e.donGia,
-                          soLuong: e.soLuongSapMua,
-                          thanhTien:
-                            Number(e.donGiaSauKhuyenMai) === 0
-                              ? Number(e.donGia) * Number(e.soLuongSapMua)
-                              : Number(e.donGiaSauKhuyenMai) *
-                                Number(e.soLuongSapMua),
-                          idSanPhamChiTiet: e.idSanPhamChiTiet,
-                          idHoaDon: idOrder,
-                          donGiaSauKhiGiam: e.donGiaSauKhuyenMai,
-                          idKhachHang: account.id
-                        }
-                        try {
-                          request("POST",`/client/bill-detail/create-bill-detail`,
-                              productDetail
-                            )
-                            .then(response => {
-                              console.log(response)
-                            })
-                        } catch (error) {
-                          console.log(error)
-                        }
-                      })
-                    }
-
-                     request("GET", `/client/bill-detail/send-email-bill?id_bill=${idOrder}`)
-                     .then(response => {
-                       
-                     }).catch(error => {
-                       
-                     })
-
-                  }
-      
-                })
-            } catch (error) {
-              console.log(error)
-              setUserNoToken()
-            }
-
-            var hello = {
-              name: 'hello server'
-            }
-
-            if (stompClient) {
-              stompClient.send('/app/bills', {}, JSON.stringify(hello))
-            }
-
-
-            toast.success('Đặt hàng thành công')
-            if(account.id === ""){
-             
-            }else{
-              dispatch(addToCart(0))
-            }
-            setCheckoutState(3)
-          }
+  const handleGetUrlRedirectPayment = async (ma) => {
+    const vnpayReq = {
+      total: parseInt(totalAmount),
+      info: ma,
+      code: ma,
+    };
+    try {
+      request("POST", `/api/vnpay/payment`, vnpayReq, {
+        headers: {
+          "Content-Type": "application/json",
         },
-        {
-          label: 'Không',
-          onClick: () => {
-            console.log('Không đồng ý')
-          }
+      })
+        .then((response) => {
+          handleRedirectPayment(response.data.data);
+        });
+    } catch (error) {
+      console.log(error.response.data);
+    }
+  
+  };
+
+  const orderSuccess = async () => {
+    confirm({
+      title: 'Xác tạo đơn hàng mới',
+      icon: <ExclamationCircleFilled />,
+      content: 'Bạn đồng ý với các thông tin và xác nhận tạo đơn hàng.',
+      okText: 'Xác nhận',
+      cancelText: 'Huỷ bỏ',
+      style: {
+        marginTop: '20px',
+        width: '2000px'
+      },
+      onOk () {
+        // success
+        setIsLoadingRequest(false)
+        let idOrder = ''
+        const orderRequest = {
+          tongTien:
+            totalAmount +
+            Number(voucher === '' ? 0 : voucher.giaTriVoucher) - informationBill.shipFee,
+          tienThua: 0,
+          tongTienSauKhiGiam: Number( totalAmount) - Number(informationBill.shipFee),
+          tienKhachTra:
+            totalAmount +
+            Number(voucher === '' ? 0 : voucher.giaTriVoucher),
+          trangThai: 'PENDING_CONFIRM',
+          loaiHoaDon: 'DELIVERY',
+          phiShip: informationBill.shipFee,
+          ghiChu: informationBill.note,
+          soDienThoaiNguoiNhan: informationBill.phone,
+          tenNguoiNhan: informationBill.name,
+          diaChiNguoiNhan: informationBill.address,
+          quanHuyenNguoiNhan: informationBill.district,
+          tinhThanhPhoNguoiNhan: informationBill.province,
+          xaPhuongNguoiNhan: informationBill.ward,
+          idKhachHang: account && account.id,
+          ngayNhanHang: informationBill.receivedDate,
+          isPayment: true,
+          isUpdateInfo: false,
+          isUpdateVoucher: false,
+          voucher: voucher === '' ? null : voucher,
+          paymentMethod: paymentMethodCss,
+          email: account && account.email
         }
-      ]
+
+        try {
+          request("POST",`/client/bill/create-bill`,
+              orderRequest
+            )
+            .then(response => {
+              var user = {
+                ...account,
+                soDienThoai: informationBill.phone
+              }
+              dispatch(changeInformationUser(user))
+              console.log(response)
+              setBill(response.data)
+              idOrder = response.data.id
+              if (idOrder !== '') {
+                if (account.id === '') {
+                  productDetailsRedux.forEach(async e => {
+                    let productDetail = {
+                      donGia: e.data.price,
+                      soLuong: e.quantity,
+                      thanhTien:
+                        Number(e.data.priceDiscount) === 0
+                          ? Number(e.data.price) * Number(e.quantity)
+                          : Number(e.data.priceDiscount) * Number(e.quantity),
+                      idSanPhamChiTiet: e.data.id,
+                      idHoaDon: idOrder,
+                      donGiaSauKhiGiam: e.data.priceDiscount,
+                      idKhachHang: account.id
+                    }
+                    try {
+                      request("POST",`/client/bill-detail/create-bill-detail`,
+                          productDetail
+                        )
+                        .then(response => {
+                          console.log(response)
+                        })
+                    } catch (error) {
+                      console.log(error)
+                    }
+                  })
+                } else {
+                  productDetails.forEach(async e => {
+                    console.log(e)
+                    let productDetail = {
+                      donGia: e.donGia,
+                      soLuong: e.soLuongSapMua,
+                      thanhTien:
+                        Number(e.donGiaSauKhuyenMai) === 0
+                          ? Number(e.donGia) * Number(e.soLuongSapMua)
+                          : Number(e.donGiaSauKhuyenMai) *
+                            Number(e.soLuongSapMua),
+                      idSanPhamChiTiet: e.idSanPhamChiTiet,
+                      idHoaDon: idOrder,
+                      donGiaSauKhiGiam: e.donGiaSauKhuyenMai,
+                      idKhachHang: account.id
+                    }
+                    try {
+                      request("POST",`/client/bill-detail/create-bill-detail`,
+                          productDetail
+                        )
+                        .then(response => {
+                          console.log(response)
+                        })
+                    } catch (error) {
+                      console.log(error)
+                    }
+                  })
+                }
+
+              request("GET", `/client/bill-detail/send-email-bill?id_bill=${idOrder}`)
+              .then(response => {
+                
+              }).catch(error => {
+                console.log(error)
+              })
+              if(paymentMethodCss === 2){
+                 handleGetUrlRedirectPayment(response.data.ma)
+              }
+              }
+            })
+        } catch (error) {
+          console.log(error)
+          setUserNoToken()
+        }
+
+        var hello = {
+          name: 'hello server'
+        }
+
+        if (stompClient) {
+          stompClient.send('/app/bills', {}, JSON.stringify(hello))
+        }
+        deleteProductSelected()
+        if(paymentMethodCss === 1){
+          setTimeout(() => {
+            setIsLoadingRequest(true)
+            toast.success('Đặt hàng thành công')
+            setCheckoutState(3)
+          }, 500)
+        }
+       
+      },
+      onCancel () {
+        console.log("Không đồng ý")
+      }
     })
   }
 
@@ -382,16 +388,23 @@ const CartPage = () => {
       return
     }
 
-    if (voucher !== null || voucher !== undefined || voucher !== '') {
-      if (voucher.ma === codeVoucher) {
-        toast.error('Bạn đã sử dụng voucher này rồi.Vui lòng nhập voucher khác')
-        return
-      }
-    }
+    confirm({
+      title: 'Thông báo',
+      icon: <ExclamationCircleFilled />,
+      content: `Kiểm tra kỹ voucher của bạn trước khi bấm xác nhận, một khi đã bấm Xác nhận, voucher sẽ không thể sử dụng được cho đơn hàng khác nữa.`,
+      okText: 'Xác nhận',
+      cancelText: 'Huỷ bỏ',
+      onOk () {
+        if (voucher !== null || voucher !== undefined || voucher !== '') {
+          if (voucher.ma === codeVoucher) {
+            toast.error('Bạn đã sử dụng voucher này rồi.Vui lòng nhập voucher khác')
+            return
+          }
+        }
 
-    request("GET",`/client/voucher/check-voucher?code=${codeVoucher}`
-      )
-      .then(res => {
+        request("GET",`/client/voucher/check-voucher?code=${codeVoucher}`
+        )
+        .then(res => {
         if (res.data.dieuKienApDung > totalAmount) {
           toast.error('Hoá đơn này không đạt đủ điều kiện áp dụng')
         } else {
@@ -406,6 +419,11 @@ const CartPage = () => {
         setUserNoToken()
         if (error.response.status === 400) toast.error(error.response.data)
       })
+      },
+      onCancel () {}
+    })
+
+  
   }
 
   const paymentMethodSelected = () => {
@@ -446,768 +464,790 @@ const CartPage = () => {
     }
   }
 
+  const deleteCartDetail = async product => {
+    if(account.id === ""){
+        dispatch(deleteProduct(product))
+    }else{
+
+      if (product.idGioHangChiTiet !== null) {
+         request("DELETE",`/client/cart-detail/delete-cart-details?id_customer=${account.id}&id_cart_detail=${product.idGioHangChiTiet}`)
+          .then(res => {
+            if (res.data.length === 0) return
+            dispatch(addToCart())
+          })
+          .catch(res => console.log(res))
+      }
+    }
+   
+  }
+
+  const deleteProductSelected = () => {
+    if(account.id === ""){
+      productDetailsRedux.forEach(product => {
+        deleteCartDetail(product.data)
+       })
+
+    }else{
+      productDetails.forEach(product => {
+        deleteCartDetail(product)
+       })
+    }
+     
+  }
+
   return (
     <>
-      <h3
-        className='text-center fw-5'
-        style={{ marginTop: 30, marginBottom: -10 }}
-      >
+    {
+      isLoadingRequest === true  ? 
+       <> </>
+      :
+        <div className='custom-spin'>
+         <Spin indicator={<LoadingOutlined style={{ fontSize: 40, color: '#126de4', marginLeft: 5 }} spin />} />
+        </div>
+      
+    }
+       <>
+        <h3
+          className='text-center fw-5'
+          style={{ marginTop: 30, marginBottom: -10 }}
+        >
+          {checkoutState === 3 ? (
+            <></>
+          ) : (
+            <span>
+              <i
+                onClick={() => {
+                  console.log(checkoutState)
+                  if (checkoutState === 1) {
+                    navigate('/cart')
+                  } else if (checkoutState === 2) {
+                    setCheckoutState(1)
+                  }
+                }}
+                class='fa fa-arrow-left'
+                style={{ transform: 'translateX(-271px)' }}
+              ></i>
+            </span>
+          )}
+  
+          <span style={{ fontWeight: 600 }}>
+            {checkoutState === 1 ? 'Thông tin' : ''}
+            {checkoutState === 2 ? 'Thanh toán' : ''}
+            {checkoutState === 3 ? 'Hoàn thành' : ''}
+          </span>
+        </h3>
+  
+        <Divider
+          style={{ margin: ' 10px auto', width: '45%', minWidth: '45%' }}
+        />
         {checkoutState === 3 ? (
           <></>
         ) : (
-          <span>
-            <i
-              onClick={() => {
-                console.log(checkoutState)
-                if (checkoutState === 1) {
-                  navigate('/cart')
-                } else if (checkoutState === 2) {
-                  setCheckoutState(1)
-                }
-              }}
-              class='fa fa-arrow-left'
-              style={{ transform: 'translateX(-271px)' }}
-            ></i>
-          </span>
-        )}
-
-        <span style={{ fontWeight: 600 }}>
-          {checkoutState === 1 ? 'Thông tin' : ''}
-          {checkoutState === 2 ? 'Thanh toán' : ''}
-          {checkoutState === 3 ? 'Hoàn thành' : ''}
-        </span>
-      </h3>
-
-      <Divider
-        style={{ margin: ' 10px auto', width: '45%', minWidth: '45%' }}
-      />
-      {checkoutState === 3 ? (
-        <></>
-      ) : (
-        <div
-          className='title_checkout'
-          onClick={() => {
-            setCheckoutState(1)
-          }}
-        >
           <div
-            style={
-              checkoutState === 1
-                ? checkoutStateTitleCssActive()
-                : checkoutStateTitleCssNoActive()
-            }
+            className='title_checkout'
+            onClick={() => {
+              setCheckoutState(1)
+            }}
           >
-            1. Thông tin
-            <Button
-              variant='contained'
+            <div
               style={
                 checkoutState === 1
-                  ? checkoutStateButtonCssActive()
-                  : checkoutStateButtonCssNoActive()
+                  ? checkoutStateTitleCssActive()
+                  : checkoutStateTitleCssNoActive()
               }
-            ></Button>
-          </div>
-
-          <div
-            style={
-              checkoutState === 2
-                ? checkoutStateTitleCssActive()
-                : checkoutStateTitleCssNoActive()
-            }
-          >
-            2. Thanh toán
-            <Button
-              variant='contained'
+            >
+              1. Thông tin
+              <Button
+                variant='contained'
+                style={
+                  checkoutState === 1
+                    ? checkoutStateButtonCssActive()
+                    : checkoutStateButtonCssNoActive()
+                }
+              ></Button>
+            </div>
+  
+            <div
               style={
                 checkoutState === 2
-                  ? checkoutStateButtonCssActive()
-                  : checkoutStateButtonCssNoActive()
+                  ? checkoutStateTitleCssActive()
+                  : checkoutStateTitleCssNoActive()
               }
-            ></Button>
+            >
+              2. Thanh toán
+              <Button
+                variant='contained'
+                style={
+                  checkoutState === 2
+                    ? checkoutStateButtonCssActive()
+                    : checkoutStateButtonCssNoActive()
+                }
+              ></Button>
+            </div>
           </div>
-        </div>
-      )}
-
-      {checkoutState === 3 ? (
-        <>
+        )}
+  
+        {checkoutState === 3 ? (
+          <>
+            <div
+              className='container'
+              style={{ margin: `20px auto`, width: `50%`, borderRadius: '10px' }}
+            >
+              {/* <img src="../../assets/images/Shippe.png"/> */}
+              <div
+                className='cart bg-white'
+                style={{
+                  textAlign: 'center',
+                  fontSize: '20px',
+                  fontWeight: '600',
+                  padding: `27px`,
+                  backgroundColor: 'rgba(255, 193, 7, 0.12)'
+                }}
+              >
+                Đơn hàng đang được xử lí
+              </div>
+            </div>
+          </>
+        ) : (
+          <> </>
+        )}
+  
+        {checkoutState === 1 ? (
           <div
             className='container'
             style={{ margin: `20px auto`, width: `50%`, borderRadius: '10px' }}
           >
+            <div className='cart bg-white'>
+              <div className='cart-ctable'>
+                <div className='cart-cbody bg-white'>
+                  {account.id !== '' &&
+                    productDetails.map(product => {
+                      return (
+                        <>
+                          <div
+                            className='cart-ctr'
+                            key={product?.id}
+                            style={{ marginTop: 10 }}
+                          >
+                            <div className='cart-ctd'>
+                              <img
+                                style={{ width: 112, height: 105 }}
+                                src={product.duongDan}
+                              />
+                            </div>
+                            <div
+                              className='cart-ctd'
+                              style={{ position: 'relative', top: '0px' }}
+                            >
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  width: 550,
+                                  height: 140,
+                                  marginLeft: 10
+                                }}
+                              >
+                                <div style={{ width: '127%', marginTop: 17 }}>
+                                  <span className='cart-ctxtf fw-7'>
+                                    {product?.tenSanPham +
+                                      ' ' +
+                                      product?.dungLuongRam +
+                                      'GB ' +
+                                      product?.dungLuongRom +
+                                      'GB - ' +
+                                      product?.tenMauSac}
+                                  </span>
+                                  <br />
+                                  <span>
+                                    <span
+                                      className='cart-ctxt'
+                                      style={{
+                                        color: '#128DE2',
+                                        fontSize: '17px',
+                                        fontWeight: 500
+                                      }}
+                                    >
+                                      {formatMoney(
+                                        product?.donGiaSauKhuyenMai === 0
+                                          ? product?.donGia
+                                          : product?.donGiaSauKhuyenMai
+                                      )}
+                                    </span>
+                                    <del
+                                      style={{
+                                        color: '#999',
+                                        fontSize: '14px',
+                                        marginLeft: '5px',
+                                        fontWeight: 500
+                                      }}
+                                    >
+                                      {product?.donGiaSauKhuyenMai === 0
+                                        ? ''
+                                        : formatMoney(product?.donGia)}
+                                    </del>
+                                  </span>
+                                </div>
+                                <div
+                                  style={{
+                                    width: '58%',
+                                    marginTop: 42,
+                                    fontWeight: 500
+                                  }}
+                                >
+                                  Số lượng :
+                                  <span style={{ color: '#128DE2' }}>
+                                    {' ' + product?.soLuongSapMua}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className='cart-ctd'></div>
+                            <div className='cart-ctd'></div>
+  
+                            <div className='cart-ctd'></div>
+                          </div>
+                        </>
+                      )
+                    })}
+  
+                  {account.id === '' &&
+                    productDetailsRedux.map(product => {
+                      return (
+                        <>
+                          <div
+                            className='cart-ctr'
+                            key={product?.id}
+                            style={{ marginTop: 10 }}
+                          >
+                            <div className='cart-ctd'>
+                              <img
+                                style={{ width: 112, height: 105 }}
+                                src={product.data.urlImage}
+                              />
+                            </div>
+                            <div
+                              className='cart-ctd'
+                              style={{ position: 'relative', top: '0px' }}
+                            >
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  width: 550,
+                                  height: 140,
+                                  marginLeft: 10
+                                }}
+                              >
+                                <div style={{ width: '127%', marginTop: 17 }}>
+                                  <span className='cart-ctxtf fw-7'>
+                                    {product?.data.nameProduct +
+                                      ' ' +
+                                      product?.data.ram +
+                                      'GB ' +
+                                      product?.data.rom +
+                                      'GB - ' +
+                                      product?.data.color}
+                                  </span>
+                                  <br />
+                                  <span>
+                                    <span
+                                      className='cart-ctxt'
+                                      style={{
+                                        color: '#128DE2',
+                                        fontSize: '17px',
+                                        fontWeight: 500
+                                      }}
+                                    >
+                                      {formatMoney(
+                                        product?.data.priceDiscount === 0
+                                          ? product?.data.price
+                                          : product?.data.priceDiscount
+                                      )}
+                                    </span>
+                                    <del
+                                      style={{
+                                        color: '#999',
+                                        fontSize: '14px',
+                                        marginLeft: '5px',
+                                        fontWeight: 500
+                                      }}
+                                    >
+                                      {product?.data.priceDiscount === 0
+                                        ? ''
+                                        : formatMoney(product?.data.price)}
+                                    </del>
+                                  </span>
+                                </div>
+                                <div
+                                  style={{
+                                    width: '58%',
+                                    marginTop: 42,
+                                    fontWeight: 500
+                                  }}
+                                >
+                                  Số lượng :
+                                  <span style={{ color: '#128DE2' }}>
+                                    {' ' + product?.quantity}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className='cart-ctd'></div>
+                            <div className='cart-ctd'></div>
+  
+                            <div className='cart-ctd'></div>
+                          </div>
+                        </>
+                      )
+                    })}
+                </div>
+              </div>
+            </div>
+  
+            <Checkout
+              account={account}
+              informationBill={informationBill}
+              stepCheckOutTwo={stepCheckOutTwo}
+              totalAmount={totalAmount}
+              changeValueInformationBill={changeValueInformationBill}
+              setTotalCount={setTotalCount}
+            />
+            <br />
+            <br />
+  
+            <br />
+          </div>
+        ) : (
+          <> </>
+        )}
+  
+        {checkoutState === 2 ? (
+          <>
             <div
               className='cart bg-white'
               style={{
-                textAlign: 'center',
-                fontSize: '20px',
-                fontWeight: '600',
-                padding: `27px`,
-                backgroundColor: 'rgba(255, 193, 7, 0.12)'
-              }}
-            >
-              Đơn hàng đang được xử lí
-            </div>
-          </div>
-        </>
-      ) : (
-        <> </>
-      )}
-
-      {checkoutState === 1 ? (
-        <div
-          className='container'
-          style={{ margin: `20px auto`, width: `50%`, borderRadius: '10px' }}
-        >
-          <div className='cart bg-white'>
-            <div className='cart-ctable'>
-              <div className='cart-cbody bg-white'>
-                {account.id !== '' &&
-                  productDetails.map(product => {
-                    return (
-                      <>
-                        <div
-                          className='cart-ctr'
-                          key={product?.id}
-                          style={{ marginTop: 10 }}
-                        >
-                          <div className='cart-ctd'>
-                            <img
-                              style={{ width: 112, height: 105 }}
-                              src={product.duongDan}
-                            />
-                          </div>
-                          <div
-                            className='cart-ctd'
-                            style={{ position: 'relative', top: '0px' }}
-                          >
-                            <div
-                              style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                width: 550,
-                                height: 140,
-                                marginLeft: 10
-                              }}
-                            >
-                              <div style={{ width: '127%', marginTop: 17 }}>
-                                <span className='cart-ctxtf fw-7'>
-                                  {product?.tenSanPham +
-                                    ' ' +
-                                    product?.dungLuongRam +
-                                    'GB ' +
-                                    product?.dungLuongRom +
-                                    'GB - ' +
-                                    product?.tenMauSac}
-                                </span>
-                                <br />
-                                <span>
-                                  <span
-                                    className='cart-ctxt'
-                                    style={{
-                                      color: '#128DE2',
-                                      fontSize: '17px',
-                                      fontWeight: 500
-                                    }}
-                                  >
-                                    {formatMoney(
-                                      product?.donGiaSauKhuyenMai === 0
-                                        ? product?.donGia
-                                        : product?.donGiaSauKhuyenMai
-                                    )}
-                                  </span>
-                                  <del
-                                    style={{
-                                      color: '#999',
-                                      fontSize: '14px',
-                                      marginLeft: '5px',
-                                      fontWeight: 500
-                                    }}
-                                  >
-                                    {product?.donGiaSauKhuyenMai === 0
-                                      ? ''
-                                      : formatMoney(product?.donGia)}
-                                  </del>
-                                </span>
-                              </div>
-                              <div
-                                style={{
-                                  width: '58%',
-                                  marginTop: 42,
-                                  fontWeight: 500
-                                }}
-                              >
-                                Số lượng :
-                                <span style={{ color: '#128DE2' }}>
-                                  {' ' + product?.soLuongSapMua}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className='cart-ctd'></div>
-                          <div className='cart-ctd'></div>
-
-                          <div className='cart-ctd'></div>
-                        </div>
-                      </>
-                    )
-                  })}
-
-                {account.id === '' &&
-                  productDetailsRedux.map(product => {
-                    return (
-                      <>
-                        <div
-                          className='cart-ctr'
-                          key={product?.id}
-                          style={{ marginTop: 10 }}
-                        >
-                          <div className='cart-ctd'>
-                            <img
-                              style={{ width: 112, height: 105 }}
-                              src={product.data.urlImage}
-                            />
-                          </div>
-                          <div
-                            className='cart-ctd'
-                            style={{ position: 'relative', top: '0px' }}
-                          >
-                            <div
-                              style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                width: 550,
-                                height: 140,
-                                marginLeft: 10
-                              }}
-                            >
-                              <div style={{ width: '127%', marginTop: 17 }}>
-                                <span className='cart-ctxtf fw-7'>
-                                  {product?.data.nameProduct +
-                                    ' ' +
-                                    product?.data.ram +
-                                    'GB ' +
-                                    product?.data.rom +
-                                    'GB - ' +
-                                    product?.data.color}
-                                </span>
-                                <br />
-                                <span>
-                                  <span
-                                    className='cart-ctxt'
-                                    style={{
-                                      color: '#128DE2',
-                                      fontSize: '17px',
-                                      fontWeight: 500
-                                    }}
-                                  >
-                                    {formatMoney(
-                                      product?.data.priceDiscount === 0
-                                        ? product?.data.price
-                                        : product?.data.priceDiscount
-                                    )}
-                                  </span>
-                                  <del
-                                    style={{
-                                      color: '#999',
-                                      fontSize: '14px',
-                                      marginLeft: '5px',
-                                      fontWeight: 500
-                                    }}
-                                  >
-                                    {product?.data.priceDiscount === 0
-                                      ? ''
-                                      : formatMoney(product?.data.price)}
-                                  </del>
-                                </span>
-                              </div>
-                              <div
-                                style={{
-                                  width: '58%',
-                                  marginTop: 42,
-                                  fontWeight: 500
-                                }}
-                              >
-                                Số lượng :
-                                <span style={{ color: '#128DE2' }}>
-                                  {' ' + product?.quantity}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className='cart-ctd'></div>
-                          <div className='cart-ctd'></div>
-
-                          <div className='cart-ctd'></div>
-                        </div>
-                      </>
-                    )
-                  })}
-              </div>
-            </div>
-          </div>
-
-          <Checkout
-            account={account}
-            informationBill={informationBill}
-            stepCheckOutTwo={stepCheckOutTwo}
-            totalAmount={totalAmount}
-            changeValueInformationBill={changeValueInformationBill}
-            setTotalCount={setTotalCount}
-          />
-          <br />
-          <br />
-
-          <br />
-        </div>
-      ) : (
-        <> </>
-      )}
-
-      {checkoutState === 2 ? (
-        <>
-          <div
-            className='cart bg-white'
-            style={{
-              padding: 15,
-              margin: `5px auto`,
-              width: `47%`,
-              borderRadius: '10px'
-            }}
-          >
-            <div>
-              <Input
-                placeholder='Nhập mã giảm giá hoặc phiếu mua hàng'
-                onChange={e => {
-                  setCodeVoucher(e.target.value)
-                }}
-                style={{
-                  width: '75%',
-                  margin: `0px 0px`,
-                  fontSize: 16,
-                  top: '12px',
-                  height: 40
-                }}
-              />
-              <Button
-                variant='contained'
-                style={{
-                  width: '20%',
-                  marginLeft: 15,
-                  marginTop: 22,
-                  fontSize: 16
-                }}
-                onClick={checkVoucher}
-              >
-                Áp dụng
-              </Button>
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                Số lượng sản phẩm
-              </div>
-
-              <div style={{ style: '#707070' }}>
-                {' '}
-                {account.id === '' ? quantityRedux : productDetails.length}
-              </div>
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                Tiền hàng (tạm tính)
-              </div>
-
-              <div style={{ style: '#707070' }}>
-                {formatMoney(
-                  totalAmount +
-                    Number(voucher === '' ? 0 : voucher.giaTriVoucher) - informationBill.shipFee
-                )}
-              </div>
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div
-                style={{
-                  color: 'rgb(155 148 148)',
-                  marginLeft: '-12px'
-                }}
-              >
-                Phí vận chuyển
-              </div>
-
-              <div style={{ style: '#707070' }}>
-                {informationBill.shipFee === 0
-                  ? 'Miễn phí'
-                  : formatMoney(informationBill.shipFee)}
-              </div>
-            </div>
-
-            {voucher && (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  margin: 15
-                }}
-              >
-                <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                  Phiếu giảm giá
-                </div>
-
-                <div style={{ color: 'red' }}>
-                  - {formatMoney(voucher?.giaTriVoucher)}
-                </div>
-              </div>
-            )}
-
-            <Divider />
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
+                padding: 15,
+                margin: `5px auto`,
+                width: `47%`,
+                borderRadius: '10px'
               }}
             >
               <div>
-                <span style={{ marginLeft: '-12px', fontWeight: 600 }}>
-                  Tổng tiền
-                </span>
-                <span style={{ color: 'rgb(155 148 148)' }}>(đã gồm VAT)</span>
-              </div>
-
-              <div style={{ marginLeft: '-12px', fontWeight: 600 }}>
-                {formatMoney(totalAmount)}
-              </div>
-            </div>
-          </div>
-
-          <div
-            style={{
-              margin: `10px auto`,
-              width: `47%`,
-              borderRadius: '10px'
-            }}
-          >
-            HÌNH THỨC THANH TOÁN
-          </div>
-
-          <div
-            className='cart bg-white'
-            style={{
-              padding: 15,
-              margin: `5px auto`,
-              width: `47%`,
-              borderRadius: '10px'
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-
-             <div
-                style={
-                  paymentMethodCss === 1
-                    ? paymentMethodSelected()
-                    : paymentMethodNotSelected()
-                }
-                onClick={() => {
-                  setPaymentMethodCss(1)
-                }}
-              >
-                <LocalAtmOutlinedIcon
+                <Input
+                  placeholder='Nhập mã giảm giá hoặc phiếu mua hàng'
+                  onChange={e => {
+                    setCodeVoucher(e.target.value)
+                  }}
                   style={{
-                    fontSize: '27px',
-                    position: 'relative',
-                    padding: 3,
-                    left: '61px',
-                    color: '#444'
+                    width: '75%',
+                    margin: `0px 0px`,
+                    fontSize: 16,
+                    top: '12px',
+                    height: 40
                   }}
                 />
-                <span
+                <Button
+                  variant='contained'
                   style={{
-                    fontSize: '11px',
-                    position: 'relative',
-                    top: '15px',
-                    left: '-13px'
+                    width: '20%',
+                    marginLeft: 15,
+                    marginTop: 17,
+                    fontSize: 16
+                  }}
+                  onClick={checkVoucher}
+                >
+                  Áp dụng
+                </Button>
+              </div>
+  
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  margin: 15
+                }}
+              >
+                <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
+                  Số lượng sản phẩm
+                </div>
+  
+                <div style={{ style: '#707070' }}>
+                  {' '}
+                  {account.id === '' ? quantityRedux : productDetails.length}
+                </div>
+              </div>
+  
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  margin: 15
+                }}
+              >
+                <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
+                  Tiền hàng (tạm tính)
+                </div>
+  
+                <div style={{ style: '#707070' }}>
+                  {formatMoney(
+                    totalAmount +
+                      Number(voucher === '' ? 0 : voucher.giaTriVoucher) - Number(informationBill.shipFee)
+                  )}
+                </div>
+              </div>
+  
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  margin: 15
+                }}
+              >
+                <div
+                  style={{
+                    color: 'rgb(155 148 148)',
+                    marginLeft: '-12px'
                   }}
                 >
-                  Thanh toán khi nhận hàng
+                  Phí vận chuyển
+                </div>
+  
+                <div style={{ style: '#707070' }}>
+                  {informationBill.shipFee === 0
+                    ? 'Miễn phí'
+                    : formatMoney(informationBill.shipFee)}
+                </div>
+              </div>
+  
+              {voucher && (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
+                    Phiếu giảm giá
+                  </div>
+  
+                  <div style={{ color: 'red' }}>
+                    - {formatMoney(voucher?.giaTriVoucher)}
+                  </div>
+                </div>
+              )}
+  
+              <Divider />
+  
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  margin: 15
+                }}
+              >
+                <div>
+                  <span style={{ marginLeft: '-12px', fontWeight: 600 }}>
+                    Tổng tiền
+                  </span>
+                  <span style={{ color: 'rgb(155 148 148)' }}>(đã gồm VAT)</span>
+                </div>
+  
+                <div style={{ marginLeft: '-12px', fontWeight: 600 }}>
+                  {formatMoney(totalAmount)}
+                </div>
+              </div>
+            </div>
+  
+            <div
+              style={{
+                margin: `10px auto`,
+                width: `47%`,
+                borderRadius: '10px'
+              }}
+            >
+              HÌNH THỨC THANH TOÁN
+            </div>
+  
+            <div
+              className='cart bg-white'
+              style={{
+                padding: 15,
+                margin: `5px auto`,
+                width: `47%`,
+                borderRadius: '10px'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+  
+               <div
+                  style={
+                    paymentMethodCss === 1
+                      ? paymentMethodSelected()
+                      : paymentMethodNotSelected()
+                  }
+                  onClick={() => {
+                    setPaymentMethodCss(1)
+                  }}
+                >
+                  <LocalAtmOutlinedIcon
+                    style={{
+                      fontSize: '27px',
+                      position: 'relative',
+                      padding: 3,
+                      left: '61px',
+                      color: '#444'
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      position: 'relative',
+                      top: '15px',
+                      left: '-13px'
+                    }}
+                  >
+                    Thanh toán khi nhận hàng
+                  </span>
+                </div>
+  
+                <div
+                  style={
+                    paymentMethodCss === 2
+                      ? paymentMethodSelected()
+                      : paymentMethodNotSelected()
+                  }
+                  onClick={() => {
+                    setPaymentMethodCss(2)
+                  }}
+                  
+                >
+                <img src='https://vnpay.vn/assets/images/logo-icon/logo-primary.svg' style={{ width: '69%', marginLeft: '20px', marginTop: '10px'}}/>
+                </div>
+  
+                <div></div>
+              </div>
+            </div>
+  
+            <div
+              style={{
+                color: `#212b36`,
+                fontSize: `16px`,
+                fontWeight: `500`,
+                lineHeight: `18px`,
+                marginBottom: `10px`,
+                marginTop: `15px`,
+                textTransform: `uppercase`,
+                margin: `10px auto`,
+                width: `47%`
+              }}
+            >
+              THÔNG TIN NHẬN HÀNG
+            </div>
+  
+            <div
+              className='cart bg-white'
+              style={{
+                padding: 15,
+                margin: `5px auto`,
+                width: `47%`,
+                borderRadius: '10px'
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  margin: 15
+                }}
+              >
+                <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
+                  Khách hàng
+                </div>
+  
+                <div style={{ style: '#707070' }}>{informationBill?.name}</div>
+              </div>
+  
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  margin: 15
+                }}
+              >
+                <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
+                  Số điện thoại
+                </div>
+  
+                <div style={{ style: '#707070' }}>{informationBill?.phone}</div>
+              </div>
+  
+              {informationBill.email === null || informationBill.email === '' ? (
+                <> </>
+              ) : (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
+                    Email
+                  </div>
+  
+                  <div style={{ style: '#707070' }}>{informationBill?.email}</div>
+                </div>
+              )}
+  
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  margin: 15
+                }}
+              >
+                <div
+                  style={{
+                    color: 'rgb(155 148 148)',
+                    marginLeft: '-12px'
+                  }}
+                >
+                  Thời gian nhận hàng dự kiến
+                </div>
+  
+                <div style={{ style: '#707070' }}>
+                  {informationBill?.receivedDate}
+                </div>
+              </div>
+  
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  margin: 15
+                }}
+              >
+                <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
+                  Nhận hàng tại
+                </div>
+  
+                <div
+                  style={{
+                    style: '#707070',
+                    wordWrap: 'wrap',
+                    width: '300px',
+                    textAlign: 'right'
+                  }}
+                >
+                  {informationBill?.address}, {informationBill?.ward},{' '}
+                  {informationBill?.district}, {informationBill?.province}
+                </div>
+              </div>
+  
+              {informationBill.note === null || informationBill.note === '' ? (
+                <> </>
+              ) : (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 15
+                  }}
+                >
+                  <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
+                    Ghi chú
+                  </div>
+  
+                  <div style={{ style: '#707070' }}>{informationBill.note}</div>
+                </div>
+              )}
+            </div>
+            <br />
+            <div
+              className='countProductTemp'
+              style={{ left: 395, width: '47%', display: 'block' }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ fontWeight: 'bold' }}>Tổng tiền</span>
+                <span style={{ fontWeight: 'bold', color: '#128DE2' }}>
+                  {formatMoney(totalAmount)}
                 </span>
               </div>
-
-              <div
-                style={
-                  paymentMethodCss === 2
-                    ? paymentMethodSelected()
-                    : paymentMethodNotSelected()
-                }
-                onClick={() => {
-                  setPaymentMethodCss(2)
-                }}
-                
-              >
-              <img src='https://vnpay.vn/assets/images/logo-icon/logo-primary.svg' style={{ width: '69%', marginLeft: '20px', marginTop: '10px'}}/>
+              <div>
+                <Button
+                  variant='contained'
+                  style={{
+                    width: '100%',
+                    marginTop: 5,
+                    fontSize: 16
+                  }}
+                  onClick={orderSuccess}
+                >
+                  Hoàn thành
+                </Button>
               </div>
-
-              <div></div>
             </div>
-          </div>
-
-          <div
-            style={{
-              color: `#212b36`,
-              fontSize: `16px`,
-              fontWeight: `500`,
-              lineHeight: `18px`,
-              marginBottom: `10px`,
-              marginTop: `15px`,
-              textTransform: `uppercase`,
-              margin: `10px auto`,
-              width: `47%`
-            }}
-          >
-            THÔNG TIN NHẬN HÀNG
-          </div>
-
-          <div
-            className='cart bg-white'
-            style={{
-              padding: 15,
-              margin: `5px auto`,
-              width: `47%`,
-              borderRadius: '10px'
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                Khách hàng
-              </div>
-
-              <div style={{ style: '#707070' }}>{informationBill?.name}</div>
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                Số điện thoại
-              </div>
-
-              <div style={{ style: '#707070' }}>{informationBill?.phone}</div>
-            </div>
-
-            {informationBill.email === null || informationBill.email === '' ? (
-              <> </>
+            <br />
+            <br />
+            <br />
+          </>
+        ) : (
+          <></>
+        )}
+  
+        {checkoutState === 3 ? (
+          <>
+            {bill === null || bill === undefined ? (
+              <></>
             ) : (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  margin: 15
-                }}
-              >
-                <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                  Email
-                </div>
-
-                <div style={{ style: '#707070' }}>{informationBill?.email}</div>
-              </div>
-            )}
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div
-                style={{
-                  color: 'rgb(155 148 148)',
-                  marginLeft: '-12px'
-                }}
-              >
-                Thời gian nhận hàng dự kiến
-              </div>
-
-              <div style={{ style: '#707070' }}>
-                {informationBill?.receivedDate}
-              </div>
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: 15
-              }}
-            >
-              <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                Nhận hàng tại
-              </div>
-
-              <div
-                style={{
-                  style: '#707070',
-                  wordWrap: 'wrap',
-                  width: '300px',
-                  textAlign: 'right'
-                }}
-              >
-                {informationBill?.address}, {informationBill?.ward},{' '}
-                {informationBill?.district}, {informationBill?.province}
-              </div>
-            </div>
-
-            {informationBill.note === null || informationBill.note === '' ? (
-              <> </>
-            ) : (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  margin: 15
-                }}
-              >
-                <div style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}>
-                  Ghi chú
-                </div>
-
-                <div style={{ style: '#707070' }}>{informationBill.note}</div>
-              </div>
-            )}
-          </div>
-          <br />
-          <div
-            className='countProductTemp'
-            style={{ left: 395, width: '47%', display: 'block' }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontWeight: 'bold' }}>Tổng tiền</span>
-              <span style={{ fontWeight: 'bold', color: '#128DE2' }}>
-                {formatMoney(totalAmount)}
-              </span>
-            </div>
-            <div>
-              <Button
-                variant='contained'
-                style={{
-                  width: '100%',
-                  marginTop: 5,
-                  fontSize: 16
-                }}
-                onClick={orderSuccess}
-              >
-                Hoàn thành
-              </Button>
-            </div>
-          </div>
-          <br />
-          <br />
-          <br />
-        </>
-      ) : (
-        <></>
-      )}
-
-      {checkoutState === 3 ? (
-        <>
-          {bill === null || bill === undefined ? (
-            <></>
-          ) : (
-            <>
-              <div
-                style={{
-                  color: `#212b36`,
-                  width: '46%',
-                  margin: '0 auto',
-                  fontSize: `16px`,
-                  fontWeight: `500`,
-                  lineHeight: `18px`,
-                  marginBottom: `10px`,
-                  marginTop: `15px`,
-                  textTransform: `uppercase`
-                }}
-              >
-                THÔNG TIN ĐƠN HÀNG
-              </div>
-
-              <div
-                className='cart bg-white'
-                style={{
-                  padding: 15,
-                  margin: `5px auto`,
-                  width: `47%`,
-                  borderRadius: '10px'
-                }}
-              >
+              <>
                 <div
                   style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    margin: 15
+                    color: `#212b36`,
+                    width: '46%',
+                    margin: '0 auto',
+                    fontSize: `16px`,
+                    fontWeight: `500`,
+                    lineHeight: `18px`,
+                    marginBottom: `10px`,
+                    marginTop: `15px`,
+                    textTransform: `uppercase`
                   }}
                 >
-                  <div>
-                    <span style={{ marginLeft: '-12px', fontWeight: 600 }}>
-                      Mã đơn hàng
-                    </span>
-                  </div>
-
-                  <div style={{ marginLeft: '-12px', fontWeight: 600 }}>
-                    {bill.ma}
-                  </div>
+                  THÔNG TIN ĐƠN HÀNG
                 </div>
-
-                <Divider />
-
+  
                 <div
+                  className='cart bg-white'
                   style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    margin: 15
+                    padding: 15,
+                    margin: `5px auto`,
+                    width: `47%`,
+                    borderRadius: '10px'
                   }}
                 >
                   <div
-                    style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      margin: 15
+                    }}
                   >
-                    Số lượng sản phẩm
+                    <div>
+                      <span style={{ marginLeft: '-12px', fontWeight: 600 }}>
+                        Mã đơn hàng
+                      </span>
+                    </div>
+  
+                    <div style={{ marginLeft: '-12px', fontWeight: 600 }}>
+                      {bill.ma}
+                    </div>
                   </div>
-
-                  <div style={{ style: '#707070' }}>
-                    {' '}
-                    {account.id === '' ? quantityRedux : productDetails.length}
-                  </div>
-                </div>
-
-                {voucher && (
+  
+                  <Divider />
+  
                   <div
                     style={{
                       display: 'flex',
@@ -1218,515 +1258,536 @@ const CartPage = () => {
                     <div
                       style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
                     >
-                      Phiếu giảm giá
+                      Số lượng sản phẩm
                     </div>
-
-                    <div style={{ color: 'red' }}>
-                      - {formatMoney(voucher?.giaTriVoucher)}
+  
+                    <div style={{ style: '#707070' }}>
+                      {' '}
+                      {account.id === '' ? quantityRedux : productDetails.length}
                     </div>
                   </div>
-                )}
-
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    margin: 15
-                  }}
-                >
+  
+                  {voucher && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        margin: 15
+                      }}
+                    >
+                      <div
+                        style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                      >
+                        Phiếu giảm giá
+                      </div>
+  
+                      <div style={{ color: 'red' }}>
+                        - {formatMoney(voucher?.giaTriVoucher)}
+                      </div>
+                    </div>
+                  )}
+  
                   <div
-                    style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      margin: 15
+                    }}
                   >
-                    Tổng tiền
+                    <div
+                      style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                    >
+                      Tổng tiền
+                    </div>
+  
+                    <div style={{ style: '#707070' }}>
+                      {formatMoney(totalAmount - informationBill.shipFee)}
+                    </div>
                   </div>
-
-                  <div style={{ style: '#707070' }}>
-                    {formatMoney(totalAmount - informationBill.shipFee)}
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    margin: 15
-                  }}
-                >
+  
                   <div
-                    style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      margin: 15
+                    }}
                   >
-                    Phí vận chuyển
+                    <div
+                      style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                    >
+                      Phí vận chuyển
+                    </div>
+  
+                    <div style={{ style: '#707070' }}>
+                      {formatMoney(informationBill.shipFee)}
+                    </div>
                   </div>
-
-                  <div style={{ style: '#707070' }}>
-                    {formatMoney(informationBill.shipFee)}
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    margin: 15
-                  }}
-                >
+  
                   <div
-                    style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      margin: 15
+                    }}
                   >
-                    Hình thức thanh toán
+                    <div
+                      style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                    >
+                      Hình thức thanh toán
+                    </div>
+  
+                    <div style={{ style: '#707070' }}>
+                      {paymentMethodCss === 1
+                        ? 'Thanh toán khi nhận hàng'
+                        : 'Thanh toán online'}
+                    </div>
                   </div>
-
-                  <div style={{ style: '#707070' }}>
-                    {paymentMethodCss === 1
-                      ? 'Thanh toán khi nhận hàng'
-                      : 'Thanh toán online'}
-                  </div>
-                </div>
-
-                <Divider />
-
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    margin: 15
-                  }}
-                >
-                  <div>
-                    <span style={{ marginLeft: '-12px', fontWeight: 600 }}>
-                      Cần thanh toán
-                    </span>
-                  </div>
-
-                  <div style={{ marginLeft: '-12px', fontWeight: 600 }}>
-                    {formatMoney(totalAmount)}
-                  </div>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  color: `#212b36`,
-                  width: '46%',
-                  margin: '0 auto',
-                  fontSize: `16px`,
-                  fontWeight: `500`,
-                  lineHeight: `18px`,
-                  marginBottom: `10px`,
-                  marginTop: `15px`,
-                  textTransform: `uppercase`
-                }}
-              >
-                THÔNG TIN NHẬN HÀNG
-              </div>
-
-              <div
-                className='cart bg-white'
-                style={{
-                  padding: 15,
-                  margin: `5px auto`,
-                  width: `47%`,
-                  borderRadius: '10px'
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    margin: 15
-                  }}
-                >
+  
+                  <Divider />
+  
                   <div
-                    style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      margin: 15
+                    }}
                   >
-                    Khách hàng
+                    <div>
+                      <span style={{ marginLeft: '-12px', fontWeight: 600 }}>
+                        Cần thanh toán
+                      </span>
+                    </div>
+  
+                    <div style={{ marginLeft: '-12px', fontWeight: 600 }}>
+                      {formatMoney(totalAmount)}
+                    </div>
                   </div>
-
-                  <div style={{ style: '#707070' }}>{informationBill.name}</div>
                 </div>
-
+  
                 <div
                   style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    margin: 15
+                    color: `#212b36`,
+                    width: '46%',
+                    margin: '0 auto',
+                    fontSize: `16px`,
+                    fontWeight: `500`,
+                    lineHeight: `18px`,
+                    marginBottom: `10px`,
+                    marginTop: `15px`,
+                    textTransform: `uppercase`
                   }}
                 >
-                  <div
-                    style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
-                  >
-                    Số điện thoại
-                  </div>
-
-                  <div style={{ style: '#707070' }}>
-                    {informationBill.phone}
-                  </div>
+                  THÔNG TIN NHẬN HÀNG
                 </div>
-
+  
                 <div
+                  className='cart bg-white'
                   style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    margin: 15
+                    padding: 15,
+                    margin: `5px auto`,
+                    width: `47%`,
+                    borderRadius: '10px'
                   }}
                 >
                   <div
                     style={{
-                      color: 'rgb(155 148 148)',
-                      marginLeft: '-12px'
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      margin: 15
                     }}
                   >
-                    Thời gian nhận hàng dự kiến
+                    <div
+                      style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                    >
+                      Khách hàng
+                    </div>
+  
+                    <div style={{ style: '#707070' }}>{informationBill.name}</div>
                   </div>
-
-                  <div style={{ style: '#707070' }}>
-                    {informationBill?.receivedDate}
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    margin: 15
-                  }}
-                >
-                  <div
-                    style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
-                  >
-                    Nhận hàng tại
-                  </div>
-
+  
                   <div
                     style={{
-                      style: '#707070',
-                      wordWrap: 'wrap',
-                      width: '300px',
-                      textAlign: 'right'
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      margin: 15
                     }}
                   >
-                    {informationBill.address}, {informationBill.ward},{' '}
-                    {informationBill.district}, {informationBill.province}
+                    <div
+                      style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                    >
+                      Số điện thoại
+                    </div>
+  
+                    <div style={{ style: '#707070' }}>
+                      {informationBill.phone}
+                    </div>
+                  </div>
+  
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      margin: 15
+                    }}
+                  >
+                    <div
+                      style={{
+                        color: 'rgb(155 148 148)',
+                        marginLeft: '-12px'
+                      }}
+                    >
+                      Thời gian nhận hàng dự kiến
+                    </div>
+  
+                    <div style={{ style: '#707070' }}>
+                      {informationBill?.receivedDate}
+                    </div>
+                  </div>
+  
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      margin: 15
+                    }}
+                  >
+                    <div
+                      style={{ color: 'rgb(155 148 148)', marginLeft: '-12px' }}
+                    >
+                      Nhận hàng tại
+                    </div>
+  
+                    <div
+                      style={{
+                        style: '#707070',
+                        wordWrap: 'wrap',
+                        width: '300px',
+                        textAlign: 'right'
+                      }}
+                    >
+                      {informationBill.address}, {informationBill.ward},{' '}
+                      {informationBill.district}, {informationBill.province}
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              <div
-                style={{
-                  margin: `10px auto`,
-                  width: `47%`,
-                  borderRadius: '10px'
-                }}
-              >
-                DANH SÁCH SẢN PHẨM
-              </div>
-
-              <div
-                className='cart bg-white'
-                style={{ width: '47%', margin: '0 auto' }}
-              >
-                <div className='cart-ctable'>
-                  <div className='cart-cbody bg-white'>
-                    {account.id !== '' &&
-                      productDetails.map(product => {
-                        return (
-                          <>
-                            <div
-                              className='cart-ctr'
-                              key={product?.id}
-                              style={{ marginTop: 10 }}
-                            >
-                              <div className='cart-ctd'>
-                                <img
-                                  style={{ width: 112, height: 105 }}
-                                  src={product.duongDan}
-                                />
-                              </div>
-                              <div
-                                className='cart-ctd'
-                                style={{ position: 'relative', top: '0px' }}
-                              >
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    width: 550,
-                                    height: 140,
-                                    marginLeft: 10
-                                  }}
-                                >
-                                  <div style={{ width: '127%', marginTop: 17 }}>
-                                    <span className='cart-ctxtf fw-7'>
-                                      {product?.tenSanPham +
-                                        ' ' +
-                                        product?.dungLuongRam +
-                                        'GB ' +
-                                        product?.dungLuongRom +
-                                        'GB - ' +
-                                        product?.tenMauSac}
-                                    </span>
-                                    <br />
-                                    <span>
-                                      <span
-                                        className='cart-ctxt'
-                                        style={{
-                                          color: '#128DE2',
-                                          fontSize: '17px',
-                                          fontWeight: 500
-                                        }}
-                                      >
-                                        {formatMoney(
-                                          product?.donGiaSauKhuyenMai === 0
-                                            ? product?.donGia
-                                            : product?.donGiaSauKhuyenMai
-                                        )}
-                                      </span>
-                                      <del
-                                        style={{
-                                          color: '#999',
-                                          fontSize: '14px',
-                                          marginLeft: '5px',
-                                          fontWeight: 500
-                                        }}
-                                      >
-                                        {product?.donGiaSauKhuyenMai === 0
-                                          ? ''
-                                          : formatMoney(product?.donGia)}
-                                      </del>
-                                    </span>
-                                  </div>
-                                  <div
-                                    style={{
-                                      width: '58%',
-                                      marginTop: 42,
-                                      fontWeight: 500
-                                    }}
-                                  >
-                                    Số lượng :
-                                    <span style={{ color: '#128DE2' }}>
-                                      {' ' + product?.soLuongSapMua}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className='cart-ctd'></div>
-                              <div className='cart-ctd'></div>
-
-                              <div className='cart-ctd'></div>
-                            </div>
-                          </>
-                        )
-                      })}
-
-                    {account.id === '' &&
-                      productDetailsRedux.map(product => {
-                        return (
-                          <>
-                            <div
-                              className='cart-ctr'
-                              key={product?.id}
-                              style={{ marginTop: 10 }}
-                            >
-                              <div className='cart-ctd'>
-                                <img
-                                  style={{ width: 112, height: 115 }}
-                                  src={product.data.urlImage}
-                                />
-                              </div>
-                              <div
-                                className='cart-ctd'
-                                style={{ position: 'relative', top: '0px' }}
-                              >
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    width: 550,
-                                    height: 140,
-                                    marginLeft: 10
-                                  }}
-                                >
-                                  <div style={{ width: '127%', marginTop: 17 }}>
-                                    <span className='cart-ctxtf fw-7'>
-                                      {product?.data.nameProduct +
-                                        ' ' +
-                                        product?.data.ram +
-                                        'GB ' +
-                                        product?.data.rom +
-                                        'GB - ' +
-                                        product?.data.color}
-                                    </span>
-                                    <br />
-                                    <span>
-                                      <span
-                                        className='cart-ctxt'
-                                        style={{
-                                          color: '#128DE2',
-                                          fontSize: '17px',
-                                          fontWeight: 500
-                                        }}
-                                      >
-                                        {formatMoney(
-                                          product?.data.priceDiscount === 0
-                                            ? product?.data.price
-                                            : product?.data.priceDiscount
-                                        )}
-                                      </span>
-                                      <del
-                                        style={{
-                                          color: '#999',
-                                          fontSize: '14px',
-                                          marginLeft: '5px',
-                                          fontWeight: 500
-                                        }}
-                                      >
-                                        {product?.data.priceDiscount === 0
-                                          ? ''
-                                          : formatMoney(product?.data.price)}
-                                      </del>
-                                    </span>
-                                  </div>
-                                  <div
-                                    style={{
-                                      width: '58%',
-                                      marginTop: 42,
-                                      fontWeight: 500
-                                    }}
-                                  >
-                                    Số lượng :
-                                    <span style={{ color: '#128DE2' }}>
-                                      {' ' + product?.quantity}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className='cart-ctd'></div>
-                              <div className='cart-ctd'></div>
-
-                              <div className='cart-ctd'></div>
-                            </div>
-                          </>
-                        )
-                      })}
-                  </div>
-                </div>
-              </div>
-              <br />
-
-              <div
-                className='countProductTemp'
-                style={{
-                  left: 395,
-                  width: '47%',
-                  display: 'flex',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <Button
-                  variant='outlined'
+  
+                <div
                   style={{
-                    width: '48%',
-                    marginTop: 5,
-                    fontSize: 14
-                  }}
-                  onClick={() => {
-                    if(account.id === ''){
-                      dispatch(resetAllCartDetail())
-                    }
-                    navigate('/')
+                    margin: `10px auto`,
+                    width: `47%`,
+                    borderRadius: '10px'
                   }}
                 >
-                  Tiếp tục mua hàng
-                </Button>
-
-                <Button
-                  variant='contained'
+                  DANH SÁCH SẢN PHẨM
+                </div>
+  
+                <div
+                  className='cart bg-white'
+                  style={{ width: '47%', margin: '0 auto' }}
+                >
+                  <div className='cart-ctable'>
+                    <div className='cart-cbody bg-white'>
+                      {account.id !== '' &&
+                        productDetails.map(product => {
+                          return (
+                            <>
+                              <div
+                                className='cart-ctr'
+                                key={product?.id}
+                                style={{ marginTop: 10 }}
+                              >
+                                <div className='cart-ctd'>
+                                  <img
+                                    style={{ width: 112, height: 105 }}
+                                    src={product.duongDan}
+                                  />
+                                </div>
+                                <div
+                                  className='cart-ctd'
+                                  style={{ position: 'relative', top: '0px' }}
+                                >
+                                  <div
+                                    style={{
+                                      display: 'flex',
+                                      justifyContent: 'space-between',
+                                      width: 550,
+                                      height: 140,
+                                      marginLeft: 10
+                                    }}
+                                  >
+                                    <div style={{ width: '127%', marginTop: 17 }}>
+                                      <span className='cart-ctxtf fw-7'>
+                                        {product?.tenSanPham +
+                                          ' ' +
+                                          product?.dungLuongRam +
+                                          'GB ' +
+                                          product?.dungLuongRom +
+                                          'GB - ' +
+                                          product?.tenMauSac}
+                                      </span>
+                                      <br />
+                                      <span>
+                                        <span
+                                          className='cart-ctxt'
+                                          style={{
+                                            color: '#128DE2',
+                                            fontSize: '17px',
+                                            fontWeight: 500
+                                          }}
+                                        >
+                                          {formatMoney(
+                                            product?.donGiaSauKhuyenMai === 0
+                                              ? product?.donGia
+                                              : product?.donGiaSauKhuyenMai
+                                          )}
+                                        </span>
+                                        <del
+                                          style={{
+                                            color: '#999',
+                                            fontSize: '14px',
+                                            marginLeft: '5px',
+                                            fontWeight: 500
+                                          }}
+                                        >
+                                          {product?.donGiaSauKhuyenMai === 0
+                                            ? ''
+                                            : formatMoney(product?.donGia)}
+                                        </del>
+                                      </span>
+                                    </div>
+                                    <div
+                                      style={{
+                                        width: '58%',
+                                        marginTop: 42,
+                                        fontWeight: 500
+                                      }}
+                                    >
+                                      Số lượng :
+                                      <span style={{ color: '#128DE2' }}>
+                                        {' ' + product?.soLuongSapMua}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className='cart-ctd'></div>
+                                <div className='cart-ctd'></div>
+  
+                                <div className='cart-ctd'></div>
+                              </div>
+                            </>
+                          )
+                        })}
+  
+                      {account.id === '' &&
+                        productDetailsRedux.map(product => {
+                          return (
+                            <>
+                              <div
+                                className='cart-ctr'
+                                key={product?.id}
+                                style={{ marginTop: 10 }}
+                              >
+                                <div className='cart-ctd'>
+                                  <img
+                                    style={{ width: 112, height: 115 }}
+                                    src={product.data.urlImage}
+                                  />
+                                </div>
+                                <div
+                                  className='cart-ctd'
+                                  style={{ position: 'relative', top: '0px' }}
+                                >
+                                  <div
+                                    style={{
+                                      display: 'flex',
+                                      justifyContent: 'space-between',
+                                      width: 550,
+                                      height: 140,
+                                      marginLeft: 10
+                                    }}
+                                  >
+                                    <div style={{ width: '127%', marginTop: 17 }}>
+                                      <span className='cart-ctxtf fw-7'>
+                                        {product?.data.nameProduct +
+                                          ' ' +
+                                          product?.data.ram +
+                                          'GB ' +
+                                          product?.data.rom +
+                                          'GB - ' +
+                                          product?.data.color}
+                                      </span>
+                                      <br />
+                                      <span>
+                                        <span
+                                          className='cart-ctxt'
+                                          style={{
+                                            color: '#128DE2',
+                                            fontSize: '17px',
+                                            fontWeight: 500
+                                          }}
+                                        >
+                                          {formatMoney(
+                                            product?.data.priceDiscount === 0
+                                              ? product?.data.price
+                                              : product?.data.priceDiscount
+                                          )}
+                                        </span>
+                                        <del
+                                          style={{
+                                            color: '#999',
+                                            fontSize: '14px',
+                                            marginLeft: '5px',
+                                            fontWeight: 500
+                                          }}
+                                        >
+                                          {product?.data.priceDiscount === 0
+                                            ? ''
+                                            : formatMoney(product?.data.price)}
+                                        </del>
+                                      </span>
+                                    </div>
+                                    <div
+                                      style={{
+                                        width: '58%',
+                                        marginTop: 42,
+                                        fontWeight: 500
+                                      }}
+                                    >
+                                      Số lượng :
+                                      <span style={{ color: '#128DE2' }}>
+                                        {' ' + product?.quantity}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className='cart-ctd'></div>
+                                <div className='cart-ctd'></div>
+  
+                                <div className='cart-ctd'></div>
+                              </div>
+                            </>
+                          )
+                        })}
+                    </div>
+                  </div>
+                </div>
+                <br />
+  
+                <div
+                  className='countProductTemp'
                   style={{
-                    width: '48%',
-                    marginTop: 5,
-                    fontSize: 14
+                    left: 395,
+                    width: '47%',
+                    display: 'flex',
+                    justifyContent: 'space-between'
                   }}
-                  onClick={() => {
-                    if(account.id === ''){
-                      dispatch(resetAllCartDetail())
-                    }
-                    navigate(`/look-up-order-page/${bill.ma}`)
-                    var data = [
-                      {
-                        path: `/look-up-order-page/${bill.ma}`,
-                        name: `Đơn hàng ${bill.ma}`
+                >
+                  <Button
+                    variant='outlined'
+                    style={{
+                      width: '48%',
+                      marginTop: 5,
+                      fontSize: 14
+                    }}
+                    onClick={() => {
+                      if(account.id === ''){
+                       
                       }
-                    ]
-                    dispatch(AddItemNavbar(data))
-                  }}
-                >
-                  Kiểm tra đơn hàng
-                </Button>
-              </div>
-              <br />
-              <br />
-            </>
-          )}
-        </>
-      ) : (
-        <></>
-      )}
-
-      {/* toaster */}
-      {checkoutState === 2 || checkoutState === 3 ? (
-        <Toaster
-          style={{ zIndex: -1, overflow: 'hidden', opacity: 0 }}
-          position='top-center'
-          reverseOrder={false}
-          gutter={8}
-          containerClassName='hhe'
-          toastOptions={{
-            // Define default options
-            // className: '',
-            // duration: 5000,
-            // style: {
-            //   background: '#4caf50',
-            //   color: 'white'
-            // },
-
-            // Default options for specific types
-            success: {
-              duration: 3000,
-              theme: {
-                primary: 'green',
-                secondary: 'white'
+                      navigate('/')
+                    }}
+                  >
+                    Tiếp tục mua hàng
+                  </Button>
+  
+                  <Button
+                    variant='contained'
+                    style={{
+                      width: '48%',
+                      marginTop: 5,
+                      fontSize: 14
+                    }}
+                    onClick={() => {
+                      if(account.id === ''){
+                        // dispatch(resetAllCartDetail())
+                      }
+                      navigate(`/look-up-order-page/${bill.ma}`)
+                      var data = [
+                        {
+                          path: `/look-up-order-page/${bill.ma}`,
+                          name: `Đơn hàng ${bill.ma}`
+                        }
+                      ]
+                      dispatch(AddItemNavbar(data))
+                    }}
+                  >
+                    Kiểm tra đơn hàng
+                  </Button>
+                </div>
+                <br />
+                <br />
+              </>
+            )}
+          </>
+        ) : (
+          <></>
+        )}
+  
+        {/* toaster */}
+        {checkoutState === 2 || checkoutState === 3 ? (
+          <Toaster
+            style={{ zIndex: -1, overflow: 'hidden', opacity: 0 }}
+            position='top-center'
+            reverseOrder={false}
+            gutter={8}
+            containerClassName='hhe'
+            toastOptions={{
+              // Define default options
+              // className: '',
+              // duration: 5000,
+              // style: {
+              //   background: '#4caf50',
+              //   color: 'white'
+              // },
+  
+              // Default options for specific types
+              success: {
+                duration: 3000,
+                theme: {
+                  primary: 'green',
+                  secondary: 'white'
+                },
+                iconTheme: {
+                  primary: 'white',
+                  secondary: '#4caf50'
+                },
+                style: {
+                  background: '#4caf50',
+                  color: 'white'
+                }
               },
-              iconTheme: {
-                primary: 'white',
-                secondary: '#4caf50'
-              },
-              style: {
-                background: '#4caf50',
-                color: 'white'
+  
+              error: {
+                duration: 3000,
+                theme: {
+                  primary: '#f44336',
+                  secondary: 'white'
+                },
+                iconTheme: {
+                  primary: 'white',
+                  secondary: '#f44336'
+                },
+                style: {
+                  background: '#f44336',
+                  color: 'white'
+                }
               }
-            },
-
-            error: {
-              duration: 3000,
-              theme: {
-                primary: '#f44336',
-                secondary: 'white'
-              },
-              iconTheme: {
-                primary: 'white',
-                secondary: '#f44336'
-              },
-              style: {
-                background: '#f44336',
-                color: 'white'
-              }
-            }
-          }}
-        />
-      ) : (
-        <></>
-      )}
-    </>
+            }}
+          />
+        ) : (
+          <></>
+        )}
+      </>
+   </>
   )
 }
 

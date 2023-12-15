@@ -52,11 +52,11 @@ const HomePage = () => {
     const loginBtn = document.getElementById('login')
 
     registerBtn.addEventListener('click', () => {
-      container.classList.add('active')
+      container.classList.add('activeLogin')
     })
 
     loginBtn.addEventListener('click', () => {
-      container.classList.remove('active')
+      container.classList.remove('activeLogin')
     })
   }
 
@@ -184,6 +184,24 @@ const HomePage = () => {
             setAuthHeader(res.data.token)
             reset()
             toast.success('Đăng ký tài khoản thành công')
+            request('POST', '/client/account/login', {
+              email: userRegister.email,
+              password: userRegister.password
+            })
+            .then(res => {
+              console.log(res.data)
+              setAuthHeader(res.data.token)
+              dispatch(changeInformationUser(res.data))
+              dispatch(addToCart())
+              setTimeout(() => {
+                navigate('/')
+              }, 400)
+            })
+            .catch(error => {
+              console.log(error)
+              setUserNoToken()
+              toast.error(error.response.data)
+            })
             navigate('/login')
           })
           .catch(error => {

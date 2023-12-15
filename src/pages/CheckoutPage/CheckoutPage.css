@@ -113,3 +113,19 @@
   .css-1om905o-MuiFormControl-root{
     margin: 0px!important;
   }
+
+  .ant-modal-content{
+    top: 0px;
+    overflow: hidden;
+  }
+
+  .custom-spin{
+    position: fixed;
+    display: flex;
+    background: #e5e5ec6b;
+    width: 100%;
+    height: 100%;
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+  }

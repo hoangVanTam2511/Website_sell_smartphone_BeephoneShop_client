@@ -14,7 +14,7 @@ const Navbar = () => {
   const user = getUser()
   const [searchTerm, setSearchTerm] = useState('')
   const countOfProductDetail = useSelector(state => state.cart.quantity)
-  const productDetailsRedux = useSelector(state => state.cartDetail.products)
+  const countProductNoLogin = useSelector(state => state.cartDetail.quantity)
 
   //navigate
   const navigate = useNavigate()
@@ -26,7 +26,6 @@ const Navbar = () => {
 
   useEffect(() => {
     dispatch(addToCart())
-    console.log(countOfProductDetail)
     if(user.id === null || user.id === "" || user === null){
       dispatch(checkUserAnonymous());
       dispatch(addToCart(0));
@@ -198,7 +197,7 @@ const Navbar = () => {
                 className='fa-solid fa-bag-shopping'
                 style={{ position: `relative`, right: `-8px`, fontSize: `29px` }}
               ></i>
-              <div className='cart-items-value'>{user.id === '' ? productDetailsRedux.length : countOfProductDetail}</div>
+              <div className='cart-items-value'>{user.id === '' ? countProductNoLogin : countOfProductDetail}</div>
               <div style={{ fontSize: `10px`, width: `50px`, fontWeight: '500' }}>
                 Giỏ hàng
               </div>

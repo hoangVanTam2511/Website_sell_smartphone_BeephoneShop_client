@@ -51,7 +51,6 @@ const cartDetailSlice = createSlice({
       })
       
       if (indexOfItem === -1) {
-        state.quantity = state.quantity + 1
         listOfConfigProducts.push({
           data: action.payload,
           quantity: 1
@@ -70,11 +69,15 @@ const cartDetailSlice = createSlice({
         )
       }
 
+      // calculate count of cart and totalPrice
       var totalPrice = 0;
+      var countOfProduct = 0
       listOfConfigProducts.forEach(e => {
+        countOfProduct += Number(e.quantity)
         totalPrice += (Number(e.data.priceDiscount) === 0 ? Number(e.data.price) : Number(e.data.priceDiscount)) * Number(e.quantity)
       })
 
+      state.quantity = countOfProduct
       state.totalAmount = totalPrice
     })
     .addCase(removeProductToCart.fulfilled, (state, action) => {
@@ -104,12 +107,15 @@ const cartDetailSlice = createSlice({
         )
       }
 
-      //total price
+      // calculate count of cart and totalPrice
       var totalPrice = 0;
+      var countOfProduct = 0
       listOfConfigProducts.forEach(e => {
+        countOfProduct += Number(e.quantity)
         totalPrice += (Number(e.data.priceDiscount) === 0 ? Number(e.data.price) : Number(e.data.priceDiscount)) * Number(e.quantity)
       })
 
+      state.quantity = countOfProduct
       state.totalAmount = totalPrice
     })
     .addCase(resetAllCartDetail.fulfilled, (state, action) => {
@@ -130,6 +136,17 @@ const cartDetailSlice = createSlice({
         state.products = listOfConfigProducts.splice(indexOfItem, 1)
         state.products = listOfConfigProducts
       }
+
+      // calculate count of cart and totalPrice
+      var totalPrice = 0;
+      var countOfProduct = 0
+      listOfConfigProducts.forEach(e => {
+        countOfProduct += Number(e.quantity)
+        totalPrice += (Number(e.data.priceDiscount) === 0 ? Number(e.data.price) : Number(e.data.priceDiscount)) * Number(e.quantity)
+      })
+
+      state.quantity = countOfProduct
+      state.totalAmount = totalPrice
     })
 
 

@@ -5,7 +5,7 @@ import { Space, Input } from 'antd'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { changeInformationUser } from '../../store/userSlice'
-import { SetNote, SetSelectedCart } from '../../store/cartSlice'
+import { SetNote, SetSelectedCart, getTotalProductDetails } from '../../store/cartSlice'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import toast, { Toaster } from 'react-hot-toast'
 import InputLabel from '@mui/material/InputLabel'
@@ -16,6 +16,8 @@ import { useSelector } from 'react-redux'
 import { ResetItemNavbar } from '../../store/navbarSlice'
 import { request, setAuthHeader } from '../../helpers/axios_helper'
 import { setUserNoToken } from '../../store/userSlice'
+import { LoadingOutlined } from '@ant-design/icons';
+import { Spin } from 'antd';
 
 const CartPage = props => {
   const host = 'https://provinces.open-api.vn/api/'
@@ -40,7 +42,9 @@ const CartPage = props => {
   const [addressInput, setAddressInput] = useState('')
   const [shipFee, setShipFee] = useState(0)
   const [receivedDate, setReceivedDate] = useState('')
-  const totalAmountRedux = useSelector(state => state.cartDetail.totalAmount)
+  const totalAmountRedux = getTotalProductDetails()
+
+  const [isLoadingRequest, setIsLoadingRequest] = useState(true)
 
   // redux
   const selectedCart = useSelector(state => state.cart.selectedCart)
@@ -286,7 +290,7 @@ const CartPage = props => {
     getReceiveDate(value)
 
     if(props.account.id === ""){
-      props.setTotalCount(totalAmountRedux + shipFee)
+      props.setTotalCount(Number(totalAmountRedux) + Number(shipFee))
     }else{
       props.setTotalCount( shipFee)
     }
@@ -301,6 +305,7 @@ const CartPage = props => {
 
   const handleChooseAddress = value => {
     console.log(account)
+    setIsLoadingRequest(false)
     let newAddress = {
       ...props.account,
       diaChiList: value,
@@ -310,10 +315,13 @@ const CartPage = props => {
       xaPhuong: value.xaPhuong
     }
     setAccount(newAddress)
-    setAddressSelected(3)
-    getAllProvinceGhnByAddressCustomer(newAddress)
-    toast.success('Chọn địa chỉ thành công')
-    dispatch(changeInformationUser(newAddress))
+    setTimeout(() => {
+      setIsLoadingRequest(true)
+      setAddressSelected(3)
+      getAllProvinceGhnByAddressCustomer(newAddress)
+      toast.success('Chọn địa chỉ thành công')
+      dispatch(changeInformationUser(newAddress))
+    }, 200)
   }
 
   const getAllAddress = async () => {
@@ -423,7 +431,7 @@ const CartPage = props => {
         provinesSelected: provinceSelected
       }
       if(props.account.id === ""){
-        props.setTotalCount(totalAmountRedux + shipFee)
+        props.setTotalCount(Number(totalAmountRedux) + Number(shipFee))
       }else{
         props.setTotalCount(shipFee)
       }
@@ -1187,7 +1195,7 @@ const CartPage = props => {
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span style={{ fontWeight: 'bold' }}>Tổng tiền tạm tính</span>
           <span style={{ fontWeight: 'bold', color: '#128DE2' }}>
-            {formatMoney(props.account.id === ""?props.totalAmount < (totalAmountRedux + shipFee) ? (totalAmountRedux + shipFee) : props.totalAmount : props.totalAmount)}
+            {formatMoney(props.account.id === ""?props.totalAmount < (Number(totalAmountRedux) + Number(shipFee)) ? (Number(totalAmountRedux) + Number(shipFee)) : props.totalAmount : props.totalAmount)}
           </span>
         </div>
         <Button

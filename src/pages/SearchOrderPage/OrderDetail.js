@@ -157,7 +157,7 @@ const OrderDetail = props => {
         </div>
         <Divider />
 
-        <div style={{ marginLeft: '4%', width: '110%', marginBottom: '107px' }}>
+        <div style={{ marginLeft: '4%', width: '100%', marginBottom: '107px' }}>
           <ul class='steps'>
             <li className={state1 ? 'active' : 'no_active'}>
               <div
@@ -408,7 +408,7 @@ const OrderDetail = props => {
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      width: 970,
+                      width: 770,
                       height: 140,
                       marginLeft: 10
                     }}

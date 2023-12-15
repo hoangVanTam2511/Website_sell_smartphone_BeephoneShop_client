@@ -102,7 +102,9 @@ const LookUpOrderPage = () => {
               Kiểm tra thông tin đơn hàng & tình trạng vận chuyển
             </div>
             <div className='circle'></div>
-            <div className='container-left-bottom'>
+            {
+              account === null || account.id === "" ? (
+                <div className='container-left-bottom'>
               <div className='container-left-bottom-compliment'>Hoặc</div>
               <div className='container-left-bottom-description'>
                 <p>
@@ -112,6 +114,20 @@ const LookUpOrderPage = () => {
                 </p>
               </div>
             </div>
+              ):(
+                <div className='container-left-bottom'>
+              <div className='container-left-bottom-compliment'>Hoặc</div>
+              <div className='container-left-bottom-description'>
+                <p>
+                  <Link to='/search-order-page'>
+                    <button className='btn-login'>Kiểm tra đơn hàng</button>.
+                  </Link>
+                </p>
+              </div>
+            </div>
+              )
+            }
+            
           </div>
 
           <div className='container-right-box'></div>

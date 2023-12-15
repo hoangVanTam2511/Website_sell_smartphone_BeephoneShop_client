@@ -16,11 +16,14 @@ import { addToCart } from '../../store/cartSlice'
 import { useNavigate } from 'react-router-dom'
 import toast, { Toaster } from 'react-hot-toast'
 import { addProductToCart } from '../../store/cartDetailSlice'
-import { ResetSelectedCart } from '../../store/cartSlice'
+import { ResetSelectedCart, setSelectedCartDetail } from '../../store/cartSlice'
 import { request, setAuthHeader } from '../../helpers/axios_helper'
 import { getUser, setUserNoToken } from '../../store/userSlice'
-
+import { changNewProductAddToCart } from '../../store/cartSlice'
+import { LoadingOutlined } from '@ant-design/icons';
+import { Spin } from 'antd';
 var stompClient = null
+
 const ProductSinglePage = () => {
   const { id } = useParams()
   
@@ -36,6 +39,9 @@ const ProductSinglePage = () => {
   const selectedCart = useSelector(state => state.cart.selectedCart)
   var cartDetails = useSelector(state => state.cartDetail.products) 
   const navigate = useNavigate()
+
+  //loading
+  const [isLoading, setIsLoading] = useState(false)
 
   //ram, rom, color
   const [config, setConfig] = useState({
@@ -245,6 +251,7 @@ const ProductSinglePage = () => {
         if(user.id === ''){
           dispatch(addProductToCart(config))
           getCartProduct()
+          setSelectedCartDetail({data: config})
           toast.success("Thêm sản phẩm vào giỏ hàng thành công")
         }else{
           request("POST",`/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
@@ -253,6 +260,8 @@ const ProductSinglePage = () => {
             if (res.status === 200) {
               dispatch(addToCart())
               getCartProduct()
+              console.log(res.data)
+              setSelectedCartDetail(res.data)
               toast.success("Thêm sản phẩm vào giỏ hàng thành công")
             }
           })
@@ -297,11 +306,16 @@ const ProductSinglePage = () => {
     if(soLuong >= 4){
       toast.error("Sản phẩm trong giỏ hàng đã đạt tới số lượng giới hạn.Vui lòng chọn sản phẩm khác.")
     }else{
+      setIsLoading(true)
       if(selectedCart === 0){
         if(user.id === ''){
           dispatch(addProductToCart(config))
+          setSelectedCartDetail({data: config})
           getCartProduct()
-          navigate('/cart')
+          setTimeout(() => {
+            setIsLoading(false)
+            navigate('/cart')
+          },1000)
         }else{
           request("POST",`/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
           )
@@ -309,7 +323,13 @@ const ProductSinglePage = () => {
             if (res.status === 200) {
               dispatch(addToCart())
               getCartProduct()
-              navigate('/cart')
+              console.log(res.data)
+              setSelectedCartDetail(res.data)
+              setTimeout(() => {
+                setIsLoading(false)
+                navigate('/cart')
+              },1000)
+              
             }
           })
           .catch(res =>{
@@ -618,8 +638,8 @@ const ProductSinglePage = () => {
                     type='button'
                     className='add-to-cart-btn btn'
                     style={{
-                      backgroundColor: '#fb6e2e',
-                      border: '  1px solid #fb6e2e',
+                      backgroundColor: '#128DE2',
+                      border: '  1px solid #128DE2',
                       color: 'white',
                       borderRadius: 10,
                       width: `47%`
@@ -629,7 +649,17 @@ const ProductSinglePage = () => {
                     }}
                   >
                     <i className='fas fa-shopping-cart'></i>
-                    <span className='btn-text mx-2'>Mua ngay</span>
+                    <span className='btn-text mx-2'>Mua ngay 
+                    {
+                      isLoading === true ? 
+                      <>
+                        <Spin indicator={<LoadingOutlined style={{ fontSize: 24, color: 'white', marginLeft: 5 }} spin />} />
+                      </>:
+                      <>
+                      </>
+                    }
+                    
+                    </span>
                   </button>
 
                   <button
