@@ -387,6 +387,7 @@ const CartPage = () => {
 
     if (codeVoucher.trim()) {
       toast('Vui lòng nhập mã voucher')
+      return
     }
 
     confirm({

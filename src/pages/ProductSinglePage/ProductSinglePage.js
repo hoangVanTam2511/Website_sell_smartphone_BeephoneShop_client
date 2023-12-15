@@ -620,15 +620,18 @@ const ProductSinglePage = () => {
                     {config.priceDiscount === 0 ? (
                       ''
                     ) : (
-                      <div
-                        className='discount bg-orange fs-13 text-white fw-6 font-poppins'
-                        style={{
-                          backgroundColor: '#128DE2',
-                          border: '  1px solid #128DE2'
-                        }}
-                      >
-                        -{config.discount} %
-                      </div>
+                      // <div
+                      //   className='discount bg-orange fs-13 text-white fw-6 font-poppins'
+                      //   style={{
+                      //     backgroundColor: '#128DE2',
+                      //     border: '  1px solid #128DE2'
+                      //   }}
+                      // >
+                      //   -{config.discount} %
+                      // </div>
+
+                      <>
+                      </>
                     )}
                   </div>
                 </div>
