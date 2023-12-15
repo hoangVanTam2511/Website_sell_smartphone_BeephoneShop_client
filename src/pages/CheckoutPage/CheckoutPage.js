@@ -247,8 +247,7 @@ const CartPage = () => {
           tienThua: 0,
           tongTienSauKhiGiam: Number( totalAmount) - Number(informationBill.shipFee),
           tienKhachTra:
-            totalAmount +
-            Number(voucher === '' ? 0 : voucher.giaTriVoucher),
+            totalAmount,
           trangThai: 'PENDING_CONFIRM',
           loaiHoaDon: 'DELIVERY',
           phiShip: informationBill.shipFee,
@@ -382,10 +381,12 @@ const CartPage = () => {
       codeVoucher === null ||
       codeVoucher === undefined
     ) {
-      if (codeVoucher.trim()) {
-        toast('Vui lòng nhập mã voucher')
-      }
+      toast('Vui lòng nhập mã voucher')
       return
+    }
+
+    if (codeVoucher.trim()) {
+      toast('Vui lòng nhập mã voucher')
     }
 
     confirm({

@@ -381,8 +381,8 @@ const CartPage = () => {
   const getQuantityOfCart = () => {
       var count = 0;
       if(user.id !== ""){
-        checkeds.forEach(e => {
-          count += e.soLuongSapMua
+        checkeds.map(e => {
+          count += Number(changeCount.get(e.idSanPhamChiTiet))
         })
       }else{
         checkeds.forEach(e => {
