@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 import './SearchOrderPage.css'
-import { Divider } from 'antd'
+import { Divider, Radio } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import TextField from '@mui/material/TextField'
@@ -22,9 +22,12 @@ const Orders = () => {
   const [changeAddress, setChangeAddress] = useState(1)
   const [totalAmount, setTotalAmount] = useState(0)
   const [diaChiList, setDiaChiList] = useState([])
-
+  const [value1, setValue1] = useState('Nam');
    // redux
    const [isLoadingRequest, setIsLoadingRequest] = useState(true)
+
+   const plainOptions = ['Nam', 'Nữ'];
+   const [account, setAccount] = useState()
 
   const getBillsByIdCustomer = async() => {
     let sum = 0;
@@ -46,6 +49,8 @@ const Orders = () => {
     dispatch(SetSelectedCart(1))
     getBillsByIdCustomer()
     getAllAddress()
+    changeGender(user.gioiTinh === true ? "Nam": "Nữ")
+    setAccount(user)
   }, [])
 
   const getAllAddress = async () => {
@@ -133,6 +138,17 @@ const Orders = () => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number)
   }
 
+  const changeGender = ( value ) => {
+    setValue1(value);
+  };
+
+  const changeInformationUser = (e) => {
+    // setAccount({...account,
+    //   e.target.name : e.target.value,
+    // })
+    // console.log(e)
+  }
+
   return (
     <>
     {
@@ -146,7 +162,6 @@ const Orders = () => {
     }
       {changeAddress === 1 ? (
         <div>
-
           <div class='card bg-white'>
             <div class='title' style={{ marginLeft: '36%' }}>
               <h4>
@@ -158,31 +173,53 @@ const Orders = () => {
 
             <Divider></Divider>
 
+
             <div style={{ marginTop: '35px' }}>
               <div className='title'>
                 <span>
                   {' '}
                   <TextField
-                    style={{ width: '800px' }}
+                    style={{ width: '937px' }}
                     label='Họ và tên'
                     id='standard-basic'
                     variant='standard'
+                    name="hoVaTen"
+                    onChange={(e)=>changeInformationUser(e)}
                     value={user.hoVaTen}
                   />
                 </span>
               </div>
             </div>
 
+            <div style={{ marginTop: '35px'}}>
+            <div className='title'>
+            <span>Giới tính:</span>
+            <Radio.Group 
+                  style={{
+                    marginRight: `77%`,
+                    marginTop: `3px`
+                }}
+               options={plainOptions} 
+               name="gioiTinh"
+               onChange={changeGender} value={value1} />
+               <br />
+             
+            </div>
+             <Divider style={{ margin: '5px auto'}}></Divider>
+            </div>
+
             <div style={{ marginTop: '35px' }}>
               <div className='title'>
                 <span>
                   {' '}
                   <TextField
-                    style={{ width: '800px' }}
+                    style={{ width: '937px' }}
                     label='Số điện thoại'
                     id='standard-basic'
                     variant='standard'
                     value={user.soDienThoai}
+                    name="soDienThoai"
+                    onChange={(e)=>changeInformationUser(e)}
                   />
                 </span>
               </div>
@@ -193,31 +230,19 @@ const Orders = () => {
                 <span>
                   {' '}
                   <TextField
-                    style={{ width: '800px' }}
+                    style={{ width: '937px' }}
                     label='Email'
                     id='standard-basic'
                     variant='standard'
+                    name="email"
                     value={user.email}
+                    onChange={(e)=>changeInformationUser(e)}
                   />
                 </span>
               </div>
             </div>
 
-            {/* <div style={{ marginTop: '35px'}}>
-          <div className='title'>
-           <span>Giới tính: {user.gioiTinh === true?'Nam':'Nữ'} </span>
-
-            <button
-              style={{
-                // backgroundColor: `#128DE2`,    
-                color: `white`,
-                marginLeft: "5px",
-              }}
-              // variant="outlined"
-            > <i class="fa-regular fa-pen-to-square" style={{ fontSize: '22px', color:'#128DE2'}}></i> </button>
-          </div>
-          <Divider style={{ margin: '5px auto'}}></Divider>
-        </div> */}
+          
 
 
             <div style={{ marginTop: '35px' }}>

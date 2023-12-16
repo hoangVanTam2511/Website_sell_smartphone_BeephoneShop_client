@@ -583,7 +583,7 @@ const ProductSinglePage = () => {
                   })}
                 </div>
 
-                <div className='fw-6' style={{ marginTop: 10, fontSize: 13 }}>
+                <div className='fw-6' style={{  fontSize: 13 }}>
                   Chọn màu để xem giá :
                 </div>
 

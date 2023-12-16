@@ -678,7 +678,7 @@ const CategoryProductPage = () => {
           if (flag === 0) {
             flag++
             productDetails.forEach(item => {
-              if(item.donGiaSauKhuyenMai === null){
+              if(item.donGiaSauKhuyenMai === null || item.donGiaSauKhuyenMai === 0 || item.donGiaSauKhuyenMai === undefined){
                 if (
                   priceFillter.find(
                     e => e.min <= item.donGia && item.donGia <= e.max
@@ -1470,7 +1470,7 @@ const CategoryProductPage = () => {
                                     priceZone.min === 0 && priceZone.max === priceBiggest ? <>
                                     <Slider
                                       onChange={(e) => sliderChange(e)}
-                                      style={{ width: '296px', marginLeft: 10, marginBottom: 20 }}
+                                      style={{ width: '232px', marginLeft: 10, marginBottom: 20 }}
                                       min={0}
                                       max={Number(priceBiggest)}
                                       step={100000}
@@ -1480,7 +1480,7 @@ const CategoryProductPage = () => {
                                     </> :
                                     <Slider
                                     onChange={(e) => sliderChange(e)}
-                                    style={{ width: '296px', marginLeft: 10, marginBottom: 20 }}
+                                    style={{ width: '232px', marginLeft: 10, marginBottom: 20 }}
                                     min={0}
                                     max={Number(priceBiggest)}
                                     step={100000}
