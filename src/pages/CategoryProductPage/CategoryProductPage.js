@@ -10,10 +10,12 @@ import axios from 'axios'
 import { ResetSelectedCart } from '../../store/cartSlice'
 import { AddItemNavbar } from '../../store/navbarSlice'
 import Button from '@mui/material/Button'
-import { Empty } from 'antd'
+import { Empty,  Slider } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 import { request, setAuthHeader } from '../../helpers/axios_helper'
 import { setUserNoToken } from '../../store/userSlice'
+import { LoadingOutlined } from '@ant-design/icons';
+import { Spin } from 'antd';
 
 const CategoryProductPage = () => {
   const dispatch = useDispatch()
@@ -40,12 +42,20 @@ const CategoryProductPage = () => {
   const [danhMucFillter, setDanhMucFillter] = useState([])
   const [productFillter, setProductFillter] = useState([])
   const [brandFillter, setBrandFillter] = useState()
+  const [priceZone, setPriceZone] = useState({
+    max: 0,
+    min: 0
+  })
 
   //user param
   const { brand } = useParams()
   const flag = useSelector(state => state.navbar.flag)
   const navbar = useSelector(state => state.navbar.navbar)
   const navigate = useNavigate();
+
+  // loading 
+  const [isLoadingRequest, setIsLoadingRequest ] = useState(0)
+
   const [chiTietSanPham, setchiTietSanPham] = useState({
     sanPham: '',
     dongSanPham: '',
@@ -137,7 +147,10 @@ const CategoryProductPage = () => {
   ])
 
   useEffect(() => {
-    if (brand === 'all') {
+    console.log(String(brand) === 'all')
+    if (String(brand) === 'all') {
+      searchProductsAll('')
+      deleteAll()
       if (navbar.length > 1) {
         var data = [
           {
@@ -146,16 +159,18 @@ const CategoryProductPage = () => {
           }
         ]
         dispatch(AddItemNavbar(data))
-        searchProductsAll('')
+        
       }
+    }else{
+      searchProductsAll(brand)
+      setBrandFillter(brand)
+      // resultSearch()
     }
 
     if (listRam.length === 0) {
       loadDataComboBox()
-      searchProducts()
       dispatch(ResetSelectedCart())
       loadListProductDetails()
-      resultSearch()
       window.scrollTo(0, 0)
     }
   }, [dispatch, chiTietSanPham, flag, brand])
@@ -235,6 +250,10 @@ const CategoryProductPage = () => {
       request("GET",`/client/product-detail/get-max-price`)
       .then(response => {
         setpriceBiggest(response.data)
+        setPriceZone({...priceZone, 
+          min: 0,
+          max: response.data
+        })
       })
       .catch(error => {
         console.log(error)
@@ -260,6 +279,7 @@ const CategoryProductPage = () => {
   }
 
   const searchProductsAll = async data => {
+    console.log(data)
     request("POST",`/client/product-detail/search`, {
         sanPham: '',
         dongSanPham: '',
@@ -276,7 +296,9 @@ const CategoryProductPage = () => {
         tanSoQuet: ''
       })
       .then(res => {
+        console.log(res)
         if (res.status === 200) {
+          console.log(res.data)
           setProducts(res.data)
           setProductFillter(res.data)
         }
@@ -291,6 +313,7 @@ const CategoryProductPage = () => {
     request("GET",`/client/product-detail/get-product-detail`)
       .then(res => {
         if (res.status === 200) {
+          console.log(res.data)
           setProductDetails(res.data)
         }
       })
@@ -473,9 +496,9 @@ const CategoryProductPage = () => {
   }
 
   const resultSearch = () => {
-    window.scrollTo(0, 180)
+    window.scrollTo(0, 175)
     setShowFilter(0)
-
+    setIsLoadingRequest(1)
     // fillter
     if (
       ramFillter.length === 0 &&
@@ -491,7 +514,11 @@ const CategoryProductPage = () => {
       products.forEach(item => {
         temp.push(item)
       })
-      setProductFillter(temp)
+      setTimeout(() => {
+        deleteAll()
+        setIsLoadingRequest(0)
+        setProductFillter(temp)
+      }, 200)
     } else {
       var setFillter = new Set()
       var listFillter = []
@@ -502,7 +529,7 @@ const CategoryProductPage = () => {
           if (flag === 0) {
             flag++
             productDetails.forEach(item => {
-              if (ramFillter.find(e => e.value === item.ram.id) !== undefined) {
+              if (ramFillter.find(e => e.value === item.idRam) !== undefined) {
                 listFillter.push(item)
               }
             })
@@ -510,7 +537,7 @@ const CategoryProductPage = () => {
         } else {
           var temp = []
           listFillter.forEach(item => {
-            if (ramFillter.find(e => e.value === item.ram.id) !== undefined) {
+            if (ramFillter.find(e => e.value === item.idRam) !== undefined) {
               temp.push(item)
             }
           })
@@ -523,7 +550,7 @@ const CategoryProductPage = () => {
           if (flag === 0) {
             flag++
             productDetails.forEach(item => {
-              if (romFillter.find(e => e.value === item.rom.id) !== undefined) {
+              if (romFillter.find(e => e.value === item.idRom) !== undefined) {
                 listFillter.push(item)
               }
             })
@@ -531,7 +558,7 @@ const CategoryProductPage = () => {
         } else {
           var temp = []
           listFillter.forEach(item => {
-            if (romFillter.find(e => e.value === item.rom.id) !== undefined) {
+            if (romFillter.find(e => e.value === item.idRom) !== undefined) {
               temp.push(item)
             }
           })
@@ -546,7 +573,7 @@ const CategoryProductPage = () => {
             productDetails.forEach(item => {
               if (
                 displayFillter.find(
-                  e => e.value === item.sanPham.manHinh.kichThuoc
+                  e => e.value === item.kichThuoc
                 ) !== undefined
               ) {
                 listFillter.push(item)
@@ -558,7 +585,7 @@ const CategoryProductPage = () => {
           listFillter.forEach(item => {
             if (
               displayFillter.find(
-                e => e.value === item.sanPham.manHinh.kichThuoc
+                e => e.value === item.kichThuoc
               ) !== undefined
             ) {
               temp.push(item)
@@ -575,7 +602,7 @@ const CategoryProductPage = () => {
             productDetails.forEach(item => {
               if (
                 refreshRateFillter.find(
-                  e => e.value === item.sanPham.manHinh.tanSoQuet
+                  e => e.value === item.tanSoQuet
                 ) !== undefined
               ) {
                 listFillter.push(item)
@@ -587,7 +614,7 @@ const CategoryProductPage = () => {
           listFillter.forEach(item => {
             if (
               refreshRateFillter.find(
-                e => e.value === item.sanPham.manHinh.tanSoQuet
+                e => e.value === item.tanSoQuet
               ) !== undefined
             ) {
               temp.push(item)
@@ -602,19 +629,7 @@ const CategoryProductPage = () => {
           if (flag === 0) {
             flag++
             productDetails.forEach(item => {
-              var count = 0;
-              item.sanPham.danhMucs.forEach(danhMuc => {
-                if (
-                  danhMucFillter.find(
-                    e => e.value === danhMuc.danhMuc.id
-                  ) !== undefined
-                ) {
-                  count++;
-                  }
-                })
-              if (
-               count > 0
-              ) {
+              if (danhMucFillter.find(e => e.value === item.idDanhMuc) !== undefined) {
                 listFillter.push(item)
               }
             })
@@ -622,19 +637,7 @@ const CategoryProductPage = () => {
         } else {
           var temp = []
           listFillter.forEach(item => {
-            var count = 0;
-            item.sanPham.danhMucs.forEach(danhMuc => {
-              if (
-                danhMucFillter.find(
-                  e => e.value === danhMuc.danhMuc.id
-                ) !== undefined
-              ) {
-                count++;
-                }
-              })
-            if (
-             count > 0
-            ) {
+            if (danhMucFillter.find(e => e.value === item.idDanhMuc) !== undefined) {
               temp.push(item)
             }
           })
@@ -649,7 +652,7 @@ const CategoryProductPage = () => {
             flag++
             productDetails.forEach(item => {
               if (
-                chipFillter.find(e => e.value === item.sanPham.chip.id) !==
+                chipFillter.find(e => e.value === item.idChip) !==
                 undefined
               ) {
                 listFillter.push(item)
@@ -660,7 +663,7 @@ const CategoryProductPage = () => {
           var temp = []
           listFillter.forEach(item => {
             if (
-              chipFillter.find(e => e.value === item.sanPham.chip.id) !==
+              chipFillter.find(e => e.value === item.idChip) !==
               undefined
             ) {
               temp.push(item)
@@ -675,41 +678,59 @@ const CategoryProductPage = () => {
           if (flag === 0) {
             flag++
             productDetails.forEach(item => {
-              if (
-                priceFillter.find(
-                  e => e.min <= item.donGia && item.donGia <= e.max
-                ) !== undefined
-              ) {
-                listFillter.push(item)
+              if(item.donGiaSauKhuyenMai === null){
+                if (
+                  priceFillter.find(
+                    e => e.min <= item.donGia && item.donGia <= e.max
+                  ) !== undefined
+                ) {
+                  listFillter.push(item)
+                }
+              }else{
+                if (
+                  priceFillter.find(
+                    e => e.min <= item.donGiaSauKhuyenMai && item.donGiaSauKhuyenMai <= e.max
+                  ) !== undefined
+                ) {
+                  listFillter.push(item)
+                }
               }
+             
             })
           }
         } else {
           var temp = []
           listFillter.forEach(item => {
-            if (
-              priceFillter.find(
-                e => e.min <= item.donGia && item.donGia <= e.max
-              ) !== undefined
-            ) {
-              temp.push(item)
+            if(item.donGiaSauKhuyenMai === null){
+              if (
+                priceFillter.find(
+                  e => e.min <= item.donGia && item.donGia <= e.max
+                ) !== undefined
+              ) {
+                temp.push(item)
+              }
+            }else{
+              if (
+                priceFillter.find(
+                  e => e.min <= item.donGiaSauKhuyenMai && item.donGiaSauKhuyenMai <= e.max
+                ) !== undefined
+              ) {
+                temp.push(item)
+              }
             }
           })
           listFillter = temp
         }
       }
 
-      if (brandFillter === '') {
-        setBrandFillter(brand)
-      }
-
-      if (brandFillter !== undefined) {
-        if (brandFillter !== 'all') {
+      if (brandFillter === undefined) {
+        console.log(brand)
+        if (brand !== 'all') {
           if (listFillter.length === 0) {
             if (flag === 0) {
               flag++
               productDetails.forEach(item => {
-                if (brandFillter === item.sanPham.hang.tenHang) {
+                if (brand.toLowerCase() === item.tenHang.toLowerCase()) {
                   listFillter.push(item)
                 }
               })
@@ -718,8 +739,8 @@ const CategoryProductPage = () => {
             var temp = []
             listFillter.forEach(item => {
               if (
-                brandFillter.toLowerCase() ===
-                item.sanPham.hang.tenHang.toLowerCase()
+                brand.toLowerCase() ===
+                item.tenHang.toLowerCase()
               ) {
                 temp.push(item)
               }
@@ -728,24 +749,146 @@ const CategoryProductPage = () => {
           }
         }
       }
-      console.log(listFillter)
 
-      listFillter.forEach(item => {
-        setFillter.add(item.sanPham.id)
-      })
+      setTimeout(() => {
+        setIsLoadingRequest(0)
 
-      listFillter = []
-      products.forEach(item => {
-        if (Array.from(setFillter).find(e => e === item.id)) {
-          listFillter.push(item)
+        if (brandFillter !== undefined) {
+          if (brandFillter !== 'all') {
+            if (listFillter.length === 0) {
+              if (flag === 0) {
+                flag++
+                productDetails.forEach(item => {
+                  if (brandFillter.toLowerCase() === item.tenHang.toLowerCase()) {
+                    listFillter.push(item)
+                  }
+                })
+              }
+            } else {
+              var temp = []
+              listFillter.forEach(item => {
+                if (
+                  brandFillter.toLowerCase() ===
+                  item.tenHang.toLowerCase()
+                ) {
+                  temp.push(item)
+                }
+              })
+              listFillter = temp
+            }
+          }
         }
-      })
 
-      setProductFillter(listFillter)
+        console.log(listFillter)
+  
+        listFillter.forEach(item => {
+          setFillter.add(item.idSanPham)
+        })
+  
+        listFillter = []
+        products.forEach(item => {
+          if (Array.from(setFillter).find(e => e === item.id)) {
+            listFillter.push(item)
+          }
+        })
+        setProductFillter(listFillter)
+      }, 200)
+
     }
   }
 
+  const deleteAll = () => {
+    var prices = listPrice
+    priceFillter.forEach(e => {
+      if(e.label.indexOf("đến") === -1){
+        prices.push(e)
+      }else{
+        setPriceZone({...priceZone,
+        min: 0,
+        max: priceBiggest
+      })
+    }})
+    setpriceFillter([])
+    setListPrice(prices)
+
+    var danhmus = listDanhMuc
+    danhMucFillter.forEach(e => {
+      danhmus.push(e)
+    })
+    setDanhMucFillter([])
+    setListDanhMuc(danhmus)
+
+    var rams = listRam
+    ramFillter.forEach(e => {
+      rams.push(e)
+    })
+    setRamFillter([])
+    setListRam(rams)
+
+    var roms = listRom
+    romFillter.forEach(e => {
+      roms.push(e)
+    })
+    setRomFillter([])
+    setlistRom(roms)
+
+    var displays = listManHinh
+    displayFillter.forEach(e => {
+      displays.push(e)
+    })
+    setdisplayFillter([])
+    setlistManHinh(displays)
+
+    var tanSoQuets = listTanSoQuet
+    refreshRateFillter.forEach(e => {
+      tanSoQuets.push(e)
+    })
+    setRefreshRateFillter([])
+    setListTanSoQuet(tanSoQuets)
+
+    var chips = listChip
+    chipFillter.forEach(e => {
+      chips.push(e)
+    })
+    setChipFillter([])
+    setlistChip(chips)
+  }
+
+  const formatMoney = number => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(number)
+  }
+
+  const sliderChange = e => {
+
+    setPriceZone({...priceZone, 
+      min: Number(e[0]),
+      max: Number(e[1])
+    })
+    var result  = []
+    result.push({
+      label: `Từ ${formatMoney(e[0])} đến ${formatMoney(e[1])}`,
+      min: e[0],
+      max: e[1]
+    })
+    setpriceFillter(result)
+   
+  }
+
   return (
+    <>
+     
+    {
+      Number(isLoadingRequest) === 0 ? 
+       <> </>
+      :
+        <div className='custom-spin'>
+         <Spin indicator={<LoadingOutlined style={{ fontSize: 40, color: '#126de4', marginLeft: 5 }} spin />} />
+        </div>
+      
+    }
     <div className='cat-products'>
       <div className='container'>
         <div
@@ -855,7 +998,7 @@ const CategoryProductPage = () => {
                   if (showFilter === 1) {
                     setShowFilter(0)
                   } else setShowFilter(1)
-                  window.scrollTo(0, 180)
+                  window.scrollTo(0, 175)
                 }}
               >
                 <i class='fa fa-filter' style={{ margin: `0 5px 0px ` }}></i>
@@ -932,56 +1075,7 @@ const CategoryProductPage = () => {
                               textAlign: `right`,
                               float: `right`
                             }}
-                            onClick={() => {
-                              var prices = listPrice
-                              priceFillter.forEach(e => {
-                                prices.push(e)
-                              })
-                              setpriceFillter([])
-                              setListPrice(prices)
-
-                              var danhmus = listDanhMuc
-                              danhMucFillter.forEach(e => {
-                                danhmus.push(e)
-                              })
-                              setDanhMucFillter([])
-                              setListDanhMuc(danhmus)
-
-                              var rams = listRam
-                              ramFillter.forEach(e => {
-                                rams.push(e)
-                              })
-                              setRamFillter([])
-                              setListRam(rams)
-
-                              var roms = listRom
-                              romFillter.forEach(e => {
-                                roms.push(e)
-                              })
-                              setRomFillter([])
-                              setlistRom(roms)
-
-                              var displays = listManHinh
-                              displayFillter.forEach(e => {
-                                displays.push(e)
-                              })
-                              setdisplayFillter([])
-                              setlistManHinh(displays)
-
-                              var tanSoQuets = listTanSoQuet
-                              refreshRateFillter.forEach(e => {
-                                tanSoQuets.push(e)
-                              })
-                              setRefreshRateFillter([])
-                              setListTanSoQuet(tanSoQuets)
-
-                              var chips = listChip
-                              chipFillter.forEach(e => {
-                                chips.push(e)
-                              })
-                              setChipFillter([])
-                              setlistChip(chips)
-                            }}
+                            onClick={() => deleteAll()}
                           >
                             <i class='fa fa-trash'></i> Xoá tất cả
                           </span>
@@ -1334,6 +1428,70 @@ const CategoryProductPage = () => {
                                   </button>
                                 )
                               })}
+                                 <span
+                          style={{
+                            fontWeight: '700',
+                            marginLeft: '2px',
+                            marginTop: '10px',
+                            marginBottom: '10px',
+                            display: 'block',
+                            textAlign: 'left',
+                            width: '100%'
+                          }}
+                        >
+                          Lựa chọn khoảng giá
+                        </span>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%'}}>
+                          
+                              <button
+                                style={itemNotSelected()}
+                              >
+                                {priceZone.min == ""
+                                  ? "0".toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " đ"
+                                  : priceZone.min
+                                      .toString()
+                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " đ"}
+                              </button>
+                              
+                              <button
+                                style={itemNotSelected()}
+                              >
+                                {priceZone.max == ""
+                                  ? priceBiggest
+                                      .toString()
+                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " đ"
+                                  : priceZone.max 
+                                      .toString()
+                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " đ"}
+                              </button>
+                              </div>
+                                <div style={{ display: 'flex', with: '100%'}}>
+                                  {
+                                    priceZone.min === 0 && priceZone.max === priceBiggest ? <>
+                                    <Slider
+                                      onChange={(e) => sliderChange(e)}
+                                      style={{ width: '296px', marginLeft: 10, marginBottom: 20 }}
+                                      min={0}
+                                      max={Number(priceBiggest)}
+                                      step={100000}
+                                      range
+                                      defaultValue={[0,Number(priceBiggest)]}
+                                    />
+                                    </> :
+                                    <Slider
+                                    onChange={(e) => sliderChange(e)}
+                                    style={{ width: '296px', marginLeft: 10, marginBottom: 20 }}
+                                    min={0}
+                                    max={Number(priceBiggest)}
+                                    step={100000}
+                                    range
+                                    defaultValue={[priceZone.min, Number(priceZone.max)]}
+                                  />
+                                  }
+                                  
+                                  
+                              </div>
                             </>
                           )}
                         </div>
@@ -1687,7 +1845,7 @@ const CategoryProductPage = () => {
                   if (showFilter === 2) {
                     setShowFilter(0)
                   } else setShowFilter(2)
-                  window.scrollTo(0, 180)
+                  window.scrollTo(0, 175)
                 }}
               >
                 Mức giá
@@ -1724,8 +1882,15 @@ const CategoryProductPage = () => {
                             onClick={() => {
                               var rams = listPrice
                               priceFillter.forEach(e => {
-                                rams.push(e)
-                              })
+                                if(e.label.indexOf("đến") === -1){
+                                  rams.push(e)
+                                }else{
+                                  setPriceZone({...priceZone,
+                                  min: 0,
+                                  max: priceBiggest
+                                })
+                                
+                            }})
                               setpriceFillter([])
                               setListPrice(rams)
                             }}
@@ -1744,7 +1909,15 @@ const CategoryProductPage = () => {
                                   priceSelect = priceSelect.filter(
                                     ram => ram.min !== item.min
                                   )
-                                  prices[prices.length] = item
+                                  if(item.label.indexOf("đến") === -1){
+                                    prices[prices.length] = item
+                                  }else{
+                                    setPriceZone({...priceZone,
+                                    min: 0,
+                                    max: priceBiggest
+                                  })
+                                  }
+                                  
                                 } else {
                                   priceSelect[priceFillter.length] = item
                                   prices = prices.filter(
@@ -1768,6 +1941,7 @@ const CategoryProductPage = () => {
                             </button>
                           )
                         })}
+                       
                         <div style={{ width: '100%' }}></div>
                       </>
                     )}
@@ -1815,6 +1989,70 @@ const CategoryProductPage = () => {
                             </button>
                           )
                         })}
+                           <span
+                          style={{
+                            fontWeight: '700',
+                            marginLeft: '2px',
+                            marginTop: '10px',
+                            marginBottom: '10px',
+                            display: 'block',
+                            textAlign: 'left',
+                            width: '100%'
+                          }}
+                        >
+                          Lựa chọn khoảng giá
+                        </span>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%'}}>
+                          
+                              <button
+                                style={itemNotSelected()}
+                              >
+                                {priceZone.min == ""
+                                  ? "0".toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " đ"
+                                  : priceZone.min
+                                      .toString()
+                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " đ"}
+                              </button>
+                              
+                              <button
+                                style={itemNotSelected()}
+                              >
+                                {priceZone.max == ""
+                                  ? priceBiggest
+                                      .toString()
+                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " đ"
+                                  : priceZone.max 
+                                      .toString()
+                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " đ"}
+                              </button>
+                         </div>
+                           <div style={{ display: 'flex', with: '100%'}}>
+                            {
+                              priceZone.min === 0 && priceZone.max === priceBiggest ? <>
+                               <Slider
+                                onChange={(e) => sliderChange(e)}
+                                style={{ width: '296px', marginLeft: 10, marginBottom: 20 }}
+                                min={0}
+                                max={Number(priceBiggest)}
+                                step={100000}
+                                range
+                                defaultValue={[0,Number(priceBiggest)]}
+                              />
+                              </> :
+                              <Slider
+                              onChange={(e) => sliderChange(e)}
+                              style={{ width: '296px', marginLeft: 10, marginBottom: 20 }}
+                              min={0}
+                              max={Number(priceBiggest)}
+                              step={100000}
+                              range
+                              defaultValue={[priceZone.min, Number(priceZone.max)]}
+                            />
+                            }
+                             
+                             
+                         </div>
                       </>
                     )}
 
@@ -1861,7 +2099,7 @@ const CategoryProductPage = () => {
                   if (showFilter === 6) {
                     setShowFilter(0)
                   } else setShowFilter(6)
-                  window.scrollTo(0, 180)
+                  window.scrollTo(0, 175)
                 }}
               >
                 Nhu cầu sử dụng
@@ -2033,7 +2271,7 @@ const CategoryProductPage = () => {
                   if (showFilter === 7) {
                     setShowFilter(0)
                   } else setShowFilter(7)
-                  window.scrollTo(0, 180)
+                  window.scrollTo(0, 175)
                 }}
               >
                 Dung lượng RAM
@@ -2205,7 +2443,7 @@ const CategoryProductPage = () => {
                   if (showFilter === 8) {
                     setShowFilter(0)
                   } else setShowFilter(8)
-                  window.scrollTo(0, 180)
+                  window.scrollTo(0, 175)
                 }}
               >
                 Bộ nhớ trong
@@ -2379,7 +2617,7 @@ const CategoryProductPage = () => {
                   if (showFilter === 9) {
                     setShowFilter(0)
                   } else setShowFilter(9)
-                  window.scrollTo(0, 180)
+                  window.scrollTo(0, 175)
                 }}
               >
                 Kích thước màn hình
@@ -2553,7 +2791,7 @@ const CategoryProductPage = () => {
                   if (showFilter === 10) {
                     setShowFilter(0)
                   } else setShowFilter(10)
-                  window.scrollTo(0, 180)
+                  window.scrollTo(0, 175)
                 }}
               >
                 Tần số quét
@@ -2729,7 +2967,7 @@ const CategoryProductPage = () => {
                   if (showFilter === 11) {
                     setShowFilter(0)
                   } else setShowFilter(11)
-                  window.scrollTo(0, 180)
+                  window.scrollTo(0, 175)
                 }}
               >
                 Chip xử lí
@@ -2914,6 +3152,8 @@ const CategoryProductPage = () => {
           <br/>
           <br/>
     </div>
+
+    </>
   )
 }
 

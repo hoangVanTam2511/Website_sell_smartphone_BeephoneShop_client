@@ -381,12 +381,12 @@ const CartPage = () => {
       codeVoucher === null ||
       codeVoucher === undefined
     ) {
-      toast('Vui lòng nhập mã voucher')
+      toast.error('Vui lòng nhập mã voucher')
       return
     }
 
-    if (codeVoucher.trim()) {
-      toast('Vui lòng nhập mã voucher')
+    if (codeVoucher.trim() === '') {
+      toast.error('Vui lòng nhập mã voucher')
       return
     }
 

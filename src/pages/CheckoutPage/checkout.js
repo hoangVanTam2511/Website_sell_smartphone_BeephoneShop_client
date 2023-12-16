@@ -321,7 +321,7 @@ const CartPage = props => {
       getAllProvinceGhnByAddressCustomer(newAddress)
       toast.success('Chọn địa chỉ thành công')
       dispatch(changeInformationUser(newAddress))
-    }, 200)
+    }, 500)
   }
 
   const getAllAddress = async () => {

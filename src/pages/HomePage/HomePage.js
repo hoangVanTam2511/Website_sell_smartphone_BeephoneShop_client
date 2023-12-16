@@ -356,12 +356,12 @@ const HomePage = () => {
                               name: 'Điện thoại'
                             },
                             {
-                              path: '/products/samsung',
+                              path: '/products/Samsung',
                               name: 'Samsung'
                             }
                           ]
                           dispatch(AddItemNavbar(data))
-                          naviage('/products/samsung')
+                          naviage('/products/Samsung')
                         }}
                       >
                         Samsung
@@ -390,7 +390,7 @@ const HomePage = () => {
                             },
                             {
                               path: '/products/xiaomi',
-                              name: 'Samsung'
+                              name: 'Xiaomi'
                             }
                           ]
                           dispatch(AddItemNavbar(data))
@@ -543,12 +543,12 @@ const HomePage = () => {
                               name: 'Điện thoại'
                             },
                             {
-                              path: '/products/samsung',
+                              path: '/products/Samsung',
                               name: 'Samsung'
                             }
                           ]
                           dispatch(AddItemNavbar(data))
-                          naviage('/products/samsung')
+                          naviage('/products/Samsung')
                         }}
                       >
                         Samsung
