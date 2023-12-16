@@ -499,7 +499,9 @@ const ProductSinglePage = () => {
                     ) {
                       return (
                         <>
-                          <Button
+                        {
+                          item.soLuongTonKho > 0 ? (
+                            <Button
                             type='primary'
                             onClick={() => addConfigs(item)}
                             style={
@@ -538,7 +540,8 @@ const ProductSinglePage = () => {
                                   borderTopLeftRadius: '3px',
                                   borderBottomRightRadius: '7px',
                                   fontSize: 11,
-                                  color: 'white'
+                                  color: 'white',
+                                 
                                 }}
                               ></i>
                             )}
@@ -579,6 +582,88 @@ const ProductSinglePage = () => {
                               </div>
                             </div>
                           </Button>
+                          ):(
+                            <Button
+                            type='primary'
+                            disabled
+                            onClick={() => addConfigs(item)}
+                            style={ borderButtonNoSell  }
+                            ghost
+                          >
+                            {config.color === item.tenMauSac && item.soLuongTonKho > 0 ? (
+                              <i
+                                class='fa fa-check'
+                                style={{
+                                  position: 'absolute',
+                                  width: 14,
+                                  height: 14,
+                                  background: '#128DE2',
+                                  top: 0,
+                                  left: 0,
+                                  borderTopLeftRadius: '3px',
+                                  borderBottomRightRadius: '7px',
+                                  fontSize: 11,
+                                  color: 'white'
+                                }}
+                              ></i>
+                            ) : (
+                              <i
+                                class='fa fa-check'
+                                style={{
+                                  position: 'absolute',
+                                  width: 14,
+                                  height: 14,
+                                  background: 'white',
+                                  top: 0,
+                                  left: 0,
+                                  borderTopLeftRadius: '3px',
+                                  borderBottomRightRadius: '7px',
+                                  fontSize: 11,
+                                  color: 'white',
+                                 
+                                }}
+                              ></i>
+                            )}
+
+                            <div style={{ display: 'flex' }}>
+                              <div>
+                                <img
+                                  style={{ width: 38, height: 38 }}
+                                  src={images.find(e => e.tenMauSac === item.tenMauSac) === undefined ? "" : images.find(e => e.tenMauSac === item.tenMauSac).url}
+                                />
+                              </div>
+
+                              <div>
+                                <span
+                                  style={{
+                                    fontSize: 12,
+                                    color: '#444',
+                                    display: 'block',
+                                    textAlign: 'left',
+                                    marginLeft: '5px'
+                                  }}
+                                  className='fw-6'
+                                >
+                                  {item.tenMauSac}
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: 12,
+                                    color: '#444',
+                                    position: 'relative',
+                                    top: '-3px',
+                                    left: '5px'
+                                  }}
+                                >
+                                  {' '}
+                                  {formatMoney(item.donGia)}
+                                </span>
+                              </div>
+                            </div>
+                          </Button>
+                          )
+                        }
+                       
                         </>
                       )
                     }

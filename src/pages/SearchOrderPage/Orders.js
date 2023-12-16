@@ -33,7 +33,8 @@ const Orders = () => {
           setListBillFillter(res.data)
           // console.log(res.data)
           res.data.forEach(item => {
-            sum += item.tongTienSauKhiGiam
+            console.log(item)
+            sum += item.tongTienSauKhiGiam 
           })
           setTotalAmount(sum)
         }
@@ -120,7 +121,7 @@ const Orders = () => {
           <div style={{ textAlign: "center", width: "45%", color: "#128DE2" }}>
             <span className="fs-20 fw-8">{formatMoney(totalAmount)}</span>
             <br />
-            <span className="fs-20 fw-8">Tổng tiền tích luỹ</span>
+            <span className="fs-20 fw-8">Tổng tiền đã mua</span>
           </div>
   
           <div></div>

@@ -140,14 +140,17 @@ const OrderDetail = props => {
             display: 'flex',
             justifyContent: 'space-between'
           }}
+         
         >
           <div
-            style={{ width: '34%', fontWeight: '600' }}
+            style={{ width: '34%', fontWeight: '600', position: 'relative', zIndex: 667 }}
             onClick={() => {
               props.setTab(null)
             }}
           >
-            <i class='fa fa-arrow-left'></i>
+            <i class='fa fa-arrow-left'
+           
+            ></i>
           </div>
 
           <div style={{ width: '89%', fontWeight: '600' }}>

@@ -389,12 +389,12 @@ const HomePage = () => {
                               name: 'Điện thoại'
                             },
                             {
-                              path: '/products/xiaomi',
+                              path: '/products/Xiaomi',
                               name: 'Xiaomi'
                             }
                           ]
                           dispatch(AddItemNavbar(data))
-                          naviage('/products/xiaomi')
+                          naviage('/products/Xiaomi')
                         }}
                       >
                         Xiaomi
@@ -576,12 +576,12 @@ const HomePage = () => {
                               name: 'Điện thoại'
                             },
                             {
-                              path: '/products/xiaomi',
+                              path: '/products/Xiaomi',
                               name: 'Xiaomi'
                             }
                           ]
                           dispatch(AddItemNavbar(data))
-                          naviage('/products/xiaomi')
+                          naviage('/products/Xiaomi')
                         }}
                       >
                         Xiaomi
