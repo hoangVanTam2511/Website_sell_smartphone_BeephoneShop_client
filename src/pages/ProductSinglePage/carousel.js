@@ -97,7 +97,7 @@ export default function App (props) {
               height: '347px',
               backgroundRepeat: `no-repeat`,
               backgroundPosition: 'center',
-              backgroundSize: '35%'
+              backgroundSize: '40%'
             }}
           >
             <i
