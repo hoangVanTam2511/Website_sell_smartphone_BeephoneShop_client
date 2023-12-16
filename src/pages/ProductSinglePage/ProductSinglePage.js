@@ -868,8 +868,10 @@ const ProductSinglePage = () => {
                       backgroundColor: 'white',
                       border: '  1px solid #128DE2',
                       borderRadius: 10,
-                      width: `34%`,
+                      width: `18%`,
                       height: '60px',
+                      margin: 0,
+                      marginLeft: '10px'
                     }}
                     onClick={() => {
                       addToCartHandler()
