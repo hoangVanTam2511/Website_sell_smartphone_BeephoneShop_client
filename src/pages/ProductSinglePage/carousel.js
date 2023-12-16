@@ -18,7 +18,8 @@ export default function App (props) {
       height: '20%',
       borderRadius: '10px',
       marginRight: '10px',
-      border: '1px solid #d1d5db'
+      border: '1px solid #d1d5db',
+      padding: '8px'
     }
   }
 
@@ -64,7 +65,8 @@ export default function App (props) {
       height: '20%',
       borderRadius: '10px',
       marginRight: '10px',
-      border: '1px solid rgb(18, 141, 226)'
+      border: '1px solid rgb(18, 141, 226)',
+      padding: '8px'
     }
   }
 
@@ -94,7 +96,8 @@ export default function App (props) {
               border: '1px solid #d1d5db',
               height: '347px',
               backgroundRepeat: `no-repeat`,
-              backgroundPosition: 'center'
+              backgroundPosition: 'center',
+              backgroundSize: '35%'
             }}
           >
             <i
@@ -107,25 +110,48 @@ export default function App (props) {
               onClick={() => handleChangeSlide('right')}
             ></i>
           </div>
-
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              marginTop: '20px',
-              position: 'relative',
-              left: '31%'
-            }}
-          >
-            {items.map((item, index) => (
-              <img
-                src={item.url}
-                alt=''
-                onClick={() => setItemSelected(index)}
-                style={index === itemSelected ? cssSelected() : cssNoSelected()}
-              />
-            ))}
-          </div>
+          {
+            items.length > 3 ? (
+              <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginTop: '20px',
+                position: 'relative',
+                left: '2%'
+              }}
+            >
+              {items.map((item, index) => (
+                <img
+                  src={item.url}
+                  alt=''
+                  onClick={() => setItemSelected(index)}
+                  style={index === itemSelected ? cssSelected() : cssNoSelected()}
+                />
+              ))}
+            </div>
+            ):(
+              <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginTop: '20px',
+                position: 'relative',
+                left: '31%'
+              }}
+            >
+              {items.map((item, index) => (
+                <img
+                  src={item.url}
+                  alt=''
+                  onClick={() => setItemSelected(index)}
+                  style={index === itemSelected ? cssSelected() : cssNoSelected()}
+                />
+              ))}
+            </div>
+            )
+          }
+        
         </>
       )}
     </div>

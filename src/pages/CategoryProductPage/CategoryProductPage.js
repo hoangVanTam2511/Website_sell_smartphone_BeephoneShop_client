@@ -879,7 +879,6 @@ const CategoryProductPage = () => {
 
   return (
     <>
-     
     {
       Number(isLoadingRequest) === 0 ? 
        <> </>

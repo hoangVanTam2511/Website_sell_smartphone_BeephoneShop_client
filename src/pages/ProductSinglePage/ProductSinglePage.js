@@ -42,6 +42,7 @@ const ProductSinglePage = () => {
 
   //loading
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingAddToCart, setIsLoadingAddToCart] = useState(false)
 
   //ram, rom, color
   const [config, setConfig] = useState({
@@ -109,15 +110,15 @@ const ProductSinglePage = () => {
   }
 
   const rows = [
-    createData('Màn hình :', `6.7 inch, AMOLED, 1200 x 2640 Pixels`),
+    createData('Màn hình :', `${product.sizeDisplay} inch, ${product.typeDisplay}, 1200 x 2640 Pixels`),
     createData('Hệ điều hành :', 'IOS 13'),
     createData('Camera sau :', 'Chính 48 MP & Phụ 8 MP, 5 MP'),
     createData('Camera trước :', 'Chính 48 MP & Phụ 8 MP, 5 MP'),
-    createData('Chip', `A13 Bionic`),
+    createData('Chip', `${product.nameChip}`),
     createData('Ram', `${config.ram} GB`),
     createData('ROM', `${config.rom} GB`),
     createData('SIM', '1 Nano SIM & 1 eSIM'),
-    createData('Pin, sạc:', `3400 mah, 20 W`)
+    createData('Pin:', `${product.batteryCapacity} mah`)
   ]
 
   // getting single product
@@ -151,7 +152,6 @@ const ProductSinglePage = () => {
     request("GET",`/client/product-detail/get-config/${id}`)
       .then(res => {
         if (res.status === 200) {
-          console.log(res.data)
           setProductDetails(res.data)
           let listRamRomDistinct = []
           res.data.map(e => {
@@ -195,7 +195,9 @@ const ProductSinglePage = () => {
             nameBrand: res.tenHang,
             nameChip: res.tenChip,
             batteryCapacity: res.dungLuongPin,
-            memoryCardType: res.loaiTheNho
+            memoryCardType: res.loaiTheNho,
+            refreshRate: res.tanSoQuet,
+
           })
         }
       })
@@ -247,12 +249,16 @@ const ProductSinglePage = () => {
     if(soLuong >= 4){
       toast.error("Sản phẩm trong giỏ hàng đã đạt tới số lượng giới hạn.Vui lòng chọn sản phẩm khác.")
     }else{
+      setIsLoadingAddToCart(true)
       if(selectedCart === 0){
         if(user.id === ''){
           dispatch(addProductToCart(config))
           getCartProduct()
           setSelectedCartDetail({data: config})
-          toast.success("Thêm sản phẩm vào giỏ hàng thành công")
+          setTimeout(() => {
+            setIsLoadingAddToCart(false)
+            toast.success("Thêm sản phẩm vào giỏ hàng thành công")
+          }, 500)
         }else{
           request("POST",`/client/cart-detail/add-to-cart?id_customer=${user.id}&id_product_detail=${config.id}&type=plus`
           )
@@ -262,7 +268,10 @@ const ProductSinglePage = () => {
               getCartProduct()
               console.log(res.data)
               setSelectedCartDetail(res.data)
-              toast.success("Thêm sản phẩm vào giỏ hàng thành công")
+              setTimeout(() => {
+                setIsLoadingAddToCart(false)
+                toast.success("Thêm sản phẩm vào giỏ hàng thành công")
+              }, 500)
             }
           })
           .catch(res => {
@@ -407,6 +416,30 @@ const ProductSinglePage = () => {
           <div className='product-single-content bg-white grid'>
             <div className='product-single-l'>
               <Carousel images={images} colorSelected={config.color} />
+
+              <div
+                className='title fs-20 fw-7'
+                style={{ marginBottom: 20, textAlign: `center`, marginTop: '10px' }}
+              >
+                Thông tin điện thoại
+              </div>
+
+              <div className='title fs-20 fw-7' style={{ width: '95%'}}>
+                Mới đây thì chiếc điện thoại {product.nameProduct + " " + config.rom + " GB"} cũng đã
+                được chính thức lộ diện trên toàn cầu và đập tan bao lời đồn
+                đoán bấy lâu nay, bên trong máy sẽ được trang bị con chip hiệu
+                năng khủng cùng sự nâng cấp về camera đến từ nhà {product.nameBrand}.
+              </div>
+
+              <img
+                src={images.find(e => e.tenMauSac === config.color) === undefined ? "" : images.find(e => e.tenMauSac === config.color).url}
+                style={{ marginTop: 10, width: 340, height: 340, marginLeft: '143px' }}
+              />
+
+              <div className=' fs-17 ' style={{ width: '95%', marginTop: '10px'}}>
+               Máy được chế tác có độ hoàn thiện cực cao với thiết kế nguyên khối, khung nhôm và mặt sau là kính cường lực cao cấp toát lên vẻ ngoài sang chảnh cũng như mang lại độ hiệu quả an toàn cao mỗi khi sử dụng.
+              </div>
+             
             </div>
 
             <div className='product-single-r'>
@@ -490,7 +523,7 @@ const ProductSinglePage = () => {
 
                 <div
                   className='info flex align-center flex-wrap fs-14'
-                  style={{ marginTop: 10 }}
+                  style={{ marginTop: 10, marginBottom: 0 }}
                 >
                   {productDetails.map(item => {
                     if (
@@ -673,7 +706,7 @@ const ProductSinglePage = () => {
                 <div>
                   <span
                     className='fs-14 mx-2 text-dark fw-6'
-                    style={{ marginLeft: '0px' }}
+                    style={{ marginLeft: '0px', marginTop:'10px', marginBottom: '10px' }}
                   >
                     Giá bán
                   </span>
@@ -721,6 +754,18 @@ const ProductSinglePage = () => {
                   </div>
                 </div>
 
+                <div>
+                  <img
+                    style={{
+                      width: '100%',
+                      display: 'block',
+                      borderRadius: '10px',
+                      marginBottom: '7px',
+                      marginTop: '-4px'
+                    }}
+                  src='https://cdn2.cellphones.com.vn/insecure/rs:fill:0:120/q:80/plain/https://dashboard.cellphones.com.vn/storage/dt-ss-sv-2-productbanner-new11.jpg'/>
+                </div>
+
                 <div className='btns'>
                   <button
                     type='button'
@@ -730,14 +775,14 @@ const ProductSinglePage = () => {
                       border: '  1px solid #128DE2',
                       color: 'white',
                       borderRadius: 10,
-                      width: `47%`
+                      width: `100%`,
+                      height: '60px'
                     }}
                     onClick={() => {
                       buyNowHandler()
                     }}
                   >
-                    <i className='fas fa-shopping-cart'></i>
-                    <span className='btn-text mx-2'>Mua ngay 
+                    <span className='btn-text mx-2' style={{ fontWeight: '600', fontSize: '20px'}}>Mua ngay 
                     {
                       isLoading === true ? 
                       <>
@@ -752,63 +797,38 @@ const ProductSinglePage = () => {
 
                   <button
                     type='button'
-                    className='buy-now btn mx-3'
+                    className='buy-now btn mx-2'
                     style={{
-                      backgroundColor: '#128DE2',
+                      backgroundColor: 'white',
                       border: '  1px solid #128DE2',
                       borderRadius: 10,
-                      width: `47%`
+                      width: `34%`,
+                      height: '60px',
                     }}
                     onClick={() => {
                       addToCartHandler()
                     }}
                   >
-                    <i className='fas fa-shopping-cart'></i>
-                    <span className='btn-text mx-2'>Thêm vào giỏ hàng</span>
+                     {
+                      isLoadingAddToCart === true ? 
+                      <>
+                        <Spin indicator={<LoadingOutlined style={{ fontSize: 24, color: '#128DE2', marginLeft: 5 }} spin />} />
+                      </>:
+                      <>
+                      <i className='fas fa-shopping-cart' style={{ color: '#128DE2'}}></i>
+                      <span className='btn-text mx-2'
+                        style={{ color: '#128DE2', display: 'block', fontSize: '8px' }}
+                      >Thêm vào giỏ</span>
+                      </>
+                    }
+                    
                   </button>
                 </div>
-              </div>
-            </div>
-          </div>
 
-          <div className='product-single-content bg-white grid'>
-            <div className='product-single-l'>
-              <div
+                {/* config */}
+                <div
                 className='title fs-20 fw-7'
-                style={{ marginBottom: 20, textAlign: `center` }}
-              >
-                Thông tin điện thoại
-              </div>
-
-              <div className='title fs-20 fw-7' style={{}}>
-                Mới đây thì chiếc điện thoại iPhone 14 Pro Max 256GB cũng đã
-                được chính thức lộ diện trên toàn cầu và đập tan bao lời đồn
-                đoán bấy lâu nay, bên trong máy sẽ được trang bị con chip hiệu
-                năng khủng cùng sự nâng cấp về camera đến từ nhà Apple.
-              </div>
-
-              <img
-                src='https://cdn.tgdd.vn/Products/Images/42/289700/iphone-14-pro-max-256gb-080922-102929.jpg'
-                style={{ marginTop: 10 }}
-              />
-
-              <Button
-                type='primary'
-                ghost
-                style={{
-                  marginTop: 20,
-                  height: 40,
-                  width: `90%`,
-                  marginLeft: `6%`
-                }}
-              >
-                Xem thêm thông tin
-              </Button>
-            </div>
-            <div className='product-single-r' style={{ marginLeft: 45 }}>
-              <div
-                className='title fs-20 fw-7'
-                style={{ marginBottom: 20, textAlign: `center` }}
+                style={{ marginBottom: 20, textAlign: `center`, marginTop:'10px' }}
               >
                 Cấu hình điện thoại
               </div>
@@ -829,20 +849,12 @@ const ProductSinglePage = () => {
                 </Table>
               </TableContainer>
 
-              <Button
-                type='primary'
-                ghost
-                style={{
-                  marginTop: 20,
-                  height: 40,
-                  width: `90%`,
-                  marginLeft: `6%`
-                }}
-              >
-                Xem thêm cấu hình chi tiết
-              </Button>
+           
+              </div>
             </div>
           </div>
+
+        
         </div>
       </div>
 

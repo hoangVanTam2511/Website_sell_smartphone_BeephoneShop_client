@@ -18,6 +18,8 @@ import FormControl from '@mui/material/FormControl'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import { setUserNoToken } from '../../store/userSlice'
+import { LoadingOutlined } from '@ant-design/icons';
+import { Spin } from 'antd';
 
 const { confirm } = Modal
 const HomePage = () => {
@@ -27,6 +29,8 @@ const HomePage = () => {
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
   const [forgetPassView, setForgetPassView] = useState(1)
+
+  const [isLoadingRequest, setIsLoadingRequest] = useState(true)
 
   const [userLogin, SetUserLogin] = useState({
     email: '',
@@ -63,20 +67,26 @@ const HomePage = () => {
   const login = async e => {
     setAuthHeader(null)
     e.preventDefault()
+    setIsLoadingRequest(false)
     request('POST', '/client/account/login', userLogin)
       .then(res => {
         setAuthHeader(res.data.token)
         console.log(res.data)
         dispatch(changeInformationUser(res.data))
         dispatch(addToCart())
-        toast.success('Đăng nhập thành công')
+        setTimeout(() => {
+          toast.success('Đăng nhập thành công')
+        }, 200)
         setTimeout(() => {
           navigate('/')
-        }, 900)
+          setIsLoadingRequest(true)
+
+        }, 701)
       })
       .catch(error => {
         console.log(error)
         setUserNoToken()
+        setIsLoadingRequest(true)   
         toast.error(error.response.data)
       })
   }
@@ -92,6 +102,7 @@ const HomePage = () => {
   }
 
   const reset = () => {
+    
     SetUserLogin({
       email: '',
       password: ''
@@ -179,6 +190,7 @@ const HomePage = () => {
       icon: <ExclamationCircleFilled />,
       content: 'Bạn đồng ý với thông tin và xác nhận tạo tài khoản mới.',
       onOk () {
+        setIsLoadingRequest(false)
         request('POST', '/client/account/register', userRegister)
           .then(res => {
             setAuthHeader(res.data.token)
@@ -190,6 +202,7 @@ const HomePage = () => {
             })
             .then(res => {
               console.log(res.data)
+              setIsLoadingRequest(true)
               setAuthHeader(res.data.token)
               dispatch(changeInformationUser(res.data))
               dispatch(addToCart())
@@ -233,13 +246,15 @@ const HomePage = () => {
   }
 
   const getPass = (e) => {
+    setIsLoadingRequest(false)
     e.preventDefault()
     request("POST", "/email/send-html-email-get-pass",
     {
       "email": userLogin.email
     }).then(res => {
-      toast.success("Mật khẩu đã được gửi về email của bạn.Vui lòng kiẻm tra email")
+      toast.success("Mật khẩu đã được gửi về email của bạn.Vui lòng kiểm tra email")
       setForgetPassView(1)
+      setIsLoadingRequest(true)
     }).catch(error => {
       console.log(error.response.data)
       setUserNoToken()
@@ -249,6 +264,15 @@ const HomePage = () => {
 
   return (
     <main>
+        {
+      isLoadingRequest === true  ? 
+       <> </>
+      :
+        <div className='custom-spin'>
+         <Spin indicator={<LoadingOutlined style={{ fontSize: 40, color: '#126de4', marginLeft: 5 }} spin />} />
+        </div>
+      
+    }
       <section>
         <div class='container-login' id='container-login'>
           <div class='form-container-login sign-up'>
