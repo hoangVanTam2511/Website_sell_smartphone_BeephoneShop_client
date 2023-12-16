@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Col, Row } from "antd";
 import Button from "@mui/material/Button";
 import "./SearchOrderPage.css";
@@ -9,9 +9,10 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { changeInformationUser } from "../../store/userSlice";
 import { setAuthHeader } from "../../helpers/axios_helper";
+import { ResetItemNavbar } from '../../store/navbarSlice'
 
 const App = () => {
-  const [component, setComponent] = useState(1);
+  const [component, setComponent] = useState(2);
   const navigate = useNavigate();
   const dispatch = useDispatch(); 
 
@@ -19,6 +20,11 @@ const App = () => {
     setComponent(value);
     console.log(value)
   };
+
+  useEffect(() => {
+    dispatch(ResetItemNavbar())
+    // window.scrollTo(0, 0);
+  }, [])
 
   const backgroundButtonChoise = () => {
     return {
@@ -52,7 +58,7 @@ const App = () => {
         <Row>
           <Col span={6} style={{ position: 'fixed', zIndex: '666' }}>
 
-            <button
+            {/* <button
               style={ component === 1 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
               onClick={() => choiseAnotherComponent(1)}
             >
@@ -61,15 +67,19 @@ const App = () => {
                 style={{ color: "#128DE2", margin: `0px 4px` }}
               ></i>{" "}
               Trang chủ
-            </button>
+            </button> */}
 
             <button
               style={ component === 2 ? backgroundButtonChoise() : backgroundButtonNoChoise()}
               onClick={() => choiseAnotherComponent(2)}
             >
               <i
-                class="fa-solid fa-id-card"
-                style={{ color: "#128DE2", margin: `0px 4px` }}
+                class="fa fa-file-invoice"
+                style={
+                  component === 2?
+                  { color: "#128DE2", margin: `0px 4px` }
+                :  { color: "#303030", margin: `0px 4px` }
+              }
               ></i>{" "}
               Lịch sử mua hàng
             </button>
@@ -102,7 +112,11 @@ const App = () => {
             >
               <i
                 class="fa-solid fa-id-card"
-                style={{ color: "#128DE2", margin: `0px 4px` }}
+                style={
+                  component === 3?
+                  { color: "#128DE2", margin: `0px 4px` }
+                :  { color: "#303030", margin: `0px 4px` }
+              }
               ></i>{" "}
               Tài khoản của bạn
             </button>
