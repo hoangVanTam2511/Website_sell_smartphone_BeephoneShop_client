@@ -109,13 +109,16 @@ const CartPage = props => {
       )
       .then(response => {
         setProvinces(response.data.data)
-        if(account.id !== ''){
-          var provinceId = response.data.data.find(e => e.ProvinceName === data.tinhThanhPho)
-          if(provinceId !== undefined){
-            setProvinceSelected(provinceId.ProvinceID)
-            getAllDistrictGhnByIdProvinceByAddressCustomer(provinceId.ProvinceID,2,data)
+        setTimeout(()=>{
+          if(props.account.id !== ''){
+            var provinceId = response.data.data.find(e => e.ProvinceName === data.tinhThanhPho)
+            if(provinceId !== undefined){
+            
+                setProvinceSelected(provinceId.ProvinceID)
+                getAllDistrictGhnByIdProvinceByAddressCustomer(provinceId.ProvinceID,2,data)
+            }
           }
-        }
+        }, 100)
       }).catch(error => {
         console.log(error)
         setUserNoToken()
@@ -140,14 +143,15 @@ const CartPage = props => {
 
         setDistricts(response.data.data)
         if(type === 2){
+          setTimeout(()=>{
             var district_id = response.data.data.find(e => e.DistrictName === data.quanHuyen)
             if(district_id !== undefined){
-              setDistrictSelected(district_id.DistrictID)
-              getAllWardGhnByIdDistrictByAddressCustonmer(district_id.DistrictID, 2, data)
-              setAddressInput(props.account.diaChi)
+                setDistrictSelected(district_id.DistrictID)
+                getAllWardGhnByIdDistrictByAddressCustonmer(district_id.DistrictID, 2, data)
+                // setAddressInput(props.account.diaChi)
             }
+          }, 100)
           }
-        
       }).catch(error => {
         console.log(error)
       })
@@ -170,13 +174,14 @@ const CartPage = props => {
       .then(response => {
         setWards(response.data.data)
         if( type === 2){
-          var ward_id = response.data.data.find(e => e.WardName === data.xaPhuong)
-          if(ward_id !== undefined){
-            setWardSelected(ward_id.WardCode)
-            getShipFeeGhnWithAddressCustomer(ward_id.WardCode, ward_id.DistrictID)
-            getReceiveDateWithAddress(ward_id.WardCode, ward_id.DistrictID)
-            console.log(addressInput)
-          }
+          setTimeout(()=>{
+            var ward_id = response.data.data.find(e => e.WardName === data.xaPhuong)
+            if(ward_id !== undefined){
+                setWardSelected(ward_id.WardCode)
+                getShipFeeGhnWithAddressCustomer(ward_id.WardCode, ward_id.DistrictID)
+                getReceiveDateWithAddress(ward_id.WardCode, ward_id.DistrictID)
+            }
+          }, 100)
         }
       }).catch(error => {
         console.log(error)
@@ -304,7 +309,6 @@ const CartPage = props => {
   }
 
   const handleChooseAddress = value => {
-    console.log(account)
     setIsLoadingRequest(false)
     let newAddress = {
       ...props.account,
@@ -315,12 +319,33 @@ const CartPage = props => {
       xaPhuong: value.xaPhuong
     }
     setAccount(newAddress)
+    dispatch(changeInformationUser(newAddress))
+    getAllProvinceGhnByAddressCustomer(newAddress)
+    setAddressInput(value.diaChi)
     setTimeout(() => {
       setIsLoadingRequest(true)
       setAddressSelected(3)
-      getAllProvinceGhnByAddressCustomer(newAddress)
       toast.success('Chọn địa chỉ thành công')
-      dispatch(changeInformationUser(newAddress))
+    }, 200)
+  }
+
+  const handleChooseAddressCustomer = value => {
+    setIsLoadingRequest(false)
+    let newAddress = {
+      ...props.account,
+      diaChiList: value,
+      diaChi: value.diaChi,
+      tinhThanhPho: value.tinhThanhPho,
+      quanHuyen: value.quanHuyen,
+      xaPhuong: value.xaPhuong
+    }
+    setAccount(newAddress)
+    dispatch(changeInformationUser(newAddress))
+    getAllProvinceGhnByAddressCustomer(newAddress)
+    setAddressInput(value.diaChi)
+    setTimeout(() => {
+      setIsLoadingRequest(true)
+      setAddressSelected(3)
     }, 500)
   }
 
@@ -334,6 +359,13 @@ const CartPage = props => {
             ...props.account,
             diaChiList: []
           })
+          if(res.data.length > 0){
+            if(res.data.find(e => e.trangThai === 1) !== undefined){
+              handleChooseAddressCustomer(res.data)
+            }else{
+              handleChooseAddressCustomer(res.data[0])
+            }
+          }
           if (res.data.length === 0) {
             setAddressSelected(1)
           } else {
