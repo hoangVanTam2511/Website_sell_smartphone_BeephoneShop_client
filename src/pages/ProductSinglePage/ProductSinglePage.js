@@ -782,7 +782,7 @@ const ProductSinglePage = () => {
                       buyNowHandler()
                     }}
                   >
-                    <span className='btn-text mx-2' style={{ fontWeight: '600', fontSize: '20px'}}>Mua ngay 
+                    <span className='btn-text' style={{ fontWeight: '600', fontSize: '20px', marginLeft: '8px'}}>Mua ngay 
                     {
                       isLoading === true ? 
                       <>
