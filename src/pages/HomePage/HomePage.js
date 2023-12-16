@@ -133,7 +133,7 @@ const HomePage = () => {
       <div className='main-content bg-white'>
         <div className='container'>
           <div className='categories'>
-            <div class='slider'>
+            {/* <div class='slider'>
               <div class='slide-track'>
                 <div class='slide'>
                   <img
@@ -248,7 +248,7 @@ const HomePage = () => {
                   />
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* <FlashsalePage/> */}
 
