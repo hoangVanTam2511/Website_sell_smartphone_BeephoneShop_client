@@ -352,6 +352,7 @@ const CartPage = () => {
           setUserNoToken()
         }
 
+        deleteProductSelected()
         var hello = {
           name: 'hello server'
         }
@@ -359,13 +360,12 @@ const CartPage = () => {
         if (stompClient) {
           stompClient.send('/app/bills', {}, JSON.stringify(hello))
         }
-        deleteProductSelected()
         if(paymentMethodCss === 1){
           setTimeout(() => {
             setIsLoadingRequest(true)
             toast.success('Đặt hàng thành công')
             setCheckoutState(3)
-          }, 500)
+          }, 800)
         }
        
       },
@@ -393,7 +393,7 @@ const CartPage = () => {
     confirm({
       title: 'Thông báo',
       icon: <ExclamationCircleFilled />,
-      content: `Kiểm tra kỹ voucher của bạn trước khi bấm xác nhận, một khi đã bấm Xác nhận, voucher sẽ không thể sử dụng được cho đơn hàng khác nữa.`,
+      content: `Kiểm tra kỹ voucher của bạn trước khi bấm xác nhận.`,
       okText: 'Xác nhận',
       cancelText: 'Huỷ bỏ',
       onOk () {
@@ -490,11 +490,28 @@ const CartPage = () => {
        })
 
     }else{
+      // console.log(productDetails)
       productDetails.forEach(product => {
         deleteCartDetail(product)
        })
     }
      
+  }
+
+  const getCountProductDetail = () => {
+    if(account.id === ""){
+      var count = 0 ;
+      productDetailsRedux.forEach((item) => {
+        count += Number(item.quantity)
+      })
+      return count
+    }else{
+      var count = 0 ;
+      productDetails.forEach((item) => {
+        count += Number(item.soLuongSapMua)
+      })
+      return count
+    }
   }
 
   return (
@@ -1265,7 +1282,7 @@ const CartPage = () => {
   
                     <div style={{ style: '#707070' }}>
                       {' '}
-                      {account.id === '' ? quantityRedux : productDetails.length}
+                      {getCountProductDetail()}
                     </div>
                   </div>
   

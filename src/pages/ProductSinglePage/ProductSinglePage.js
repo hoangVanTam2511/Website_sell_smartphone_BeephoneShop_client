@@ -145,8 +145,6 @@ const ProductSinglePage = () => {
     }
   
   }
-    
-  
 
   const rows = [
     createData('Màn hình :', `${product.sizeDisplay} inch, ${product.typeDisplay}, ${product.widthDisplay} x ${product.lengthDisplay} Pixels`),

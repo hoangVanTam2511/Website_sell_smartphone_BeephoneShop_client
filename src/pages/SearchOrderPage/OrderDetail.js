@@ -218,11 +218,11 @@ const OrderDetail = props => {
                     : 'img_no_active'
                 }
               >
-                <i class='fa fa-shipping-fast'></i>
+                <i class='fa fa-inbox'></i>
               </div>
               <div class='caption'>
                 <span className='text-top' style={{ marginLeft: '-29px' }}>
-                  Vận chuyển
+                  Chờ giao hàng
                 </span>
                 {state3 && (
                   <span className='text-bottom' style={{ marginLeft: '-30px' }}>
@@ -242,11 +242,11 @@ const OrderDetail = props => {
                     : 'img_no_active'
                 }
               >
-                <i class='fa fa-inbox'></i>
+                <i class='fa fa-shipping-fast'></i> 
               </div>
               <div class='caption'>
                 <span className='text-top' style={{ marginLeft: '-37px' }}>
-                  Chờ giao hàng
+                Vận chuyển 
                 </span>
                 {state4 && (
                   <span className='text-bottom' style={{ marginLeft: '-29px' }}>
