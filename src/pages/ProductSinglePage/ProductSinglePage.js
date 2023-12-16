@@ -44,6 +44,10 @@ const ProductSinglePage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingAddToCart, setIsLoadingAddToCart] = useState(false)
 
+  // camnera
+  const [cameraRear, setCameraRear] = useState([])
+  const [cameraFront, setCameraFront] = useState([])
+  
   //ram, rom, color
   const [config, setConfig] = useState({
     id: '',
@@ -109,16 +113,53 @@ const ProductSinglePage = () => {
     return { name, value }
   }
 
+  const findCameraRearNotMain = () => {
+    if(cameraRear.length > 1) {
+      var text = "& Phụ"
+      cameraRear.forEach((e, index) => {
+        if(e.isCameraMain === false) {
+          text += e.doPhanGiai + " MP "
+        }
+        
+      })
+
+      return text
+    }else{
+      return ""
+    }
+  }
+    
+  const findCameraFrontNotMain = () => {
+    if(cameraFront.length > 1) {
+      var text = "& Phụ"
+      cameraFront.forEach((e, index) => {
+        if(e.isCameraMain === false) {
+          text += e.doPhanGiai + " MP "
+        }
+        
+      })
+
+      return text
+    }else{
+      return ""
+    }
+  
+  }
+    
+  
+
   const rows = [
-    createData('Màn hình :', `${product.sizeDisplay} inch, ${product.typeDisplay}, 1200 x 2640 Pixels`),
-    createData('Hệ điều hành :', 'IOS 13'),
-    createData('Camera sau :', 'Chính 48 MP & Phụ 8 MP, 5 MP'),
-    createData('Camera trước :', 'Chính 48 MP & Phụ 8 MP, 5 MP'),
+    createData('Màn hình :', `${product.sizeDisplay} inch, ${product.typeDisplay}, ${product.widthDisplay} x ${product.lengthDisplay} Pixels`),
+    createData('Hệ điều hành :', `${product.system === 0 ? "Android" : "IOS"}`),
+    createData('Camera sau :', `Chính ${cameraRear.length === 0 ? "" : cameraRear.find(e => e.isCameraMain === true).doPhanGiai} MP ${findCameraRearNotMain()}`),
+    createData('Camera trước :', `Chính ${cameraFront.length === 0 ? "" : cameraFront.find(e => e.isCameraMain === true).doPhanGiai} MP  ${findCameraFrontNotMain()}`),
     createData('Chip', `${product.nameChip}`),
     createData('Ram', `${config.ram} GB`),
     createData('ROM', `${config.rom} GB`),
     createData('SIM', '1 Nano SIM & 1 eSIM'),
-    createData('Pin:', `${product.batteryCapacity} mah`)
+    createData('Pin:', `${product.batteryCapacity} mah`),
+    createData('Hãng:', `${product.nameBrand} `),
+    createData('Thẻ Nhớ:', `${product.memoryCardType == null ? "Không có": product.memoryCardType} `)
   ]
 
   // getting single product
@@ -197,7 +238,9 @@ const ProductSinglePage = () => {
             batteryCapacity: res.dungLuongPin,
             memoryCardType: res.loaiTheNho,
             refreshRate: res.tanSoQuet,
-
+            lengthDisplay: res.chieuDai,
+            widthDisplay: res.chieuRong,
+            system: res.heDieuHanh
           })
         }
       })
@@ -215,6 +258,29 @@ const ProductSinglePage = () => {
       .catch(error => {
         setUserNoToken()
         console.log(error)})
+
+        request("GET",`/client/product-detail/camera-rear?id=${id}`)
+        .then(item => {
+          if (item.status === 200) {
+            var res = item.data
+            setCameraRear(res)
+          }
+        })
+        .catch(error => {
+          setUserNoToken()
+          console.log(error)})
+
+          request("GET",`/client/product-detail/camera-front?id=${id}`)
+          .then(item => {
+            if (item.status === 200) {
+              console.log(item.data)
+              var res = item.data
+              setCameraFront(res)
+            }
+          })
+          .catch(error => {
+            setUserNoToken()
+            console.log(error)})
   }
 
   const addToCartHandler = async product => {
