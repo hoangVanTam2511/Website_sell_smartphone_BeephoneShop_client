@@ -361,7 +361,7 @@ const CartPage = props => {
           })
           if(res.data.length > 0){
             if(res.data.find(e => e.trangThai === 1) !== undefined){
-              handleChooseAddressCustomer(res.data)
+              handleChooseAddressCustomer(res.data.find(e => e.trangThai === 1))
             }else{
               handleChooseAddressCustomer(res.data[0])
             }
