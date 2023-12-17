@@ -128,6 +128,7 @@ const CartPage = () => {
     if (productDetailsRedux.length === 1 && user.id === "") {
       setIsCheckedAll(true);
     }
+
   }, []);
 
   useEffect(() => {
@@ -254,7 +255,9 @@ const CartPage = () => {
   const deleteCartDetail = async (product) => {
     if (user.id === "") {
       dispatch(deleteProduct(product));
+      setCheckeds(checkeds.filter((e) => e.id !== product.id));
     } else {
+      setCheckeds(checkeds.filter((e) => e.idSanPhamChiTiet !== product.idSanPhamChiTiet));
       if (productDetails.length === 1) {
         dispatch(addToCart(0));
       }
@@ -373,7 +376,6 @@ const CartPage = () => {
     if (user.id === "") {
       checkeds.forEach((product) => {
         deleteCartDetail(product.data);
-        setCheckeds(checkeds.filter((e) => e.data.id !== product.data.id));
       });
 
       setTimeout(() => {
@@ -382,7 +384,6 @@ const CartPage = () => {
     } else {
       checkeds.forEach((product) => {
         deleteCartDetail(product);
-        setCheckeds(checkeds.filter((e) => e.id !== product.id));
       });
 
       // set total money
