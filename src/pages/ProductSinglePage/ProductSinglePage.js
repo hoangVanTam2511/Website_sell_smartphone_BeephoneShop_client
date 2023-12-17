@@ -846,13 +846,14 @@ const ProductSinglePage = () => {
                       buyNowHandler()
                     }}
                   >
-                    <span className='btn-text' style={{ fontWeight: '600', fontSize: '20px', marginLeft: '8px'}}>Mua ngay 
+                    <span className='btn-text' style={{ fontWeight: '600', fontSize: '20px', marginLeft: '8px'}}>
                     {
                       isLoading === true ? 
                       <>
                         <Spin indicator={<LoadingOutlined style={{ fontSize: 24, color: 'white', marginLeft: 5 }} spin />} />
                       </>:
                       <>
+                        Mua ngay 
                       </>
                     }
                     
