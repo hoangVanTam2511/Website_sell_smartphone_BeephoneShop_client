@@ -22,6 +22,7 @@ import { request, setAuthHeader } from '../../helpers/axios_helper'
 import { getUser, setUserNoToken } from '../../store/userSlice'
 import { getSelectedProductDetails, getTotalProductDetails, addToCart } from '../../store/cartSlice'
 import { deleteProduct } from '../../store/cartDetailSlice'
+import dayjs from "dayjs"; // Import thư viện Day.js
 import { LoadingOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
 
@@ -35,12 +36,13 @@ const CartPage = () => {
   const [checkoutState, setCheckoutState] = useState(1)
   const account = getUser()
   const [voucher, setVoucher] = useState('')
-  const [codeVoucher, setCodeVoucher] = useState()
+  const [codeVoucher, setCodeVoucher] = useState('')
   const [paymentMethodCss, setPaymentMethodCss] = useState(1)
   const [bill, setBill] = useState()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [totalTemp, setTotatTemp] = useState(0)
+  const [counpoun, setCounpoun] = useState('')
 
   // redux
   const [isLoadingRequest, setIsLoadingRequest] = useState(true)
@@ -410,11 +412,12 @@ const CartPage = () => {
         if (res.data.dieuKienApDung > totalAmount) {
           toast.error('Hoá đơn này không đạt đủ điều kiện áp dụng')
         } else {
+          setCounpoun(res.data)
           let priceWhenAfterVoucherUsed =
             Number(totalAmount) - Number(res.data.giaTriVoucher)
-          setTotalAmount(priceWhenAfterVoucherUsed)
-          setVoucher(res.data)
-          toast.success('Áp dụng voucher thành công.')
+            setTotalAmount(priceWhenAfterVoucherUsed)
+            setVoucher(res.data)
+            toast.success('Áp dụng voucher thành công.')
         }
       })
       .catch(error => {
@@ -858,6 +861,7 @@ const CartPage = () => {
                   onChange={e => {
                     setCodeVoucher(e.target.value)
                   }}
+                  value={codeVoucher}
                   style={{
                     width: '75%',
                     margin: `0px 0px`,
@@ -952,7 +956,31 @@ const CartPage = () => {
                   </div>
   
                   <div style={{ color: 'red' }}>
-                    - {formatMoney(voucher?.giaTriVoucher)}
+                  <div class="cardCoupoun">
+                  <div class="main">
+                    <div class="co-img">
+                      <img
+                        src="https://firebasestorage.googleapis.com/v0/b/uploadimage-575f0.appspot.com/o/xanh.png?alt=media&token=6d6a830f-d774-497e-a423-5221a06beedf"
+                        alt=""
+                      />
+                    </div>
+                    <div class="vertical"></div>
+                    <div class="content">
+                      <h5>{counpoun.ten}</h5>
+                      <><span>{formatMoney(counpoun.giaTriVoucher)}</span></>
+                      <p>Giá trị đến {dayjs(counpoun.ngayKetThuc).format("DD/MM/YYYY")} </p>
+                    </div>
+                  </div>
+                  <div class="copy-button">
+                    <input id="copyvalue" type="text" readonly value={counpoun.ma} />
+                    <button onClick={() => {
+                      setVoucher('')
+                      var temp = Number(totalAmount) + Number(counpoun.giaTriVoucher)
+                      setTotalAmount(temp)
+                      setCodeVoucher('')
+                    }} class="copybtn">Xoá</button>
+                  </div>
+                </div>
                   </div>
                 </div>
               )}

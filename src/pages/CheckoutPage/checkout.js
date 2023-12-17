@@ -46,6 +46,7 @@ const CartPage = props => {
 
   const [isLoadingRequest, setIsLoadingRequest] = useState(true)
 
+
   // redux
   const selectedCart = useSelector(state => state.cart.selectedCart)
 
@@ -384,26 +385,31 @@ const CartPage = props => {
     var vnf_regex = /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/
     var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-    if (nameSelected === '' ? 'fail' : 'pass' === 'fail') {
+    if (nameSelected === '' || nameSelected === undefined || nameSelected === null ? 'fail' : 'pass' === 'fail') {
       flag++
       toast.error('Quý khách vui lòng không được bỏ trống họ và tên')
-    } else if (nameSelected.trim() === '') {
+      return;
+    } 
+     if (nameSelected.trim() === '') {
       if (flag === 0) {
         toast.error('Quý khách vui lòng không được bỏ trống họ và tên')
+        return;
       }
-
       flag++
     }
 
-    if (phoneSelected === null) {
+    if (phoneSelected === null || phoneSelected === '' || phoneSelected === undefined ? 'fail' : 'pass' === 'fail') {
       if (flag === 0) {
         toast.error('Quý khách vui này điền đầy đủ số điện thoại')
+        return;
       }
 
       flag++
-    } else if (phoneSelected.trim() === '') {
+    } 
+     if (phoneSelected.trim() === '') {
       if (flag === 0) {
         toast.error('Quý khách vui này điền đầy đủ số điện thoại')
+        return
       }
 
       flag++

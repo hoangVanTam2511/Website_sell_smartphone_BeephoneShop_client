@@ -129,3 +129,81 @@
     align-items: center;
     justify-content: center;
   }
+
+  
+.cardCoupoun {
+  width: 400px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+  padding: 10px 10px;
+  position: relative;
+}
+
+.main,
+.copy-button {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  align-items: center;
+}
+
+
+.co-img img {
+  width: 100px;
+  height: 100px;
+}
+.vertical {
+  border-left: 5px dotted black;
+  height: 100px;
+  position: absolute;
+  left: 40%;
+}
+
+
+.content h1 {
+  font-size: 35px;
+  margin-left: -20px;
+  color: #565656;
+}
+
+.content h1 span {
+  font-size: 18px;
+}
+.content h5 {
+  color: #565656;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.content p {
+  font-size: 14px;
+  color: #696969;
+}
+
+.copy-button {
+  margin: 12px 0 -5px 0;
+  height: 45px;
+  border-radius: 4px;
+  padding: 0 5px;
+  border: 1px solid rgb(18, 141, 226);
+}
+
+.copy-button input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  font-size: 15px;
+}
+
+.copy-button button {
+  padding: 5px 20px;
+  background-color: rgb(18, 141, 226);
+  color: #fff;
+  border: 1px solid transparent;
+}
+
+.content{
+  width: 56%;
+}
