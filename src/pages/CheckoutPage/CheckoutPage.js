@@ -473,11 +473,9 @@ const CartPage = () => {
     if(account.id === ""){
         dispatch(deleteProduct(product))
     }else{
-
       if (product.idGioHangChiTiet !== null) {
          request("DELETE",`/client/cart-detail/delete-cart-details?id_customer=${account.id}&id_cart_detail=${product.idGioHangChiTiet}`)
           .then(res => {
-            if (res.data.length === 0) return
             dispatch(addToCart())
           })
           .catch(res => console.log(res))
@@ -493,8 +491,8 @@ const CartPage = () => {
        })
 
     }else{
-      // console.log(productDetails)
-      productDetails.forEach(product => {
+        productDetails.forEach(product => {
+        console.log(product)
         deleteCartDetail(product)
        })
     }

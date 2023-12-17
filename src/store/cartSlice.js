@@ -9,6 +9,7 @@ export const addToCart = createAsyncThunk('cart/addToCart', async data => {
   let quantity = 0
   // console.log("redux is number one")
   if (data !== 0) {
+    console.log("heeh")
     await request("GET",`/client/cart-detail/count-of-cart-detail?id_customer=${user.id}`
       )
       .then(res => {
