@@ -399,12 +399,6 @@ const CartPage = () => {
       return;
     }
 
-    if (Number(totalAmount) > 100000000) {
-      toast.error("Tổng số tiền mua hàng không được vượt quá 100.000.000 đ");
-      setIsLoading(false);
-      return;
-    }
-
     if (user.id === "") {
       var temp = [];
       productDetailsRedux.forEach((e) => {
