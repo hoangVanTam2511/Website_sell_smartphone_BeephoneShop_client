@@ -893,7 +893,7 @@ const CartPage = () => {
   
                 <div style={{ style: '#707070' }}>
                   {' '}
-                  {account.id === '' ? quantityRedux : productDetails.length}
+                  {getCountProductDetail()}
                 </div>
               </div>
   

@@ -58,13 +58,12 @@ const Orders = () => {
     request("GET",`/client/address/get-all-address?id_account=${user.id}`
       )
       .then(res => {
-        if (res.status === 200) {
-          console.log(res.data)
+        console.log(res.data)
+         setDiaChiList(res.data)
           setTimeout(()=>{
+            console.log( diaChiList.find(item => item.trangThai === 1))
             setIsLoadingRequest(true)
-            setDiaChiList(res.data)
           }, 200)
-        }
       })
       .catch(error => {
         console.log(error)
@@ -143,164 +142,177 @@ const Orders = () => {
   };
 
   const changeInformationUser = (e) => {
-    // setAccount({...account,
-    //   e.target.name : e.target.value,
-    // })
-    // console.log(e)
+    setAccount({...account,
+      [e.target.name] : e.target.value
+    })
+    
   }
 
   return (
     <>
     {
-      isLoadingRequest === true  ? 
-       <> </>
-      :
-        <div className='custom-spin'>
-         <Spin indicator={<LoadingOutlined style={{ fontSize: 40, color: '#126de4', marginLeft: 5 }} spin />} />
-        </div>
+      account === null || account === undefined || account === ""  ? 
+      <div className='custom-spin'>
+        <Spin indicator={<LoadingOutlined style={{ fontSize: 40, color: '#126de4', marginLeft: 5 }} spin />} />
+      </div>
+        :
+        <>
+          {changeAddress === 1 ? (
+          <div>
+            <div class='card bg-white'>
+              <div class='title' style={{ marginLeft: '36%' }}>
+                <h4>
+                  {' '}
+                  <span className='fw-6 fs-18'>Thông tin cá nhân</span>
+                </h4>
+                <h4></h4>
+              </div>
+
+              <Divider></Divider>
+
+
+              <div style={{ marginTop: '35px' }}>
+                <div className='title'>
+                  <span>
+                    {' '}
+                    <TextField
+                      style={{ width: '937px' }}
+                      label='Họ và tên'
+                      id='standard-basic'
+                      variant='standard'
+                      name="hoVaTen"
+                      onChange={(e)=>changeInformationUser(e)}
+                      value={account.hoVaTen}
+                    />
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '35px'}}>
+              <div className='title'>
+              <span>Giới tính:</span>
+              <Radio.Group 
+                    style={{
+                      marginRight: `77%`,
+                      marginTop: `3px`
+                  }}
+                options={plainOptions} 
+                name="gioiTinh"
+                onChange={changeGender} value={value1} />
+                <br />
+              
+              </div>
+              <Divider style={{ margin: '5px auto'}}></Divider>
+              </div>
+
+              <div style={{ marginTop: '35px' }}>
+                <div className='title'>
+                  <span>
+                    {' '}
+                    <TextField
+                      style={{ width: '937px' }}
+                      label='Số điện thoại'
+                      id='standard-basic'
+                      variant='standard'
+                      value={account.soDienThoai}
+                      name="soDienThoai"
+                      onChange={(e)=>changeInformationUser(e)}
+                    />
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '35px' }}>
+                <div className='title'>
+                  <span>
+                    {' '}
+                    <TextField
+                      style={{ width: '937px' }}
+                      label='Email'
+                      id='standard-basic'
+                      variant='standard'
+                      name="email"
+                      value={account.email}
+                      onChange={(e)=>changeInformationUser(e)}
+                    />
+                  </span>
+                </div>
+              </div>
+
+            
+
+
+              <div style={{ marginTop: '35px' }}>
+                <div className='title'>
+                  <span>
+                    {
+                      
+                    diaChiList.find(item => item.trangThai === 1) === undefined  ? 
+                    <>
+                      Địa chỉ: {diaChiList[0]}, {diaChiList[0].xaPhuong}, {diaChiList[0].quanHuyen},{' '}
+                      {diaChiList[0].tinhThanhPho}{' '}
+                    </>
+                    :
+                    <>
+                      Địa chỉ: {diaChiList.find(item => item.trangThai === 1).diaChi}, {diaChiList.find(item => item.trangThai === 1).xaPhuong}, {diaChiList.find(item => item.trangThai === 1).quanHuyen},{' '}
+                      {diaChiList.find(item => item.trangThai === 1).tinhThanhPho}{' '}
+                    </>
+                  }
+                  </span>
+
+                  <button
+                    style={{
+                      color: `white`,
+                      marginLeft: '5px'
+                    }}
+                    onClick={() => setChangeAddress(2)}
+                  >
+                    {' '}
+                    <i
+                      class='fa-regular fa-pen-to-square'
+                      style={{ fontSize: '22px', color: '#128DE2' }}
+                    ></i>{' '}
+                  </button>
+                </div>
+                <Divider style={{ margin: '5px auto' }}></Divider>
+              </div>
+
+              <div style={{ marginTop: '35px' }}>
+                <div className='title'>
+                  <span>Đổi mật khẩu </span>
+                </div>
+                <Divider style={{ margin: '5px auto' }}></Divider>
+              </div>
+
+              <br />
+
+              <Button
+                style={{
+                  backgroundColor: `#128DE2`,
+                  color: `white`,
+                  marginTop: '5px',
+                  width: `380px`,
+                  fontSize: '15px',
+                  marginLeft: '200px'
+                }}
+                variant='outlined'
+                onclick={() => {
+                  setChangeAddress(2);
+                }}
+                startIcon={<i class='fa-regular fa-pen-to-square'></i>}
+              >
+                Cập nhật thông tin
+              </Button>
+            </div>
+
+          </div>
+        ) : (
+          <InformationAddress />
+        )}
+        </>
       
     }
-      {changeAddress === 1 ? (
-        <div>
-          <div class='card bg-white'>
-            <div class='title' style={{ marginLeft: '36%' }}>
-              <h4>
-                {' '}
-                <span className='fw-6 fs-18'>Thông tin cá nhân</span>
-              </h4>
-              <h4></h4>
-            </div>
-
-            <Divider></Divider>
-
-
-            <div style={{ marginTop: '35px' }}>
-              <div className='title'>
-                <span>
-                  {' '}
-                  <TextField
-                    style={{ width: '937px' }}
-                    label='Họ và tên'
-                    id='standard-basic'
-                    variant='standard'
-                    name="hoVaTen"
-                    onChange={(e)=>changeInformationUser(e)}
-                    value={user.hoVaTen}
-                  />
-                </span>
-              </div>
-            </div>
-
-            <div style={{ marginTop: '35px'}}>
-            <div className='title'>
-            <span>Giới tính:</span>
-            <Radio.Group 
-                  style={{
-                    marginRight: `77%`,
-                    marginTop: `3px`
-                }}
-               options={plainOptions} 
-               name="gioiTinh"
-               onChange={changeGender} value={value1} />
-               <br />
-             
-            </div>
-             <Divider style={{ margin: '5px auto'}}></Divider>
-            </div>
-
-            <div style={{ marginTop: '35px' }}>
-              <div className='title'>
-                <span>
-                  {' '}
-                  <TextField
-                    style={{ width: '937px' }}
-                    label='Số điện thoại'
-                    id='standard-basic'
-                    variant='standard'
-                    value={user.soDienThoai}
-                    name="soDienThoai"
-                    onChange={(e)=>changeInformationUser(e)}
-                  />
-                </span>
-              </div>
-            </div>
-
-            <div style={{ marginTop: '35px' }}>
-              <div className='title'>
-                <span>
-                  {' '}
-                  <TextField
-                    style={{ width: '937px' }}
-                    label='Email'
-                    id='standard-basic'
-                    variant='standard'
-                    name="email"
-                    value={user.email}
-                    onChange={(e)=>changeInformationUser(e)}
-                  />
-                </span>
-              </div>
-            </div>
-
-          
-
-
-            <div style={{ marginTop: '35px' }}>
-              <div className='title'>
-                <span>
-                  {/* Địa chỉ: {diaChiList.find(item => item.trangThai === 1).diaChi}, {user.diaChiList.find(item => item.trangThai === 1).xaPhuong}, {user.diaChiList.find(item => item.trangThai === 1).quanHuyen},{' '}
-                  {diaChiList.find(item => item.trangThai === 1).tinhThanhPho}{' '} */}
-                </span>
-
-                <button
-                  style={{
-                    color: `white`,
-                    marginLeft: '5px'
-                  }}
-                  onClick={() => setChangeAddress(2)}
-                >
-                  {' '}
-                  <i
-                    class='fa-regular fa-pen-to-square'
-                    style={{ fontSize: '22px', color: '#128DE2' }}
-                  ></i>{' '}
-                </button>
-              </div>
-              <Divider style={{ margin: '5px auto' }}></Divider>
-            </div>
-
-            <div style={{ marginTop: '35px' }}>
-              <div className='title'>
-                <span>Đổi mật khẩu </span>
-              </div>
-              <Divider style={{ margin: '5px auto' }}></Divider>
-            </div>
-
-            <br />
-
-            <Button
-              style={{
-                backgroundColor: `#128DE2`,
-                color: `white`,
-                marginTop: '5px',
-                width: `380px`,
-                fontSize: '15px',
-                marginLeft: '200px'
-              }}
-              variant='outlined'
-              onclick={() => {
-                setChangeAddress(2);
-              }}
-              startIcon={<i class='fa-regular fa-pen-to-square'></i>}
-            >
-              Cập nhật thông tin
-            </Button>
-          </div>
-
-        </div>
-      ) : (
-        <InformationAddress />
-      )}
+     
     </>
   )
 }

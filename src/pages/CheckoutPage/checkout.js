@@ -1013,24 +1013,32 @@ const CartPage = props => {
                 {listOfAddress &&
                 listOfAddress.length > 0 &&
                 addressSelected === 2 ? (
+                  <>
+                  <span
+                   style={{
+                    marginLeft: '25px'
+                   }}
+                  >hoặc</span>
                   <div
                     style={{
                       textAlign: 'right',
                       padding: `10px`,
                       fontSize: 14,
                       color: '#444',
-                      marginLeft: -8,
-                      width: '97%',
+                      marginLeft: -13,
+                      width: '22%',
                       color: 'rgb(18, 141, 226)',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      display: 'inline-block'
                     }}
                     onClick={() => {
                       setAddressSelected(1)
                     }}
                   >
-                    chọn địa chỉ mới
+                    nhập địa chỉ mới
                     <ArrowForwardIosIcon style={{ fontSize: 11 }} />
                   </div>
+                  </>
                 ) : (
                   <></>
                 )}
