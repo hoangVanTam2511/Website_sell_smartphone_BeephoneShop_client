@@ -194,7 +194,7 @@ const OrderDetail = props => {
                     : 'img_no_active'
                 }
               >
-                <i class='fa fa-money-check' style={{ transform: `translateY(3px)` }}></i>
+                <i class='fa fa-money-check' style={{ transform: `translateY(0px)` }}></i>
               </div>
               <div class='caption'>
                 <span className='text-top' style={{ marginLeft: '-47px' }}>
@@ -221,11 +221,11 @@ const OrderDetail = props => {
                 <i class='fa fa-inbox'></i>
               </div>
               <div class='caption'>
-                <span className='text-top' style={{ marginLeft: '-29px' }}>
+                <span className='text-top' style={{ marginLeft: '-38px' }}>
                   Chờ giao hàng
                 </span>
                 {state3 && (
-                  <span className='text-bottom' style={{ marginLeft: '-30px' }}>
+                  <span className='text-bottom' style={{ marginLeft: '-29px' }}>
                     {formatDate(state3.createdAt)}
                   </span>
                 )}
@@ -242,14 +242,14 @@ const OrderDetail = props => {
                     : 'img_no_active'
                 }
               >
-                <i class='fa fa-shipping-fast'></i> 
+                <i class='fa fa-shipping-fast' style={{ marginTop: '11px'}}></i> 
               </div>
               <div class='caption'>
-                <span className='text-top' style={{ marginLeft: '-37px' }}>
+                <span className='text-top' style={{ marginLeft: '-30px' }}>
                 Vận chuyển 
                 </span>
                 {state4 && (
-                  <span className='text-bottom' style={{ marginLeft: '-29px' }}>
+                  <span className='text-bottom' style={{ marginLeft: '-25px' }}>
                     {formatDate(state4.createdAt)}
                   </span>
                 )}
