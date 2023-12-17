@@ -50,6 +50,14 @@ const CartPage = () => {
   const getProductDetails = async () => {
     if (productDetails.length !== 0) return;
     if (user.id === "") {
+      if(productDetailsRedux.find(item => item.data.id === newProductAddToCart?.data.id) !== undefined) {
+        setCheckeds([newProductAddToCart]);
+        if (productDetailsRedux.length === 1 && user.id === "") {
+          setIsCheckedAll(true);
+        }
+      }else{
+        setCheckeds([])
+      }
     } else {
       request(
         "GET",
@@ -75,8 +83,14 @@ const CartPage = () => {
               ])
             )
           );
-          if (res.data.length === 1) {
-            setIsCheckedAll(true);
+        
+          if(res.data.find(item => item.idSanPhamChiTiet === newProductAddToCart?.idSanPhamChiTiet) !== undefined) {
+            setCheckeds([newProductAddToCart]);
+            if (res.data.length === 1) {
+              setIsCheckedAll(true);
+            }
+          }else{
+            setCheckeds([])
           }
         })
         .catch((res) => console.log(res));
@@ -113,10 +127,6 @@ const CartPage = () => {
   };
 
   useEffect(() => {
-    if (newProductAddToCart !== null) {
-      setCheckeds([newProductAddToCart]);
-    }
-
     if (user.id !== null || user.id !== "") {
       getProductDetails();
     }
@@ -124,11 +134,6 @@ const CartPage = () => {
     dispatch(addToCart());
     dispatch(SetSelectedCart(1));
     dispatch(ResetItemNavbar());
-
-    if (productDetailsRedux.length === 1 && user.id === "") {
-      setIsCheckedAll(true);
-    }
-
   }, []);
 
   useEffect(() => {
