@@ -20,21 +20,101 @@
     <link rel="stylesheet" href="owlcarousel/owl.theme.default.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="owlcarousel/owl.carousel.min.css">
-    <link rel="stylesheet" href="owlcarousel/owl.theme.default.min.css">
+    <link rel="stylesheet" href="owlcarousel/owl.carousel.min.css" />
+    <link rel="stylesheet" href="owlcarousel/owl.theme.default.min.css" />
 
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <title>BeephoneShop</title>
-   
+
+    <style>
+      .snowfall{
+        /* overflow: hidden; */
+        /* width: 100%; */
+        /* height: 1000px; */
+      }
+    
+      .snowflake {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: url('https://static.vecteezy.com/system/resources/previews/016/713/774/non_2x/openwork-blue-snowflake-illustration-with-transparent-background-free-png.png')
+          no-repeat;
+        background-size: contain;
+        animation: snowfall linear infinite;
+        opacity: 0;
+      }
+
+      @keyframes snowfall {
+        0% {
+          transform: translateY(0) translateX(0) rotate(0deg);
+        }
+        100% {
+          transform: translateY(70vh) translateX(-10vw) rotate(720deg);
+        }
+      }
+    </style>
   </head>
-  <body style="background-color:#edf0f5;" >
-    <div id="root"></div>
+  <body style="background-color: #edf0f5">
+    
+    <!-- <div class="snowfall"> -->
+      <div id="root"></div>
+    <!-- </div> -->
   </body>
 
   <script src="js/jquery-3.3.1.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="owlcarousel/owl.carousel.min.js"></script>
+  <!-- <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const snowfallContainer = document.querySelector('.snowfall')
+
+      // Zufällige Anzahl von Schneeflocken
+      const numberOfSnowflakes = Math.floor(Math.random() * 390) + 40
+
+      for (let i = 0; i < numberOfSnowflakes; i++) {
+        createSnowflake()
+      }
+
+      function createSnowflake() {
+        const snowflake = document.createElement('div')
+        snowflake.classList.add('snowflake')
+
+        // Zufällige horizontale Position
+        const randomLeft = Math.random() * 100
+        snowflake.style.left = `${randomLeft}%`
+
+        // Zufällige Breite & Höhe
+        const randomSize = Math.random() * 14 + 4
+        snowflake.style.height = `${randomSize}px`
+        snowflake.style.width = `${randomSize}px`
+
+        // Startposition oben oder unten (nur am Anfang)
+        const startTop = Math.random() > 0.5 ? -10 : window.innerHeight
+        snowflake.style.top = `${startTop}px`
+
+        // Zufällige Rotation
+        const randomRotation = Math.random() * 360
+        snowflake.style.transform = `rotate(${randomRotation}deg)`
+
+        // Zufällige Animationsdauer und Verzögerung
+        const randomDuration = Math.random() * 5 + 3 // zwischen 3 und 8 Sekunden
+        const randomDelay = Math.random() * 25 // zwischen 0 und 5 Sekunden
+        snowflake.style.animation = `snowfall ${randomDuration}s ${randomDelay}s linear infinite`
+
+        // Zufällige Animationsdauer für Opazität mit Verzögerung
+        const randomTransitionSecond = Math.random() * 1000 + 300
+        snowflake.style.transition = `opacity ${randomTransitionSecond}ms ease-in-out ${randomDelay}s`
+
+        // Opazität nach einer Verzögerung setzen
+        setTimeout(() => {
+          snowflake.style.opacity = 1
+        }, randomDelay * 100) // Verzögerung in Millisekunden umrechnen
+
+        snowfallContainer.appendChild(snowflake)
+      }
+    })
+  </script> -->
 </html>

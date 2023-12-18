@@ -58,10 +58,9 @@ const Orders = () => {
     request("GET",`/client/address/get-all-address?id_account=${user.id}`
       )
       .then(res => {
-        console.log(res.data)
+        console.log(res.data[0].diaChi)
          setDiaChiList(res.data)
           setTimeout(()=>{
-            console.log( diaChiList.find(item => item.trangThai === 1))
             setIsLoadingRequest(true)
           }, 200)
       })
@@ -246,10 +245,10 @@ const Orders = () => {
                 <div className='title'>
                   <span>
                     {
-                      
+                    
                     diaChiList.find(item => item.trangThai === 1) === undefined  ? 
                     <>
-                      Địa chỉ: {diaChiList[0]}, {diaChiList[0].xaPhuong}, {diaChiList[0].quanHuyen},{' '}
+                      Địa chỉ: {diaChiList[0].diaChi}, {diaChiList[0].xaPhuong}, {diaChiList[0].quanHuyen},{' '}
                       {diaChiList[0].tinhThanhPho}{' '}
                     </>
                     :
@@ -257,7 +256,7 @@ const Orders = () => {
                       Địa chỉ: {diaChiList.find(item => item.trangThai === 1).diaChi}, {diaChiList.find(item => item.trangThai === 1).xaPhuong}, {diaChiList.find(item => item.trangThai === 1).quanHuyen},{' '}
                       {diaChiList.find(item => item.trangThai === 1).tinhThanhPho}{' '}
                     </>
-                  }
+                   }
                   </span>
 
                   <button
