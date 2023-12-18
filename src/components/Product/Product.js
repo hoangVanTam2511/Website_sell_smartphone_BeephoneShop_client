@@ -1,20 +1,20 @@
-import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { AddItemNavbar } from '../../store/navbarSlice'
-import './Product.scss'
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { AddItemNavbar } from "../../store/navbarSlice";
+import "./Product.scss";
 
 const Product = ({ product }) => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  useEffect(() => {})
+  useEffect(() => {});
 
-  const formatMoney = number => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(number)
-  }
+  const formatMoney = (number) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(number);
+  };
 
   return (
     <Link
@@ -23,42 +23,42 @@ const Product = ({ product }) => {
       onClick={() => {
         var data = [
           {
-            path: '/products/all',
-            name: 'Điện thoại'
+            path: "/products/all",
+            name: "Điện thoại",
           },
           {
             path: `/product/${product.id}`,
-            name: `${product.tenSanPham + ' ' + product.dungLuongRom + ' GB'}`
-          }
-        ]
-        dispatch(AddItemNavbar(data))
+            name: `${product.tenSanPham + " " + product.dungLuongRom + " GB"}`,
+          },
+        ];
+        dispatch(AddItemNavbar(data));
       }}
     >
       <div
-        className='product-item bg-white'
+        className="product-item bg-white"
         style={{
-          width: '220px',
-          height: '330px',
-          margin: '10px auto'
+          width: "220px",
+          height: "330px",
+          margin: "10px auto",
         }}
       >
         {product.donGiaSauKhuyenMai === 0 ? (
           <>
             <div
-              className='category'
+              className="category"
               style={{
                 backgroundColor: `#128DE2`,
-                position: 'relative',
-                width: '40%',
-                top: '1px',
+                position: "relative",
+                width: "40%",
+                top: "1px",
                 borderTopLeftRadius: `8px`,
                 borderTopRightRadius: `20px`,
                 borderBottomRightRadius: `20px`,
-                fontWeight: '600',
-                opacity: 0
+                fontWeight: "600",
+                opacity: 0,
               }}
             >
-              Giảm{' '}
+              Giảm{" "}
               {((product.donGiaSauKhuyenMai / product.donGia) * 100).toFixed(0)}
               %
             </div>
@@ -66,19 +66,19 @@ const Product = ({ product }) => {
         ) : (
           <>
             <div
-              className='category'
+              className="category"
               style={{
                 backgroundColor: `#128DE2`,
-                position: 'relative',
-                width: '40%',
-                top: '1px',
+                position: "relative",
+                width: "40%",
+                top: "1px",
                 borderTopLeftRadius: `8px`,
                 borderTopRightRadius: `20px`,
                 borderBottomRightRadius: `20px`,
-                fontWeight: '600'
+                fontWeight: "600",
               }}
             >
-              Giảm{' '}
+              Giảm{" "}
               {(
                 ((product.donGia - product.donGiaSauKhuyenMai) /
                   product.donGia) *
@@ -89,35 +89,34 @@ const Product = ({ product }) => {
           </>
         )}
 
-        <div className='product-item-img'>
+        <div className="product-item-img">
           <img
-            style={{ width: '75%', margin: '0px auto' }}
+            style={{ width: "75%", margin: "0px auto" }}
             src={product.duongDan}
-            alt=''
+            alt=""
           />
         </div>
-        <div className='product-item-info fs-14'>
-          <div className='brand' style={{ height: 50}}>
-            <span className='fw-6' style={{ fontSize: '14px' }}>
-              {product.tenSanPham + ' ' + product.dungLuongRom + ' GB'}
+        <div className="product-item-info fs-14">
+          <div className="brand" style={{ height: 50 }}>
+            <span className="fw-6" style={{ fontSize: "14px" }}>
+              {product.tenSanPham + " " + product.dungLuongRom + " GB"}
             </span>
           </div>
 
           <div
-            className='product-item-info'
+            className="product-item-info"
             style={{
               display: `flex`,
-              marginLeft: '-12px'
+              marginLeft: "-12px",
             }}
           >
-            <div className='product-info'
-            >{product.dungLuongRam + ' GB '}</div>
+            <div className="product-info">{product.dungLuongRam + " GB "}</div>
 
-            <div className='product-info'>{product.dungLuongRom + ' GB'}</div>
+            <div className="product-info">{product.dungLuongRom + " GB"}</div>
           </div>
 
-          <div className='price flex align-center'>
-            <span className='new-price' style={{ color: 'rgb(18, 141, 226)' }}>
+          <div className="price flex align-center">
+            <span className="new-price" style={{ color: "rgb(18, 141, 226)" }}>
               {formatMoney(
                 product.donGiaSauKhuyenMai === 0
                   ? product.donGia
@@ -127,22 +126,22 @@ const Product = ({ product }) => {
             {product.donGiaSauKhuyenMai === 0 ? (
               <></>
             ) : (
-              <span className='old-price'>{formatMoney(product.donGia)}</span>
+              <span className="old-price">{formatMoney(product.donGia)}</span>
             )}
           </div>
 
-          <div style={{ color: 'yellow' }}>
+          {/* <div style={{ color: 'yellow' }}>
             <i className='fa-solid fa-star'></i>
             <i className='fa-solid fa-star'></i>
             <i className='fa-solid fa-star'></i>
             <i className='fa-solid fa-star'></i>
             <i className='fa-solid fa-star'></i>
             <span style={{ color: 'gray' }}>(5000)</span>
-          </div>
+          </div> */}
         </div>
       </div>
     </Link>
-  )
-}
+  );
+};
 
-export default Product
+export default Product;
