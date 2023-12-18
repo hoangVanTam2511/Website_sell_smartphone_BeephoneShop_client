@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom'
 import { AddItemNavbar, ResetItemNavbar } from '../../store/navbarSlice'
 import { request, setAuthHeader } from '../../helpers/axios_helper'
 import { setUserNoToken } from '../../store/userSlice'
+import { getAuthToken } from '../../helpers/axios_helper'
 
 
 var stompClient = null
@@ -25,7 +26,10 @@ const HomePage = () => {
 
   // connect websocket
   const connect = () => {
-    let Sock = new SockJS('http://localhost:8080/ws')
+    let Sock = new SockJS('http://localhost:8080/ws', null, {
+      headers : { 'Authorization': `Bearer ${getAuthToken()}`}
+    })
+    console.log(Sock)
     stompClient = over(Sock)
     stompClient.connect({}, onConnected, onError)
   }
