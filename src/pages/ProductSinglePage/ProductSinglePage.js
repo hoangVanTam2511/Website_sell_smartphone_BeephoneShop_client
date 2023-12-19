@@ -284,6 +284,16 @@ const ProductSinglePage = () => {
   const addToCartHandler = async product => {
     var soLuong = 0
     var product = null;
+    var quantityInventory = 0
+
+    await request("GET", `/client/product-detail/get-quantity-inventory?id=${config.id}`)
+    .then(res => {
+        quantityInventory = res.data
+    }).catch(
+      error => {
+        console.log(error)
+      }
+    )
 
     if(user.id === ''){
       product = cartDetails.find(e=> e.data.id === config.id);
@@ -307,7 +317,7 @@ const ProductSinglePage = () => {
       return;
     }
 
-    if((soLuong+1) > productDetail.soLuongTonKho  ){
+    if((soLuong+1) > quantityInventory ){
       toast.error("Sản phẩm trong kho không đủ.Vui lòng chọn sản phẩm khác.")
     }else
     if(soLuong >= 4){
@@ -350,6 +360,16 @@ const ProductSinglePage = () => {
   const buyNowHandler = async product => {
     var soLuong = 0
     var product = null;
+    var quantityInventory = 0
+
+    await request("GET", `/client/product-detail/get-quantity-inventory?id=${config.id}`)
+    .then(res => {
+        quantityInventory = res.data
+    }).catch(
+      error => {
+        console.log(error)
+      }
+    )
 
     if(user.id === ''){
       product = cartDetails.find(e=> e.data.id === config.id);
@@ -373,7 +393,7 @@ const ProductSinglePage = () => {
       return;
     }
 
-    if((soLuong+1) > productDetail.soLuongTonKho  ){
+    if((soLuong+1) > quantityInventory ){
       toast.error("Sản phẩm trong kho không đủ.Vui lòng chọn sản phẩm khác.")
     }else
     if(soLuong >= 4){

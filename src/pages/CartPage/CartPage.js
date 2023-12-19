@@ -175,7 +175,17 @@ const CartPage = () => {
 
   const handlePlusCart = async (product) => {
     if (user.id === "") {
-      if (product.data.quantityInventory < product.quantity + 1) {
+      var quantity = 0;
+      await request("GET", `/client/product-detail/get-quantity-inventory?id=${product.data.id}`)
+      .then(res => {
+           quantity = res.data
+      }).catch(
+        error => {
+          console.log(error)
+        }
+      )
+
+      if (quantity < product.quantity + 1) {
         toast.error(
           "Không còn đủ sản phẩm trong kho. Vui lòng chọn sản phẩm khác"
         );
@@ -190,8 +200,19 @@ const CartPage = () => {
         }
       }
     } else {
+      var quantityInvetory = 0
+
+      await request("GET", `/client/product-detail/get-quantity-inventory?id=${product.idSanPhamChiTiet}`)
+      .then(res => {
+           quantityInvetory = res.data
+      }).catch(
+        error => {
+          console.log(error)
+        }
+      )
+
       if (
-        product.soLuongTonKho <
+        quantityInvetory <
         changeCount.get(product.idSanPhamChiTiet) + 1
       ) {
         toast.error(
@@ -396,8 +417,58 @@ const CartPage = () => {
     }
   };
 
-  const buyNow = () => {
+  const validateBeforeBuy = async () => {
+    var flag = 0;
+    if(user.id === ""){
+      productDetailsRedux.forEach(async(e) => {
+        var quantity = 0;
+        if (checkeds.find((item) => item.data.id === e.data.id) !== undefined) {
+          await request("GET", `/client/product-detail/get-quantity-inventory?id=${e.data.id}`)
+          .then(res => {
+               quantity = res.data
+          }).catch(
+            error => {
+              console.log(error)
+            }
+          )
+          
+          if(e.quantity > quantity && flag === 0){
+            flag ++;
+            toast.error(`Sản phẩm ${e.data.nameProduct} còn ${quantity} sản phẩm.Vui lòng giảm số lượng hoặc chọn sản phẩm khác `)
+          }
+        }
+      });
+    
+    }else{
+      checkeds.forEach(async(e) => {
+        var quantity = 0;
+
+        await request("GET", `/client/product-detail/get-quantity-inventory?id=${e.idSanPhamChiTiet}`)
+        .then(res => {
+             quantity = res.data
+        }).catch(
+          error => {
+            console.log(error)
+          }
+        )
+        
+        if(changeCount.get(e.idSanPhamChiTiet) > quantity && flag === 0){
+          flag ++;
+          toast.error(`Sản phẩm ${e.tenSanPham} còn ${quantity} sản phẩm.Vui lòng giảm số lượng hoặc chọn sản phẩm khác `)
+        }
+      });
+    }
+
+    setTimeout(() => {
+      if(flag === 0){
+        buyNow();
+      }
+    }, 200)
+  }
+
+  const buyNow = async() => {
     setIsLoading(true);
+
     var productItemSelected = checkeds;
     if (getQuantityOfCart() > 4) {
       toast.error("Bạn chỉ được chọn 4 sản phẩm");
@@ -415,7 +486,8 @@ const CartPage = () => {
       productItemSelected = temp;
     } else {
       var temp = [];
-      productDetails.forEach((e) => {
+
+      productDetails.forEach(async(e) => {
         if (
           checkeds.find(
             (item) => item.idSanPhamChiTiet === e.idSanPhamChiTiet
@@ -639,7 +711,7 @@ const CartPage = () => {
                                   {product?.tenSanPham +
                                     " " +
                                     product?.dungLuongRam +
-                                    "GB " +
+                                    "/" +
                                     product?.dungLuongRom +
                                     "GB"}
                                 </span>
@@ -784,7 +856,7 @@ const CartPage = () => {
                                   {product?.data.nameProduct +
                                     " " +
                                     product?.data.ram +
-                                    "GB " +
+                                    "/" +
                                     product?.data.rom +
                                     "GB"}
                                 </span>
@@ -867,7 +939,7 @@ const CartPage = () => {
                 </div>
                 <div>
                   {checkeds.length > 0 ? (
-                    <div onClick={() => buyNow()}>
+                    <div onClick={() => validateBeforeBuy()}>
                       <Button
                         variant="contained"
                         style={{
