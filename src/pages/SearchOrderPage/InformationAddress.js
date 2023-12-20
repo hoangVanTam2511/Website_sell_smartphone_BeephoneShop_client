@@ -136,9 +136,19 @@ const Orders = (props) => {
       icon: <ExclamationCircleFilled />,
       content: 'Bạn đồng ý với thông tin và xác nhận thêm địa chỉ.',
       onOk () {
+        let position = provincesSelected.search("Thành phố");
+        let result = ''
+
+        if(position !== -1){
+          result = provincesSelected.slice(10)
+        }else{
+          position = provincesSelected.search("Tỉnh");
+          result = provincesSelected.slice(5)
+        }
+        
         request("POST",`/client/address/add-new-address`,{
           id: user.id,
-          province: provincesSelected,
+          province: result,
           district: districtSelected,
           ward: wardSelected,
           stress:addressSelected
@@ -168,16 +178,7 @@ const Orders = (props) => {
   return (
     <>
       <div class='card bg-white'>
-        <div style={{ 
-                width: `25%`, 
-                  margin: `10px auto`,
-                cursor: `pointer`,
-                zIndex: 4444,
-                position: 'relative'
-        }}
-         onClick={() => {
-          props.changeView()
-         }}
+        <div 
         >
           <h4
             style={{
@@ -185,7 +186,18 @@ const Orders = (props) => {
               fontSize: 20
             }}
           >
-            <i style={{ marginLeft: -340 }} class='fa-solid fa-arrow-left'></i>
+            <i class='fa-solid fa-arrow-left'
+              style={{ 
+                width: `25%`, 
+                cursor: `pointer`,
+                zIndex: 44,
+                position: 'relative',
+                marginLeft: -340
+        }}
+         onClick={() => {
+          props.changeView()
+         }}
+            ></i>
           </h4>
 
           <h4 style={{ display: 'inline-block' }}>
