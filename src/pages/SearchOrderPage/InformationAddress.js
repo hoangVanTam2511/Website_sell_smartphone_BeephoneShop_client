@@ -192,7 +192,6 @@ const Orders = (props) => {
                 cursor: `pointer`,
                 zIndex: 44,
                 position: 'relative',
-                marginLeft: -340
         }}
          onClick={() => {
           props.changeView()
@@ -200,9 +199,10 @@ const Orders = (props) => {
             ></i>
           </h4>
 
-          <h4 style={{ display: 'inline-block' }}>
+          <h4 style={{ display: 'inline-block', marginLeft: `36%`,
+                        marginBottom: `2%`}}>
             {' '}
-            <span className='fw-6 fs-20'>Thông tin địa chỉ</span>
+            <span className='fw-6 fs-20' style={{ textAlign: 'center'}}>Thông tin địa chỉ</span>
           </h4>
         </div>
         {listOfAddress.map((value, index) => (
@@ -293,7 +293,7 @@ const Orders = (props) => {
         {
           view === 1 ? <>
           
-          <div class='card'>
+          <div class='card'  style={{ width: `100%`, marginBottom: 20 }}>
         <div class='title'>
           <h4>
             {' '}
@@ -308,7 +308,7 @@ const Orders = (props) => {
           <Space wrap>
             <Select
               defaultValue=''
-              style={{ width: `450px`, height: 40 }}
+              style={{ width: `430px`, height: 40 }}
               onChange={handleChangeProvinces}
               optionFilterProp='children'
               filterOption={(input, option) =>
@@ -325,7 +325,7 @@ const Orders = (props) => {
 
             <Select
               defaultValue=''
-              style={{ width: `450px`, height: 40 }}
+              style={{ width: `430px`, height: 40 }}
               optionFilterProp='children'
               filterOption={(input, option) =>
                 (option?.label ?? '').includes(input)
@@ -342,7 +342,7 @@ const Orders = (props) => {
 
             <Select
               defaultValue=''
-              style={{ width: `450px`, height: 40 }}
+              style={{ width: `430px`, height: 40 }}
               optionFilterProp='children'
               filterOption={(input, option) =>
                 (option?.label ?? '').includes(input)
@@ -359,7 +359,7 @@ const Orders = (props) => {
 
             <Input
               placeholder='Số nhà/Tên đường'
-              style={{ width: `450px`, height: 40, borderRadius: 13 }}
+              style={{ width: `430px`, height: 40, borderRadius: 13 }}
               onChange={(e) => setAddressSelected(e.target.value)}
             />
           </Space>
@@ -372,7 +372,7 @@ const Orders = (props) => {
             color: `white`,
             width: `380px`,
             fontSize: '15px',
-            marginLeft: '225px'
+            marginLeft: '250px'
           }}
           variant='outlined'
           startIcon={<i class='fa-solid fa-plus'></i>}
@@ -394,7 +394,7 @@ const Orders = (props) => {
             color: `white`,
             width: `380px`,
             fontSize: '15px',
-            marginLeft: '225px'
+            marginLeft: '250px'
           }}
           variant='outlined'
           startIcon={<i class='fa-solid fa-plus'></i>}
