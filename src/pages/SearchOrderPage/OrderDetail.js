@@ -4,8 +4,14 @@ import { Divider, DatePicker } from "antd";
 import axios from "axios";
 import { over } from "stompjs";
 import SockJS from "sockjs-client";
+import Button from '@mui/material/Button';
 import { request, setAuthHeader } from "../../helpers/axios_helper";
 import { setUserNoToken } from "../../store/userSlice";
+import { ExclamationCircleFilled } from '@ant-design/icons'
+import toast, { Toaster } from 'react-hot-toast'
+import { Modal } from 'antd'
+import { Navigate } from "react-router-dom";
+const { confirm } = Modal
 
 var stompClient = null;
 const OrderDetail = (props) => {
@@ -18,6 +24,7 @@ const OrderDetail = (props) => {
   const [state4, setState4] = useState();
   const [stateSelected, setStateSelected] = useState(0);
   const [changeRealTime, setChangeRealTime] = useState("");
+  const [isChange, setIsChange] = useState(0)
 
   // connect websocket
   const connect = () => {
@@ -42,13 +49,12 @@ const OrderDetail = (props) => {
   useEffect(() => {
     setBill(props.id_bill);
     getOrderHistory();
-    console.log(props.id_bill);
     getProductDetails();
     if (stompClient === null) {
       connect();
     }
-    console.log(props.id_bill.orderItems);
-  }, []);
+    console.log(props.id_bill.trangThai);
+  }, [isChange, bill]);
 
   const formatMoney = (number) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -118,10 +124,10 @@ const OrderDetail = (props) => {
   };
 
   const getProductDetails = async () => {
-    request(
-      "GET",
-      `/client/bill-detail/get-product-details?id_bill=${props.id_bill.id}`
-    )
+      request(
+        "GET",
+        `/client/bill-detail/get-product-details?id_bill=${props.id_bill.id}`
+      )
       .then((res) => {
         if (res.status === 200) {
           setProductDetails(res.data);
@@ -133,6 +139,33 @@ const OrderDetail = (props) => {
         console.log(error);
       });
   };
+
+  const cancelBill = (id) => {
+    confirm({
+      title: 'Xác nhận huỷ đơn hàng',
+      icon: <ExclamationCircleFilled />,
+      content: 'Bạn đồng ý và xác nhận huỷ đơn hàng.',
+      onOk () {
+        request("PUT",`/client/bill/cancel-bill?id_bill=${bill.id}`).then(
+        res => {
+          getProductDetails();
+          getOrderHistory();
+          setIsChange(1)
+        }
+      ).catch(error => console.log(error))
+
+      setTimeout(() => {
+        getProductDetails();
+        getOrderHistory();
+      }, 1000)
+
+      toast.success("Bạn đã huỷ đơn hàng thành công!!")
+      },
+      onCancel () {
+        console.log("cancel")
+      }
+    })
+  }
 
   return (
     <>
@@ -160,7 +193,13 @@ const OrderDetail = (props) => {
 
           <div style={{ width: "89%", fontWeight: "600" }}>
             Chi tiết đơn hàng {bill.ma} -{" "}
-            <span style={{ color: "orange" }}> {stateSelected.thaoTac}</span>
+            {
+               props.id_bill.trangThai === "CANCELLED" ? (
+                <span style={{ color: "red" }}>Đã huỷ</span>
+              ): isChange === 0  ? (
+                <span style={{ color: "orange" }}> {stateSelected.thaoTac}</span>
+              ) : ( <span style={{ color: "red" }}>Đã huỷ</span>)
+            }
           </div>
         </div>
         <Divider />
@@ -292,6 +331,20 @@ const OrderDetail = (props) => {
             </li>
           </ul>
         </div>
+
+        {
+           props.id_bill.trangThai === "CANCELLED"?<></>:
+          isChange === 0 && state1 && state2 === undefined ? (
+            <div>
+            <Button 
+              onClick={() => cancelBill()}
+              style={{ marginTop: '20px', marginLeft: '60%'}}
+              variant="contained" color="error">Huỷ đơn hàng</Button>
+            </div> 
+          ):(
+            <></>
+          )
+        }
 
         <br />
 
@@ -614,6 +667,56 @@ const OrderDetail = (props) => {
           <br />
         </div>
       </div>
+
+        {/* toaster */}
+        <Toaster
+        position='top-center'
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=''
+        containerStyle={{}}
+        toastOptions={{
+          // Define default options
+          // className: '',
+          // duration: 5000,
+          // style: {
+          //   background: '#4caf50',
+          //   color: 'white'
+          // },
+
+          // Default options for specific types
+          success: {
+            duration: 3000,
+            theme: {
+              primary: 'green',
+              secondary: 'white'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#4caf50'
+            },
+            style: {
+              background: '#4caf50',
+              color: 'white'
+            }
+          },
+
+          error: {
+            duration: 3000,
+            theme: {
+              primary: '#f44336',
+              secondary: 'white'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#f44336'
+            },
+            style: {
+              background: '#f44336',
+              color: 'white'
+            }
+          }
+        }}/>
     </>
   );
 };

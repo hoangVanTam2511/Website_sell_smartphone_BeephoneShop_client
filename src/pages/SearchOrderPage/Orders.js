@@ -158,7 +158,7 @@ const Orders = () => {
               onClick={() => 
                 {
                   setStateOfOrder(2)
-                  loadDataWhenSelectButton(2)
+                  loadDataWhenSelectButton("CONFIRMED")
                  }}
             >
               Đã xác nhận
@@ -170,7 +170,7 @@ const Orders = () => {
               variant="outlined"
               onClick={() => {
                 setStateOfOrder(3)
-                loadDataWhenSelectButton(3)
+                loadDataWhenSelectButton("DELIVERING")
                }}
             >
               Đang vận chuyển
@@ -183,7 +183,7 @@ const Orders = () => {
               onClick={() => 
                 {
                   setStateOfOrder(4)
-                  loadDataWhenSelectButton(4)
+                  loadDataWhenSelectButton("SUCCESS_DELIVERY")
                  }}
             >
               Đã giao hàng
@@ -196,7 +196,7 @@ const Orders = () => {
               onClick={() => 
                 {
                   setStateOfOrder(5)
-                  loadDataWhenSelectButton(5)
+                  loadDataWhenSelectButton("CANCELLED")
                  }}
             >
               Đã hủy
@@ -223,7 +223,11 @@ const Orders = () => {
               <h4>
                 {" "}
                 <span className="fw-6" style={{ color: `green` }}>
-                  {bill.trangThai === 'PENDING_CONFIRM' ? 'Chờ xác nhận' : 'Đang giao hàng'}
+                  {bill.trangThai === 'PENDING_CONFIRM' ? 'Chờ xác nhận' :
+                  bill.trangThai === 'CONFIRMED' ? "Đã xác nhận" :
+                  bill.trangThai === 'DELIVERING' ? "Đang vận chuyển" :
+                  bill.trangThai === 'SUCCESS_DELIVERY' ? "Đã giao hàng" 
+                  : 'Đã huỷ'}
                 </span>
               </h4>
             </div>
@@ -293,7 +297,7 @@ const Orders = () => {
       ):(
         <>
         <div style={{ width: `110%`, margin: `0px auto` }}>
-         <OrderDetail id_bill={billId} setTab={setTab} />
+          <OrderDetail id_bill={billId} setTab={setTab} />
         </div>
         </>
 
