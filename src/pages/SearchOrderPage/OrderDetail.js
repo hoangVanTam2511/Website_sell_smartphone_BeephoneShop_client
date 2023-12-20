@@ -194,7 +194,7 @@ const OrderDetail = props => {
                     : 'img_no_active'
                 }
               >
-                <i class='fa fa-money-check' style={{ transform: `translateY(0px)` }}></i>
+                <i class='fa fa-money-check' style={{ transform: `translateY(4px)` }}></i>
               </div>
               <div class='caption'>
                 <span className='text-top' style={{ marginLeft: '-47px' }}>
@@ -378,8 +378,12 @@ const OrderDetail = props => {
               HÌNH THỨC THANH TOÁN
               <Divider></Divider>
             </h5>
-
-            <div>Thanh toán khi nhận hàng</div>
+            {
+             bill.paymentMethods === null?
+             <div>Thanh toán khi nhận hàng</div>:
+             <div>Thanh toán online</div>
+             
+            }
           </div>
         </div>
         <br />
@@ -557,7 +561,13 @@ const OrderDetail = props => {
               float: 'right',
             }}
           >
-            <h4 className='fw-6' style={{ marginBottom: '-20px'}}>Cần thanh toán</h4>
+             {
+             bill.paymentMethods === null?
+             <h4 className='fw-6' style={{ marginBottom: '-20px'}}>Cần thanh toán</h4>:
+             <h4 className='fw-6' style={{ marginBottom: '-20px'}}>Đã thanh toán</h4>
+             
+            }
+           
             <span style={{ color: '#d0021c', fontWeight: 600, fontSize: '20px' }}>
               {formatMoney(bill.tongTienSauKhiGiam + bill.phiShip)}
             </span>

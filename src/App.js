@@ -13,7 +13,8 @@ import {
   CheckoutPage,
   LookUpOrderPage,
   OrderDetail,
-  Page403
+  Page403,
+  VnPayPayment
 } from './pages/index'
 // components
 import Header from './components/Header/Header'
@@ -50,8 +51,11 @@ function App () {
             <Route path='/check-out' element={<CheckoutPage />} />
             {/* look up order page */}
             <Route path='/look-up-order-page/:id_bill' element={<LookUpOrderPage />} />
-             {/* look up order page */}
-             <Route path='/order-detail/:id' element={<OrderDetail />} />
+            {/* look up order page */}
+            <Route path='/order-detail/:id' element={<OrderDetail />} />
+             {/* vnpay */}
+             <Route path='/payment-success' element={<VnPayPayment />} />
+            
 
             {/* look up order page */}
             <Route path='/403-not-found' element={<Page403 />} />

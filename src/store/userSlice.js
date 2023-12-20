@@ -62,15 +62,15 @@ export const getUser = () => {
 };
 
 export const setUserNoToken = () => {
-  const user = {
-    id: '',
-    ma: '',
-    soDienThoai: '',
-  }
+  // const user = {
+  //   id: '',
+  //   ma: '',
+  //   soDienThoai: '',
+  // }
 
-  // set user
-  setAuthHeader(null);
-  localStorage.setItem('user', JSON.stringify(user))
+  // // set user
+  // setAuthHeader(null);
+  // localStorage.setItem('user', JSON.stringify(user))
 };
 
 const userSlice = createSlice({

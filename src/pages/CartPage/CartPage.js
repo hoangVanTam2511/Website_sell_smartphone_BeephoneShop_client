@@ -426,6 +426,7 @@ const CartPage = () => {
           await request("GET", `/client/product-detail/get-quantity-inventory?id=${e.data.id}`)
           .then(res => {
                quantity = res.data
+               
           }).catch(
             error => {
               console.log(error)

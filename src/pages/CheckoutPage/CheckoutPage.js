@@ -219,7 +219,7 @@ const CartPage = () => {
       code: ma,
     };
     try {
-      request("POST", `/api/vnpay/payment`, vnpayReq, {
+      request("POST", `/api/vnpay/payment-client`, vnpayReq, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -229,6 +229,9 @@ const CartPage = () => {
     } catch (error) {
       console.log(error.response.data);
     }
+
+    
+
   };
 
   const orderSuccess = async () => {
@@ -343,16 +346,18 @@ const CartPage = () => {
                   });
                 }
 
-                request(
-                  "GET",
-                  `/client/bill-detail/send-email-bill?id_bill=${idOrder}`
-                )
-                  .then((response) => {})
-                  .catch((error) => {
-                    console.log(error);
-                  });
+               
                 if (paymentMethodCss === 2) {
                   handleGetUrlRedirectPayment(response.data.ma);
+                }else{
+                  request(
+                    "GET",
+                    `/client/bill-detail/send-email-bill?id_bill=${idOrder}`
+                  )
+                    .then((response) => {})
+                    .catch((error) => {
+                      console.log(error);
+                    });
                 }
               }
             })
@@ -401,42 +406,33 @@ const CartPage = () => {
       return;
     }
 
-    confirm({
-      title: "Thông báo",
-      icon: <ExclamationCircleFilled />,
-      content: `Kiểm tra kỹ voucher của bạn trước khi bấm xác nhận.`,
-      okText: "Xác nhận",
-      cancelText: "Huỷ bỏ",
-      onOk() {
-        if (voucher !== null || voucher !== undefined || voucher !== "") {
-          if (voucher.ma === codeVoucher) {
-            toast.error(
-              "Bạn đã sử dụng voucher này rồi.Vui lòng nhập voucher khác"
-            );
-            return;
-          }
-        }
+    if (voucher !== null || voucher !== undefined || voucher !== "") {
+      if (voucher.ma === codeVoucher) {
+        toast.error(
+          "Bạn đã sử dụng voucher này rồi.Vui lòng nhập voucher khác"
+        );
+        return;
+      }
+    }
 
-        request("GET", `/client/voucher/check-voucher?code=${codeVoucher}`)
-          .then((res) => {
-            if (res.data.dieuKienApDung > totalAmount) {
-              toast.error("Hoá đơn này không đạt đủ điều kiện áp dụng");
-            } else {
-              setCounpoun(res.data);
-              let priceWhenAfterVoucherUsed =
-                Number(totalAmount) - Number(res.data.giaTriVoucher);
-              setTotalAmount(priceWhenAfterVoucherUsed);
-              setVoucher(res.data);
-              toast.success("Áp dụng voucher thành công.");
-            }
-          })
-          .catch((error) => {
-            setUserNoToken();
-            if (error.response.status === 400) toast.error(error.response.data);
-          });
-      },
-      onCancel() {},
-    });
+    request("GET", `/client/voucher/check-voucher?code=${codeVoucher}`)
+      .then((res) => {
+        if (res.data.dieuKienApDung > totalAmount) {
+          toast.error("Hoá đơn này không đạt đủ điều kiện áp dụng");
+        } else {
+          setCounpoun(res.data);
+          let priceWhenAfterVoucherUsed =
+            Number(totalAmount) - Number(res.data.giaTriVoucher);
+          setTotalAmount(priceWhenAfterVoucherUsed);
+          setVoucher(res.data);
+          toast.success("Áp dụng voucher thành công.");
+        }
+      })
+      .catch((error) => {
+        // setUserNoToken();
+        if (error.response.status === 400) toast.error(error.response.data);
+      });
+    
   };
 
   const paymentMethodSelected = () => {
