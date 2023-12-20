@@ -12,7 +12,7 @@ import { ExclamationCircleFilled } from '@ant-design/icons'
 import { Modal } from 'antd'
 const { confirm } = Modal
 
-const Orders = () => {
+const Orders = (props) => {
   const host = 'https://provinces.open-api.vn/api/'
   const user = getUser()
   const [provinces, setProvinces] = useState([])
@@ -167,15 +167,25 @@ const Orders = () => {
 
   return (
     <>
-      <div class='card'>
-        <div style={{ width: `25%`, margin: `10px auto` }}>
+      <div class='card bg-white'>
+        <div style={{ 
+                width: `25%`, 
+                  margin: `10px auto`,
+                cursor: `pointer`,
+                zIndex: 4444,
+                position: 'relative'
+        }}
+         onClick={() => {
+          props.changeView()
+         }}
+        >
           <h4
             style={{
               display: 'inline-block',
               fontSize: 20
             }}
           >
-            <i style={{ marginLeft: -280 }} class='fa-solid fa-arrow-left'></i>
+            <i style={{ marginLeft: -340 }} class='fa-solid fa-arrow-left'></i>
           </h4>
 
           <h4 style={{ display: 'inline-block' }}>

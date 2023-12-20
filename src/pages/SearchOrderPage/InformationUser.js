@@ -249,6 +249,10 @@ const Orders = () => {
 
   }
 
+  const changeView = () => {
+    setChangeAddress(1)
+  }
+
   return (
     <>
       {isLoadingRequest === true ? (
@@ -505,7 +509,9 @@ const Orders = () => {
               </div>
             </div>
           ) : (
-            <InformationAddress />
+            <InformationAddress
+              changeView={changeView}
+            />
           )}
         </>
       )}
