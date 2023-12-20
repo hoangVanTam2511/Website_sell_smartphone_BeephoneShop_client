@@ -30,9 +30,14 @@ const Orders = () => {
   const [diaChiList, setDiaChiList] = useState([]);
   const [value1, setValue1] = useState("Nam");
   const [addressSelected, setAddressSelected] = useState();
+  const [viewPass, setViewPass] = useState(0)
   const navigate = useNavigate()
   // redux
   const [isLoadingRequest, setIsLoadingRequest] = useState(true);
+
+  // new pass
+  const [newPass, setNewPass] = useState()
+  const [newPassAgain, setNewPassAgain] = useState()
 
   const plainOptions = ["Nam", "Nữ"];
   const [account, setAccount] = useState();
@@ -159,13 +164,18 @@ const Orders = () => {
   };
 
   const changeGender = (e) => {
+    setViewPass(2)
     setValue1(e)
   };
 
   const changePositionUser = (e) => {
+    setViewPass(2)
     setAccount({ ...account, [e.target.name]: e.target.value });
   };
 
+  const changePassword = () => {
+    setViewPass(1)
+  }
   
   const changeInforUser = async() => {
 
@@ -202,6 +212,41 @@ const Orders = () => {
       }
     })
   
+  }
+
+  const changePass = () => {
+    
+    //validate
+    if(newPass !== newPassAgain){
+      toast.error("Mật khẩu nhập lại không đúng.Vui lòng nhập lại mật khẩu")
+      return;
+    }
+
+    confirm({
+      title: 'Xác nhận thay đổi mật khẩu',
+      icon: <ExclamationCircleFilled />,
+      content: 'Bạn đồng ý với thông tin và xác nhận thay đổi thông tin mật khẩu.',
+      onOk () {
+        setIsLoadingRequest(false)
+
+        request("PUT", `/client/account/change-pass?pass=${newPass}&id=${account.id}`).then(
+          (res) => {
+           
+          }
+        ).catch()
+
+        setTimeout(()=>{
+          setViewPass(0)
+          setIsLoadingRequest(true)
+          toast.success("Bạn đã thay đổi mật khẩu thành công!!!")
+        }, 300)
+        
+      },
+      onCancel () {
+        console.log("Bạn đã không thay đổi thông tin ... Bạn đúng là thiên tài cmnr")
+      }
+    })
+
   }
 
   return (
@@ -359,31 +404,104 @@ const Orders = () => {
                   <Divider style={{ margin: "5px auto" }}></Divider>
                 </div>
 
-                <div style={{ marginTop: "35px" }}>
+                {
+                  viewPass === 0 || viewPass === 2 ? 
+                  <div style={{ marginTop: "35px", cursor: 'pointer' }}
+                
+                  onClick={() => changePassword()}
+                >
                   <div className="title">
                     <span>Đổi mật khẩu </span>
                   </div>
                   <Divider style={{ margin: "5px auto" }}></Divider>
                 </div>
+                  :
+                  <>
+                    <div style={{ marginTop: "35px" }}>
+                      <div className="title">
+                        <span>
+                          {" "}
+                          <TextField
+                            style={{ width: "937px" }}
+                            label="Nhập mật khẩu mới"
+                            id="standard-basic"
+                            variant="standard"
+                            name="newPass"
+                            value={newPass}
+                            type="password"
+                            onChange={(e) =>{
+                              setNewPass(e.target.value)
+                            }}
+                          />
+                        </span>
+                      </div>
+                    </div>
 
+                    <div style={{ marginTop: "35px" }}>
+                      <div className="title">
+                        <span>
+                          {" "}
+                          <TextField
+                            style={{ width: "937px" }}
+                            label="Nhập lại mật khẩu"
+                            id="standard-basic"
+                            variant="standard"
+                            name="newPassAgain"
+                            type="password"
+                            value={newPassAgain}
+                            onChange={(e) => {
+                              setNewPassAgain(e.target.value)
+                            }}
+                          />
+                        </span>
+                      </div>
+                    </div>
+                  </>
+
+                }
                 <br />
 
-                <Button
-                  style={{
-                    backgroundColor: `#128DE2`,
-                    color: `white`,
-                    marginTop: "5px",
-                    width: `380px`,
-                    fontSize: "15px",
-                    marginLeft: "31%",
-                    height: "45px",
-                  }}
-                  variant="outlined"
-                  onClick={() => changeInforUser()}
-                  startIcon={<i class="fa-regular fa-pen-to-square"></i>}
-                >
-                  Cập nhật thông tin
-                </Button>
+                {
+                  viewPass === 2 ?(
+                    <Button
+                    style={{
+                      backgroundColor: `#128DE2`,
+                      color: `white`,
+                      marginTop: "5px",
+                      width: `380px`,
+                      fontSize: "15px",
+                      marginLeft: "31%",
+                      height: "45px",
+                    }}
+                    variant="outlined"
+                    onClick={() => changeInforUser()}
+                    startIcon={<i class="fa-regular fa-pen-to-square"></i>}
+                  >
+                    Cập nhật thông tin
+                  </Button>
+                  ): viewPass === 1 ? (
+                    <Button
+                    style={{
+                      backgroundColor: `#128DE2`,
+                      color: `white`,
+                      marginTop: "5px",
+                      width: `380px`,
+                      fontSize: "15px",
+                      marginLeft: "31%",
+                      height: "45px",
+                    }}
+                    variant="outlined"
+                    onClick={() => changePass()}
+                    startIcon={<i class="fa-regular fa-pen-to-square"></i>}
+                  >
+                    Đổi mật khẩu
+                    
+                  </Button>
+                  ):(
+                    <></>
+                  )
+                }
+              
               </div>
             </div>
           ) : (
