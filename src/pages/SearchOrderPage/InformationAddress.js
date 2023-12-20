@@ -7,6 +7,10 @@ import { useSelector } from 'react-redux'
 import axios from 'axios'
 import { request, setAuthHeader } from '../../helpers/axios_helper'
 import { getUser, setUserNoToken } from '../../store/userSlice'
+import toast, { Toaster } from 'react-hot-toast'
+import { ExclamationCircleFilled } from '@ant-design/icons'
+import { Modal } from 'antd'
+const { confirm } = Modal
 
 const Orders = () => {
   const host = 'https://provinces.open-api.vn/api/'
@@ -15,14 +19,21 @@ const Orders = () => {
   const [districts, setDistricts] = useState([])
   const [wards, setWards] = useState([])
   const [listOfAddress, setListOfAddress] = useState([])
+  const [view, setView] = useState(0)
+
+  const [provincesSelected, setProvinceSelected] = useState()
+  const [districtSelected, setDistrictSelected] = useState()
+  const [wardSelected, setWardSelected] = useState()
+  const [addressSelected, setAddressSelected] = useState()
+
 
   useEffect(() => {
     callAPI('https://provinces.open-api.vn/api/?depth=2')
     getAllAddress()
-  }, [])
+  }, [listOfAddress.length])
 
   const getAllAddress = async () => {
-    request("POST",`/client/address/get-all-address?id_account=${user.id}`
+    request("GET",`/client/address/get-all-address?id_account=${user.id}`
       )
       .then(res => {
         if (res.status === 200) {
@@ -79,14 +90,29 @@ const Orders = () => {
 
   const handleChangeProvinces = value => {
     callApiDistrict(host + 'p/' + value + '?depth=2')
+    console.log(value)
+    provinces.forEach(e => {
+      if(e.value === value) {
+        setProvinceSelected(e.label)
+      }
+    })
   }
 
   const handleChangeDistricts = value => {
     callApiWard(host + 'd/' + value + '?depth=2')
+    districts.forEach(e => {
+      if(e.value === value) {
+        setDistrictSelected(e.label)
+      }
+    })
   }
 
   const handleChangeWards = value => {
-    console.log(value)
+    wards.forEach(e => {
+      if(e.value === value) {
+        setWardSelected(e.label)
+      }
+    })
   }
 
   const onChange = e => {
@@ -95,6 +121,48 @@ const Orders = () => {
 
   const formatDate = date => {
     return new Date(date).toLocaleDateString('en-US')
+  }
+
+  const addNewAddress = () => {
+    setView(0)
+
+    if(provincesSelected === undefined || districtSelected === undefined || wardSelected === undefined || addressSelected === undefined) {
+      toast.error("Bạn phải nhập đầy đủ các thông tin");
+      return;
+    }
+    
+    confirm({
+      title: 'Xác nhận thêm địa chỉ',
+      icon: <ExclamationCircleFilled />,
+      content: 'Bạn đồng ý với thông tin và xác nhận thêm địa chỉ.',
+      onOk () {
+        request("POST",`/client/address/add-new-address`,{
+          id: user.id,
+          province: provincesSelected,
+          district: districtSelected,
+          ward: wardSelected,
+          stress:addressSelected
+      }).then(
+        res => {
+          getAllAddress()
+        }
+      )
+      toast.success("Bạn đã thêm địa chỉ thành công!!!")
+      },
+      onCancel () {
+        console.log("Bạn đã không thay đổi thông tin ... Bạn đúng là thiên tài cmnr")
+      }
+    })
+  
+  }
+
+  const deleteAddress = (id) => {
+    request("DELETE",`/client/address/delete-address?id=${id}`).then(
+      res => {
+        getAllAddress()
+      }
+    )
+
   }
 
   return (
@@ -150,7 +218,9 @@ const Orders = () => {
                     padding: 4
                   }}
                 >
-                  <i class='fa-solid fa-trash'></i>
+                  <i class='fa-solid fa-trash'
+                   onClick={() => deleteAddress(value.id)}
+                  ></i>
                 </div>{' '}
               </h4>
             </div>
@@ -169,7 +239,7 @@ const Orders = () => {
                     variant='outlined'
                   >
                     {' '}
-                    <i
+                    {/* <i
                       style={{
                         backgroundColor: `#128DE2`,
                         color: `white`,
@@ -179,7 +249,7 @@ const Orders = () => {
                         borderRadius: '5px'
                       }}
                       class='fa-regular fa-pen-to-square'
-                    ></i>{' '}
+                    ></i>{' '} */}
                   </div>
                 </div>
               </Space>
@@ -188,33 +258,20 @@ const Orders = () => {
             {value.trangThai === 1 ? (
               <></>
             ) : (
-              <Checkbox style={{ marginTop: `10px` }} onChange={onChange}>
-                Đặt làm mặc định
-              </Checkbox>
+              // <Checkbox style={{ marginTop: `10px` }} onChange={onChange}>
+              //   Đặt làm mặc định
+              // </Checkbox>
+              <>
+              </>
             )}
           </div>
         ))}
 
         <br />
-
-        <Button
-          style={{
-            backgroundColor: `#128DE2`,
-            color: `white`,
-            width: `380px`,
-            fontSize: '15px',
-            marginLeft: '225px'
-          }}
-          variant='outlined'
-          startIcon={<i class='fa-solid fa-plus'></i>}
-        >
-          Thêm địa chỉ mới
-        </Button>
-      </div>
-
-      <br />
-
-      <div class='card'>
+        {
+          view === 1 ? <>
+          
+          <div class='card'>
         <div class='title'>
           <h4>
             {' '}
@@ -229,7 +286,7 @@ const Orders = () => {
           <Space wrap>
             <Select
               defaultValue=''
-              style={{ width: `380px`, height: 40 }}
+              style={{ width: `450px`, height: 40 }}
               onChange={handleChangeProvinces}
               optionFilterProp='children'
               filterOption={(input, option) =>
@@ -246,7 +303,7 @@ const Orders = () => {
 
             <Select
               defaultValue=''
-              style={{ width: `380px`, height: 40 }}
+              style={{ width: `450px`, height: 40 }}
               optionFilterProp='children'
               filterOption={(input, option) =>
                 (option?.label ?? '').includes(input)
@@ -263,7 +320,7 @@ const Orders = () => {
 
             <Select
               defaultValue=''
-              style={{ width: `380px`, height: 40 }}
+              style={{ width: `450px`, height: 40 }}
               optionFilterProp='children'
               filterOption={(input, option) =>
                 (option?.label ?? '').includes(input)
@@ -280,31 +337,106 @@ const Orders = () => {
 
             <Input
               placeholder='Số nhà/Tên đường'
-              style={{ width: `380px`, height: 40, borderRadius: 13 }}
+              style={{ width: `450px`, height: 40, borderRadius: 13 }}
+              onChange={(e) => setAddressSelected(e.target.value)}
             />
           </Space>
 
-          <br />
-          <Checkbox style={{ margin: `10px` }} onChange={onChange}>
-            Đặt làm mặc định
-          </Checkbox>
+          <br/>
           <br />
           <Button
-            style={{
-              backgroundColor: `#128DE2`,
-              color: `white`,
-              marginTop: '5px',
-              width: `380px`,
-              fontSize: '15px',
-              marginLeft: '200px'
-            }}
-            variant='outlined'
-            startIcon={<i class='fa-regular fa-pen-to-square'></i>}
-          >
-            Cập nhật
-          </Button>
+          style={{
+            backgroundColor: `#128DE2`,
+            color: `white`,
+            width: `380px`,
+            fontSize: '15px',
+            marginLeft: '225px'
+          }}
+          variant='outlined'
+          startIcon={<i class='fa-solid fa-plus'></i>}
+          onClick={
+            () => addNewAddress()
+          }
+        >
+          Thêm mới
+        </Button>
         </div>
       </div>
+      <br/>
+
+          </> :
+          <>
+              <Button
+          style={{
+            backgroundColor: `#128DE2`,
+            color: `white`,
+            width: `380px`,
+            fontSize: '15px',
+            marginLeft: '225px'
+          }}
+          variant='outlined'
+          startIcon={<i class='fa-solid fa-plus'></i>}
+          onClick={() => setView(1)}
+        >
+          Thêm địa chỉ mới
+        </Button>
+          </>
+        }
+
+    
+      </div>
+
+      <br />
+        {/* toaster */}
+       <Toaster
+        position='top-center'
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=''
+        containerStyle={{}}
+        toastOptions={{
+          // Define default options
+          // className: '',
+          // duration: 5000,
+          // style: {
+          //   background: '#4caf50',
+          //   color: 'white'
+          // },
+
+          // Default options for specific types
+          success: {
+            duration: 3000,
+            theme: {
+              primary: 'green',
+              secondary: 'white'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#4caf50'
+            },
+            style: {
+              background: '#4caf50',
+              color: 'white'
+            }
+          },
+
+          error: {
+            duration: 3000,
+            theme: {
+              primary: '#f44336',
+              secondary: 'white'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#f44336'
+            },
+            style: {
+              background: '#f44336',
+              color: 'white'
+            }
+          }
+        }}/>
+    
     </>
   )
 }
