@@ -914,7 +914,7 @@ const CategoryProductPage = () => {
             </span>
           </div>
 
-          <div style={{ marginBottom: `10px` }}>
+          {/* <div style={{ marginBottom: `10px` }}>
             {' '}
             <span
               className='text-capitalize'
@@ -927,9 +927,9 @@ const CategoryProductPage = () => {
             >
               Hãng sản xuất
             </span>
-          </div>
+          </div> */}
 
-          <div style={{ marginBottom: `0px`, display: 'flex' }}>
+          {/* <div style={{ marginBottom: `0px`, display: 'flex' }}>
             {listLogos.map(item => {
               return (
                 <div
@@ -959,7 +959,7 @@ const CategoryProductPage = () => {
                 </div>
               )
             })}
-          </div>
+          </div> */}
 
           <div style={{ marginBottom: `10px` }}>
             {' '}
