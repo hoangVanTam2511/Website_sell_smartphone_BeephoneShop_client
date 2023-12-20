@@ -50,13 +50,17 @@ const CartPage = () => {
   const getProductDetails = async () => {
     if (productDetails.length !== 0) return;
     if (user.id === "") {
-      if(productDetailsRedux.find(item => item.data.id === newProductAddToCart?.data.id) !== undefined) {
+      if (
+        productDetailsRedux.find(
+          (item) => item.data.id === newProductAddToCart?.data.id
+        ) !== undefined
+      ) {
         setCheckeds([newProductAddToCart]);
         if (productDetailsRedux.length === 1 && user.id === "") {
           setIsCheckedAll(true);
         }
-      }else{
-        setCheckeds([])
+      } else {
+        setCheckeds([]);
       }
     } else {
       request(
@@ -83,14 +87,19 @@ const CartPage = () => {
               ])
             )
           );
-        
-          if(res.data.find(item => item.idSanPhamChiTiet === newProductAddToCart?.idSanPhamChiTiet) !== undefined) {
+
+          if (
+            res.data.find(
+              (item) =>
+                item.idSanPhamChiTiet === newProductAddToCart?.idSanPhamChiTiet
+            ) !== undefined
+          ) {
             setCheckeds([newProductAddToCart]);
             if (res.data.length === 1) {
               setIsCheckedAll(true);
             }
-          }else{
-            setCheckeds([])
+          } else {
+            setCheckeds([]);
           }
         })
         .catch((res) => console.log(res));
@@ -155,8 +164,17 @@ const CartPage = () => {
     return (
       <div className="container my-5">
         <div className="empty-cart flex justify-center align-center flex-column font-manrope">
-          <img src={shopping_cart} alt="" />
-          <span className="fw-6 fs-15 ">Giỏ hàng đang trống.</span>
+          <img
+            style={{ width: "300px" }}
+            src="https://res.cloudinary.com/dqwfbbd9g/image/upload/v1701448962/yy04ozpcgnsz3lv4r2h2.png"
+            alt=""
+          />
+          <span
+            className="fw-6 fs-15 text-dark"
+            style={{ fontSize: "16px", fontWeight: "550" }}
+          >
+            Giỏ hàng đang trống.
+          </span>
           <Link
             to="/"
             className="shopping-btn text-white fw-5"
@@ -164,6 +182,8 @@ const CartPage = () => {
               backgroundColor: `#128DE2`,
               border: "1px solid #128DE2",
               borderRadius: "10px",
+              fontSize: "16px",
+              fontWeight: "550",
             }}
           >
             Đi tới trang chủ
@@ -175,17 +195,7 @@ const CartPage = () => {
 
   const handlePlusCart = async (product) => {
     if (user.id === "") {
-      var quantity = 0;
-      await request("GET", `/client/product-detail/get-quantity-inventory?id=${product.data.id}`)
-      .then(res => {
-           quantity = res.data
-      }).catch(
-        error => {
-          console.log(error)
-        }
-      )
-
-      if (quantity < product.quantity + 1) {
+      if (product.data.quantityInventory < product.quantity + 1) {
         toast.error(
           "Không còn đủ sản phẩm trong kho. Vui lòng chọn sản phẩm khác"
         );
@@ -200,19 +210,8 @@ const CartPage = () => {
         }
       }
     } else {
-      var quantityInvetory = 0
-
-      await request("GET", `/client/product-detail/get-quantity-inventory?id=${product.idSanPhamChiTiet}`)
-      .then(res => {
-           quantityInvetory = res.data
-      }).catch(
-        error => {
-          console.log(error)
-        }
-      )
-
       if (
-        quantityInvetory <
+        product.soLuongTonKho <
         changeCount.get(product.idSanPhamChiTiet) + 1
       ) {
         toast.error(
@@ -283,7 +282,9 @@ const CartPage = () => {
       dispatch(deleteProduct(product));
       setCheckeds(checkeds.filter((e) => e.id !== product.id));
     } else {
-      setCheckeds(checkeds.filter((e) => e.idSanPhamChiTiet !== product.idSanPhamChiTiet));
+      setCheckeds(
+        checkeds.filter((e) => e.idSanPhamChiTiet !== product.idSanPhamChiTiet)
+      );
       if (productDetails.length === 1) {
         dispatch(addToCart(0));
       }
@@ -417,59 +418,8 @@ const CartPage = () => {
     }
   };
 
-  const validateBeforeBuy = async () => {
-    var flag = 0;
-    if(user.id === ""){
-      productDetailsRedux.forEach(async(e) => {
-        var quantity = 0;
-        if (checkeds.find((item) => item.data.id === e.data.id) !== undefined) {
-          await request("GET", `/client/product-detail/get-quantity-inventory?id=${e.data.id}`)
-          .then(res => {
-               quantity = res.data
-               
-          }).catch(
-            error => {
-              console.log(error)
-            }
-          )
-          
-          if(e.quantity > quantity && flag === 0){
-            flag ++;
-            toast.error(`Sản phẩm ${e.data.nameProduct} còn ${quantity} sản phẩm.Vui lòng giảm số lượng hoặc chọn sản phẩm khác `)
-          }
-        }
-      });
-    
-    }else{
-      checkeds.forEach(async(e) => {
-        var quantity = 0;
-
-        await request("GET", `/client/product-detail/get-quantity-inventory?id=${e.idSanPhamChiTiet}`)
-        .then(res => {
-             quantity = res.data
-        }).catch(
-          error => {
-            console.log(error)
-          }
-        )
-        
-        if(changeCount.get(e.idSanPhamChiTiet) > quantity && flag === 0){
-          flag ++;
-          toast.error(`Sản phẩm ${e.tenSanPham} còn ${quantity} sản phẩm.Vui lòng giảm số lượng hoặc chọn sản phẩm khác `)
-        }
-      });
-    }
-
-    setTimeout(() => {
-      if(flag === 0){
-        buyNow();
-      }
-    }, 200)
-  }
-
-  const buyNow = async() => {
+  const buyNow = () => {
     setIsLoading(true);
-
     var productItemSelected = checkeds;
     if (getQuantityOfCart() > 4) {
       toast.error("Bạn chỉ được chọn 4 sản phẩm");
@@ -487,8 +437,7 @@ const CartPage = () => {
       productItemSelected = temp;
     } else {
       var temp = [];
-
-      productDetails.forEach(async(e) => {
+      productDetails.forEach((e) => {
         if (
           checkeds.find(
             (item) => item.idSanPhamChiTiet === e.idSanPhamChiTiet
@@ -712,7 +661,7 @@ const CartPage = () => {
                                   {product?.tenSanPham +
                                     " " +
                                     product?.dungLuongRam +
-                                    "/" +
+                                    "GB " +
                                     product?.dungLuongRom +
                                     "GB"}
                                 </span>
@@ -857,7 +806,7 @@ const CartPage = () => {
                                   {product?.data.nameProduct +
                                     " " +
                                     product?.data.ram +
-                                    "/" +
+                                    "GB " +
                                     product?.data.rom +
                                     "GB"}
                                 </span>
@@ -940,7 +889,7 @@ const CartPage = () => {
                 </div>
                 <div>
                   {checkeds.length > 0 ? (
-                    <div onClick={() => validateBeforeBuy()}>
+                    <div onClick={() => buyNow()}>
                       <Button
                         variant="contained"
                         style={{
