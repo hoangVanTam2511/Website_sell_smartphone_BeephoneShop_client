@@ -9,9 +9,15 @@ import InformationAddress from "./InformationAddress";
 import { request, setAuthHeader } from "../../helpers/axios_helper";
 import { getUser, setUserNoToken } from "../../store/userSlice";
 import { SetSelectedCart } from "../../store/cartSlice";
+import { ExclamationCircleFilled } from '@ant-design/icons'
 import { LoadingOutlined } from "@ant-design/icons";
 import { Spin } from "antd";
+import { Modal } from 'antd'
+import toast, { Toaster } from 'react-hot-toast'
+import { changeInformationUser } from "../../store/userSlice";
+import { useNavigate } from "react-router-dom";
 
+const { confirm } = Modal
 const Orders = () => {
   const host = "https://provinces.open-api.vn/api/";
   const user = getUser();
@@ -23,6 +29,8 @@ const Orders = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [diaChiList, setDiaChiList] = useState([]);
   const [value1, setValue1] = useState("Nam");
+  const [addressSelected, setAddressSelected] = useState();
+  const navigate = useNavigate()
   // redux
   const [isLoadingRequest, setIsLoadingRequest] = useState(true);
 
@@ -33,6 +41,7 @@ const Orders = () => {
     let sum = 0;
     request("GET", `/client/bill/get-list-bills?id_customer=${user.id}`)
       .then((res) => {
+        console.log(res.data);
         res.data.forEach((item) => {
           sum += item.tongTienSauKhiGiam;
         });
@@ -49,19 +58,30 @@ const Orders = () => {
     dispatch(SetSelectedCart(1));
     getBillsByIdCustomer();
     getAllAddress();
-    changeGender(user.gioiTinh === true ? "Nam" : "Nữ");
+    changeGender(user.gioiTinh);
+    console.log(user)
     setAccount(user);
   }, []);
 
+  useEffect(() => {
+    // update address selected 
+  }, [addressSelected])
+
   const getAllAddress = async () => {
-    setIsLoadingRequest(false);
     request("GET", `/client/address/get-all-address?id_account=${user.id}`)
       .then((res) => {
-        console.log(res.data[0].diaChi);
+        console.log(res.data)
+        if(  res.data.find(item => item.trangThai === 1) === undefined){
+          setAddressSelected(res.data[0])
+        }else{
+          setAddressSelected(res.data.find(item =>  item.trangThai === 1))
+        }
+
         setDiaChiList(res.data);
-        setTimeout(() => {
-          setIsLoadingRequest(true);
-        }, 200);
+        // setTimeout(() => {
+        //   setIsLoadingRequest(true);
+        //   console.log(addressSelected)
+        // }, 200);
       })
       .catch((error) => {
         console.log(error);
@@ -138,16 +158,69 @@ const Orders = () => {
     }).format(number);
   };
 
-  const changeGender = (value) => {
-    setValue1(value);
+  const changeGender = (e) => {
+    setValue1(e)
   };
 
-  const changeInformationUser = (e) => {
+  const changePositionUser = (e) => {
     setAccount({ ...account, [e.target.name]: e.target.value });
   };
 
+  
+  const changeInforUser = async() => {
+
+    confirm({
+      title: 'Xác nhận thay đổi thông tin tài khoản',
+      icon: <ExclamationCircleFilled />,
+      content: 'Bạn đồng ý với thông tin và xác nhận thay đổi thông tin tài khoản.',
+      onOk () {
+        request("PUT", "/client/account/change-infor", {
+          id:account.id,
+          name:account.hoVaTen,
+          gender: value1,
+          email: account.email,
+          phoneNumber: account.soDienThoai
+        }).then(
+          (res) => {
+            dispatch(changeInformationUser(res.data))
+          }
+        ).catch(error => console.log(error))
+
+        setTimeout(()=>{
+          toast.success("Bạn đã thay đổi thông tin tài khoản thành công!!!")
+          setIsLoadingRequest(false)
+        }, 300)
+        
+        setTimeout(()=>{
+          setIsLoadingRequest(true)
+          navigate("/")
+        }, 500)
+
+      },
+      onCancel () {
+        console.log("Bạn đã không thay đổi thông tin ... Bạn đúng là thiên tài cmnr")
+      }
+    })
+  
+  }
+
   return (
     <>
+      {isLoadingRequest === true ? (
+        <> </>
+      ) : (
+        <div className="custom-spin" style={{ width: `66%`}}>
+          <Spin
+            indicator={
+              <LoadingOutlined
+                style={{ fontSize: 40, color: "#126de4", marginLeft: 5 }}
+                spin
+              />
+            }
+          />
+        </div>
+      )}
+
       {account === null || account === undefined || account === "" ? (
         <div className="custom-spin">
           <Spin
@@ -184,7 +257,7 @@ const Orders = () => {
                         id="standard-basic"
                         variant="standard"
                         name="hoVaTen"
-                        onChange={(e) => changeInformationUser(e)}
+                        onChange={(e) => changePositionUser(e)}
                         value={account.hoVaTen}
                       />
                     </span>
@@ -194,16 +267,25 @@ const Orders = () => {
                 <div style={{ marginTop: "35px" }}>
                   <div className="title">
                     <span>Giới tính:</span>
-                    <Radio.Group
-                      style={{
-                        marginRight: `77%`,
-                        marginTop: `3px`,
-                      }}
-                      options={plainOptions}
-                      name="gioiTinh"
-                      onChange={changeGender}
-                      value={value1}
-                    />
+                    <div
+                     style={{
+                        width: `104px`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginRight: '76%',
+                        lineHeight: '28px',
+                     }}
+                    >
+                      <span>
+                        <input type='radio' value = "true" name="gender" onChange={(e) => changeGender(true)} checked={value1 === true? true: false} /> Nam
+                      </span>
+
+                      <span>
+                        <input type='radio' value = "true" name="gender" onChange={(e) => changeGender(false)} checked={value1 === false? true: false} /> Nữ
+                      </span>
+                     
+                    </div>
                     <br />
                   </div>
                   <Divider style={{ margin: "5px auto" }}></Divider>
@@ -220,7 +302,7 @@ const Orders = () => {
                         variant="standard"
                         value={account.soDienThoai}
                         name="soDienThoai"
-                        onChange={(e) => changeInformationUser(e)}
+                        onChange={(e) => changePositionUser(e)}
                       />
                     </span>
                   </div>
@@ -237,7 +319,7 @@ const Orders = () => {
                         variant="standard"
                         name="email"
                         value={account.email}
-                        onChange={(e) => changeInformationUser(e)}
+                        onChange={(e) => changePositionUser(e)}
                       />
                     </span>
                   </div>
@@ -246,19 +328,18 @@ const Orders = () => {
                 <div style={{ marginTop: "35px" }}>
                   <div className="title">
                     <span>
-                      {/* {
+                      {
                     
-                    diaChiList.find(item => item.trangThai === 1) === undefined  ? 
+                    addressSelected === undefined  ? 
                     <>
-                      Địa chỉ: {diaChiList[0].diaChi}, {diaChiList[0].xaPhuong}, {diaChiList[0].quanHuyen},{' '}
-                      {diaChiList[0].tinhThanhPho}{' '}
+                     
                     </>
                     :
                     <>
-                      Địa chỉ: {diaChiList.find(item => item.trangThai === 1).diaChi}, {diaChiList.find(item => item.trangThai === 1).xaPhuong}, {diaChiList.find(item => item.trangThai === 1).quanHuyen},{' '}
-                      {diaChiList.find(item => item.trangThai === 1).tinhThanhPho}{' '}
+                       Địa chỉ: {addressSelected.diaChi}, {addressSelected.xaPhuong}, {addressSelected.quanHuyen},{' '}
+                      {addressSelected.tinhThanhPho}{' '} 
                     </>
-                   } */}
+                   }
                     </span>
 
                     <button
@@ -294,12 +375,11 @@ const Orders = () => {
                     marginTop: "5px",
                     width: `380px`,
                     fontSize: "15px",
-                    marginLeft: "200px",
+                    marginLeft: "31%",
+                    height: "45px",
                   }}
                   variant="outlined"
-                  onclick={() => {
-                    setChangeAddress(2);
-                  }}
+                  onClick={() => changeInforUser()}
                   startIcon={<i class="fa-regular fa-pen-to-square"></i>}
                 >
                   Cập nhật thông tin
@@ -311,6 +391,57 @@ const Orders = () => {
           )}
         </>
       )}
+
+       {/* toaster */}
+       <Toaster
+        position='top-center'
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=''
+        containerStyle={{}}
+        toastOptions={{
+          // Define default options
+          // className: '',
+          // duration: 5000,
+          // style: {
+          //   background: '#4caf50',
+          //   color: 'white'
+          // },
+
+          // Default options for specific types
+          success: {
+            duration: 3000,
+            theme: {
+              primary: 'green',
+              secondary: 'white'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#4caf50'
+            },
+            style: {
+              background: '#4caf50',
+              color: 'white'
+            }
+          },
+
+          error: {
+            duration: 3000,
+            theme: {
+              primary: '#f44336',
+              secondary: 'white'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#f44336'
+            },
+            style: {
+              background: '#f44336',
+              color: 'white'
+            }
+          }
+        }}
+      />
     </>
   );
 };

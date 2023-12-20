@@ -160,7 +160,7 @@ const OrderDetail = props => {
         </div>
         <Divider />
 
-        <div style={{ marginLeft: '4%', width: '100%', marginBottom: '107px' }}>
+        <div style={{ marginLeft: '6%', width: '100%', marginBottom: '107px' }}>
           <ul class='steps'>
             <li className={state1 ? 'active' : 'no_active'}>
               <div
@@ -333,7 +333,7 @@ const OrderDetail = props => {
               </span>
             </div>
 
-            {
+            {/* {
               bill.ngayNhanHang === null?(
                 <div>
                 <span
@@ -369,7 +369,7 @@ const OrderDetail = props => {
                 </span>
               </div>
               )
-            }
+            } */}
          
           </div>
 

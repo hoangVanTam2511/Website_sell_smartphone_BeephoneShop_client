@@ -76,3 +76,14 @@
     font-size: 16px!important;
     color: rgb(18, 141, 226)!important;
   }
+
+  .custom-spin{
+    position: fixed;
+    display: flex;
+    background: #e5e5ec6b;
+    width: 100%;
+    height: 100%;
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+  }

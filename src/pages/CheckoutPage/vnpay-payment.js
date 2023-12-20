@@ -614,7 +614,7 @@ const CartPage = (props) => {
                     </div>
                   </div>
 
-                  <div
+                  {/* <div
                     style={{
                       display: "flex",
                       justifyContent: "space-between",
@@ -633,7 +633,7 @@ const CartPage = (props) => {
                     <div style={{ style: "#707070" }}>
                       {dayjs(bill.deliveryDate).format("DD/MM/YYYY")}
                     </div>
-                  </div>
+                  </div> */}
 
                   <div
                     style={{
@@ -810,7 +810,7 @@ const CartPage = (props) => {
                       var data = [
                         {
                           path: `/look-up-order-page/${bill.codeOrder}`,
-                          name: `Đơn hàng ${bill.ma}`,
+                          name: `Đơn hàng ${bill.codeOrder}`,
                         },
                       ];
                       dispatch(AddItemNavbar(data));
