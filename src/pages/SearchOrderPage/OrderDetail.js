@@ -201,7 +201,7 @@ const OrderDetail = (props) => {
               >
                 <i
                   class="fa fa-money-check"
-                  style={{ transform: `translateY(0px)` }}
+                  style={{ transform: `translateY(4px)` }}
                 ></i>
               </div>
               <div class="caption">
