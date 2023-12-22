@@ -130,14 +130,14 @@ const Product = ({ product }) => {
             )}
           </div>
 
-          {/* <div style={{ color: 'yellow' }}>
+          <div style={{ color: 'yellow' }}>
             <i className='fa-solid fa-star'></i>
             <i className='fa-solid fa-star'></i>
             <i className='fa-solid fa-star'></i>
             <i className='fa-solid fa-star'></i>
             <i className='fa-solid fa-star'></i>
             <span style={{ color: 'gray' }}>(5000)</span>
-          </div> */}
+          </div>
         </div>
       </div>
     </Link>
