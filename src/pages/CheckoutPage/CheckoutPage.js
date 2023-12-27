@@ -1259,7 +1259,7 @@ const CartPage = () => {
             <br />
             <div
               className="countProductTemp"
-              style={{ left: 400, width: "719px", display: "block" }}
+              style={{ left: 391, width: "710px", display: "block" }}
             >
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ fontWeight: "bold" }}>Tổng tiền</span>

@@ -765,8 +765,8 @@ const CartPage = (props) => {
                 <div
                   className="countProductTemp"
                   style={{
-                    left: 400,
-                    width: "720px",
+                    left: 391,
+                    width: "710px",
                     display: "flex",
                     justifyContent: "space-between",
                   }}

@@ -1302,7 +1302,7 @@ const CartPage = (props) => {
       <br />
       <div
         className="countProductTemp"
-        style={{ left: 400, width: 719, display: "block" }}
+        style={{ left: 391, width: 710, display: "block" }}
       >
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <span style={{ fontWeight: "bold" }}>Tổng tiền tạm tính</span>
